@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "358048944657",
+    "firebase_url": "https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "codev-cs",
+    "storage_bucket": "codev-cs.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:358048944657:android:229fc466bedfb1ce8c17b0",
+        "android_client_info": {
+          "package_name": "com.example.codev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "358048944657-tp56k5bdh5gh5717qclo6bpr4infirbs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8LIjb-vxYyM1nHU4WMwjDyOOGiFlTqWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "358048944657-tp56k5bdh5gh5717qclo6bpr4infirbs.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "358048944657-j7g76jq2b9hkf1j51nodjbmou4hgj39k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.shopApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:358048944657:android:0014afe17f8deac58c17b0",
+        "android_client_info": {
+          "package_name": "com.example.shop_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "358048944657-tp56k5bdh5gh5717qclo6bpr4infirbs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8LIjb-vxYyM1nHU4WMwjDyOOGiFlTqWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "358048944657-tp56k5bdh5gh5717qclo6bpr4infirbs.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "358048944657-j7g76jq2b9hkf1j51nodjbmou4hgj39k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.shopApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
