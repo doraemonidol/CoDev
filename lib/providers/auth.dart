@@ -8,8 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'cart.dart';
-
 class Auth with ChangeNotifier {
   String _token = '';
   DateTime? _expiryDate = null;
@@ -80,7 +78,7 @@ class Auth with ChangeNotifier {
           'expiryDate': _expiryDate!.toIso8601String(),
         },
       );
-      prefs.setString('1989data', userData);
+      prefs.setString('codev_auth', userData);
     } catch (error) {
       throw error;
     }
@@ -115,10 +113,10 @@ class Auth with ChangeNotifier {
 
   Future<bool> tryAutoLogin(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('1989data')) {
+    if (!prefs.containsKey('codev_auth')) {
       return false;
     }
-    final extractedUserData = json.decode(prefs.getString('1989data')!);
+    final extractedUserData = json.decode(prefs.getString('codev_auth')!);
     final expiryDate =
         DateTime.parse(extractedUserData['expiryDate'] as String);
 

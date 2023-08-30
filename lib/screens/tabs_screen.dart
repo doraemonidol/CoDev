@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user.dart';
-import './feature_screen.dart';
-import 'redeem_screen.dart';
-import './orders_screen.dart';
-import './products_home_screen.dart';
-import 'profile_screen.dart';
 
 enum pages {
   feature,
