@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import '../helpers/style.dart';
 import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
@@ -212,7 +213,7 @@ class _TabsScreenState extends State<TabsScreen> {
                         filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
                         child: Container(
                           decoration: new BoxDecoration(
-                              color: Colors.white.withOpacity(0.5)),
+                              color: Colors.white.withOpacity(0.7)),
                         ),
                       ),
                       Container(
@@ -223,10 +224,107 @@ class _TabsScreenState extends State<TabsScreen> {
                           bottom: displayWidth * 0.22,
                         ),
                         child: Container(
-                          width: 100,
-                          height: 100,
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                        ),
+                            width: displayWidth * 0.7,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              color: FigmaColors.sUNRISESunray,
+                              border: Border.all(
+                                width: 1,
+                                color: FigmaColors.lightblue,
+                              ),
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            padding: EdgeInsets.all(15),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    width: double.infinity,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {},
+                                      icon: Icon(
+                                        Icons.play_circle_outlined,
+                                      ),
+                                      label: Text('Start current task'),
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                          FigmaColors.sUNRISEWhite,
+                                        ),
+                                        textStyle: MaterialStateProperty.all<
+                                            TextStyle>(
+                                          FigmaTextStyles.mP,
+                                        ),
+                                        iconColor:
+                                            MaterialStateProperty.all<Color>(
+                                          // FigmaColors.sUNRISEWaves,
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                        ),
+                                        foregroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                          // FigmaColors.sUNRISEWaves,
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                        ),
+                                        shape: MaterialStateProperty.all<
+                                                RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12.0),
+                                                side: BorderSide(
+                                                    color: FigmaColors
+                                                        .lightblue))),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    width: double.infinity,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {},
+                                      icon: Icon(
+                                          Icons.add_circle_outline_rounded),
+                                      label: Text('Learn something new'),
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                          FigmaColors.sUNRISEWhite,
+                                        ),
+                                        textStyle: MaterialStateProperty.all<
+                                            TextStyle>(
+                                          FigmaTextStyles.mP,
+                                        ),
+                                        iconColor:
+                                            MaterialStateProperty.all<Color>(
+                                          // FigmaColors.sUNRISEWaves,
+                                          Theme.of(context).colorScheme.primary,
+                                        ),
+                                        foregroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                          // FigmaColors.sUNRISEWaves,
+                                          Theme.of(context).colorScheme.primary,
+                                        ),
+                                        shape: MaterialStateProperty.all<
+                                                RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12.0),
+                                                side: BorderSide(
+                                                    color: FigmaColors
+                                                        .lightblue))),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )),
                       ),
                     ],
                   );
