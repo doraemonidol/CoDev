@@ -23,7 +23,7 @@ class FigmaColors {
 class FigmaTextStyles {
   const FigmaTextStyles();
 
-  TextStyle get h1 => const TextStyle(
+  static TextStyle get h1 => const TextStyle(
         fontSize: 55,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-ExtraBold',
@@ -33,7 +33,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get h2 => const TextStyle(
+  static TextStyle get h2 => const TextStyle(
         fontSize: 40,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Bold',
@@ -43,7 +43,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get h3 => const TextStyle(
+  static TextStyle get h3 => const TextStyle(
         fontSize: 30,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Bold',
@@ -53,7 +53,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get h4 => const TextStyle(
+  static TextStyle get h4 => const TextStyle(
         fontSize: 21,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Bold',
@@ -63,7 +63,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get b => const TextStyle(
+  static TextStyle get b => const TextStyle(
         fontSize: 18,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Regular',
@@ -73,7 +73,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get p => const TextStyle(
+  static TextStyle get p => const TextStyle(
         fontSize: 16,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Regular',
@@ -83,7 +83,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get t => const TextStyle(
+  static TextStyle get t => const TextStyle(
         fontSize: 12,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Regular',
@@ -93,7 +93,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get mH1 => const TextStyle(
+  static TextStyle get mH1 => const TextStyle(
         fontSize: 36,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-ExtraBold',
@@ -103,7 +103,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get mH2 => const TextStyle(
+  static TextStyle get mH2 => const TextStyle(
         fontSize: 26,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Bold',
@@ -113,7 +113,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get mH3 => const TextStyle(
+  static TextStyle get mH3 => const TextStyle(
         fontSize: 20,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-SemiBold',
@@ -123,7 +123,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get mH4 => const TextStyle(
+  static TextStyle get mH4 => const TextStyle(
         fontSize: 18,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Regular',
@@ -133,7 +133,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get mB => const TextStyle(
+  static TextStyle get mB => const TextStyle(
         fontSize: 16,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Regular',
@@ -143,7 +143,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get mP => const TextStyle(
+  static TextStyle get mP => const TextStyle(
         fontSize: 14,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Regular',
@@ -153,7 +153,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get mT => const TextStyle(
+  static TextStyle get mT => const TextStyle(
         fontSize: 12,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Regular',
@@ -163,7 +163,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get buttons => const TextStyle(
+  static TextStyle get buttons => const TextStyle(
         fontSize: 21,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Bold',
@@ -173,7 +173,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get mButton => const TextStyle(
+  static TextStyle get mButton => const TextStyle(
         fontSize: 18,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-SemiBold',
@@ -183,7 +183,7 @@ class FigmaTextStyles {
         letterSpacing: 0,
       );
 
-  TextStyle get sButton => const TextStyle(
+  static TextStyle get sButton => const TextStyle(
         fontSize: 16,
         decoration: TextDecoration.none,
         fontFamily: 'Poppins-Bold',
