@@ -151,7 +151,7 @@ class _TabsScreenState extends State<TabsScreen> {
                     width: index == _selectedPageIndex
                         ? displayWidth * .1816 //268 16
                         : displayWidth * .1816,
-                    height: index == _selectedPageIndex ? 60 : 48,
+                    height: index == _selectedPageIndex ? 60 : 60,
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
