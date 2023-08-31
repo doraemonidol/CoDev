@@ -11,6 +11,7 @@ import 'profile_screen.dart';
 import 'agenda_screen.dart';
 import 'notification_screen.dart';
 import 'tasks_screen.dart';
+import '../helpers/structure.dart' as st;
 
 enum pages {
   agenda,
@@ -27,6 +28,13 @@ class TabsScreen extends StatefulWidget {
 class _TabsScreenState extends State<TabsScreen> {
   int _selectedPageIndex = 0;
   int _prevSelectedPageIndex = 0;
+  final pageStack = st.Stack<int>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    pageStack.push(0);
+  }
 
   void _selectPage(int index) async {
     setState(() {
@@ -35,6 +43,8 @@ class _TabsScreenState extends State<TabsScreen> {
           _selectedPageIndex = _prevSelectedPageIndex;
         }
       } else {
+        pageStack.push(index);
+        print(pageStack);
         _prevSelectedPageIndex = _selectedPageIndex;
         _selectedPageIndex = index;
       }
@@ -67,6 +77,30 @@ class _TabsScreenState extends State<TabsScreen> {
     'Notification',
     'Personal',
   ];
+
+  AppBar customizedAppBar(String title) {
+    return AppBar(
+      title: Text(
+        title,
+        style: FigmaTextStyles.mButton,
+      ),
+      centerTitle: true,
+      backgroundColor: Colors.transparent,
+      leading: pageStack.length > 1
+          ? IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                pageStack.pop();
+                _selectPage(pageStack.peek);
+                pageStack.pop();
+                //Navigator.of(context).pushReplacementNamed('/');
+              },
+              color: Theme.of(context).colorScheme.primary,
+            )
+          : null,
+    );
+  }
+
   Stack get bottomNavigationBar {
     double displayWidth = MediaQuery.of(context).size.width;
     return Stack(
@@ -187,11 +221,13 @@ class _TabsScreenState extends State<TabsScreen> {
       length: 5,
       child: switch (pages.values[_selectedPageIndex]) {
         pages.agenda => Scaffold(
+            appBar: customizedAppBar('Agenda'),
             body: AgendaScreen(),
             extendBody: true,
             bottomNavigationBar: bottomNavigationBar,
           ),
         pages.tasks => Scaffold(
+            appBar: customizedAppBar('Tasks'),
             body: TasksScreen(),
             extendBody: true,
             bottomNavigationBar: bottomNavigationBar,
@@ -202,13 +238,19 @@ class _TabsScreenState extends State<TabsScreen> {
                 PageView.builder(itemBuilder: (context, pos) {
                   return Stack(
                     children: <Widget>[
-                      _prevSelectedPageIndex == 0
-                          ? AgendaScreen()
-                          : _prevSelectedPageIndex == 1
-                              ? TasksScreen()
-                              : _prevSelectedPageIndex == 3
-                                  ? NotificationScreen()
-                                  : ProfileScreen(),
+                      Scaffold(
+                        appBar: customizedAppBar(
+                            listOfStrings[_prevSelectedPageIndex]),
+                        body: _prevSelectedPageIndex == 0
+                            ? AgendaScreen()
+                            : _prevSelectedPageIndex == 1
+                                ? TasksScreen()
+                                : _prevSelectedPageIndex == 3
+                                    ? NotificationScreen()
+                                    : ProfileScreen(),
+                        extendBody: true,
+                        bottomNavigationBar: bottomNavigationBar,
+                      ),
                       BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
                         child: Container(
@@ -335,11 +377,13 @@ class _TabsScreenState extends State<TabsScreen> {
             bottomNavigationBar: bottomNavigationBar,
           ),
         pages.notification => Scaffold(
+            appBar: customizedAppBar('Notification'),
             body: NotificationScreen(),
             extendBody: true,
             bottomNavigationBar: bottomNavigationBar,
           ),
         pages.personal => Scaffold(
+            appBar: customizedAppBar('Profile'),
             body: ProfileScreen(),
             extendBody: true,
             bottomNavigationBar: bottomNavigationBar,
