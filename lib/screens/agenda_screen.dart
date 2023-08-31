@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AgendaScreen extends StatelessWidget {
+  static const routeName = '/agenda-screen';
   const AgendaScreen({super.key});
 
   @override

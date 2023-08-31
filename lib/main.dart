@@ -1,5 +1,9 @@
 import 'package:codev/firebase_options.dart';
+import 'package:codev/screens/agenda_screen.dart';
+import 'package:codev/screens/notification_screen.dart';
+import 'package:codev/screens/profile_screen.dart';
 import 'package:codev/screens/tabs_screen.dart';
+import 'package:codev/screens/tasks_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -142,6 +146,12 @@ class MyApp extends StatelessWidget {
 // to let the device system mode control the theme mode:
       themeMode: ThemeMode.system,
       home: TabsScreen(),
+      routes: {
+        AgendaScreen.routeName: (ctx) => AgendaScreen(),
+        NotificationScreen.routeName: (ctx) => NotificationScreen(),
+        ProfileScreen.routeName: (ctx) => ProfileScreen(),
+        TasksScreen.routeName: (ctx) => TasksScreen(),
+      },
     );
   }
 }

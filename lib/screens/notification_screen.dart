@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NotificationScreen extends StatelessWidget {
+  static const routeName = '/notification-screen';
   const NotificationScreen({super.key});
 
   @override
