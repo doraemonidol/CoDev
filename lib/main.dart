@@ -1,14 +1,15 @@
-import 'package:codev/firebase_options.dart';
-import 'package:codev/screens/agenda_screen.dart';
-import 'package:codev/screens/notification_screen.dart';
-import 'package:codev/screens/profile_screen.dart';
-import 'package:codev/screens/tabs_screen.dart';
-import 'package:codev/screens/tasks_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:provider/provider.dart';
+
+import './firebase_options.dart';
+import './screens/agenda_screen.dart';
+import './screens/notification_screen.dart';
+import './screens/profile_screen.dart';
+import './screens/tabs_screen.dart';
+import './screens/tasks_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

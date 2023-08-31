@@ -1,17 +1,18 @@
 import 'dart:ui';
-
-import '../helpers/style.dart';
 import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:provider/provider.dart';
 
+import '../helpers/structure.dart' as st;
+import '../helpers/style.dart';
+
 import '../providers/user.dart';
+
 import 'profile_screen.dart';
 import 'agenda_screen.dart';
 import 'notification_screen.dart';
 import 'tasks_screen.dart';
-import '../helpers/structure.dart' as st;
 
 enum pages {
   agenda,
