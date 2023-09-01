@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../providers/auth.dart';
 
 enum AuthMode { Signup, Login }
@@ -14,16 +16,148 @@ class AuthScreen extends StatelessWidget {
     final deviceSize = MediaQuery.of(context).size;
     // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
     // transformConfig.translate(-10.0);
+
+    BorderRadiusGeometry radius = const BorderRadius.only(
+      topLeft: Radius.circular(24.0),
+      topRight: Radius.circular(24.0),
+    );
+
     return Scaffold(
-      body: Center(
-        child: Text(
-          'Log in Screen',
-        ),
+      body: SingleChildScrollView (
+        child: Column (
+          children: <Widget>[
+          /* Upper half*/
+          
+              Container(
+                height: deviceSize.height * 0.45,
+                color: const Color.fromRGBO(243, 250, 255, 1),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      
+                      const SizedBox(
+                        width: 113,
+                        height: 113,
+                        child : Image(
+                          image: AssetImage('assets/img/logo.png')
+                        ),
+                      ),
+
+                      const Text(
+                        "CoDev", 
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 30,),
+                      ),
+
+                      const Padding(padding: EdgeInsets.all(5)),
+
+                      SizedBox(
+                        width: deviceSize.width * 0.7,
+                        child: const Text(
+                          "AI pair learner that navigate the path to  developer mastery. Track progress and tailor your learning adventure.",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400, 
+                            fontSize: 16,
+                            fontFamily: String.fromEnvironment('Lato'),
+                          ),
+                          textAlign: TextAlign.center,
+                        )
+                      )
+                    ],
+                  ),
+                )
+              ),
+
+            /* Lower half */
+              Container(
+                height: deviceSize.height * 0.55,
+                width: deviceSize.width,
+                decoration : BoxDecoration(
+                  borderRadius: radius,
+                  color : Colors.white,
+                ),
+
+                padding : const EdgeInsets.all(20),
+
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    const Row(children: [
+                      Text(
+                        "Signin with",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 21,
+                        ),
+                      )
+                    ],),
+
+                    Row (
+                      children: <Widget>[
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: (){}, 
+                            icon: const SizedBox(width: 24, height:24, child : Image(image: AssetImage('assets/img/Google-logo.png'))), 
+                            label:const Text("Google"),
+                            style: ButtonStyle(
+                              minimumSize: MaterialStateProperty.all<Size>(Size(deviceSize.width*0.4, 64)),
+                            )
+                          ),
+                        ),
+                        Padding(padding: EdgeInsets.all(deviceSize.width * 0.01)),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: (){}, 
+                            icon: const SizedBox(width: 24, height:24, child : Image(image: AssetImage('assets/img/Apple-logo.png'))), 
+                            label:const Text("Apple"),
+                            style: ButtonStyle(
+                              minimumSize: MaterialStateProperty.all<Size>(Size(deviceSize.width*0.4, 64)),
+                            )
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const Row (
+                      children: <Widget>[
+                        Expanded(child: Divider()),
+                        Text("OR"),
+                        Expanded(child: Divider()),
+                      ],
+                    ),
+
+                    const TextField(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'Email',
+                        ),
+                      ),
+
+                    ElevatedButton(
+                      onPressed: () {}, 
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xff2fd1c5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)
+                        ),
+                        minimumSize: const Size(327, 50), //////// HERE
+                      ),
+                      child: const Text("Continue", style: TextStyle(color: Colors.white)),
+                    ),
+                  ]
+                ),
+              )
+          ]
+        )
       ),
     );
   }
 }
 
+
+
+
+/*
 class AuthCard extends StatefulWidget {
   @override
   _AuthCardState createState() => _AuthCardState();
@@ -312,3 +446,4 @@ class _AuthCardState extends State<AuthCard>
     );
   }
 }
+*/
