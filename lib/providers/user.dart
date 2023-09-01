@@ -4,23 +4,27 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 
 class User with ChangeNotifier {
-  String email;
-  String phoneNumber;
-  String name;
-  String address;
-  String imageUrl;
   String authToken;
   String userId;
+  String phone;
+  String email;
+  String name;
+  String location;
+  String imageUrl;
+  int timeZone;
+  int point;
 
   User({
     this.authToken = '',
     this.userId = '',
+    this.phone = 'Unknown',
     this.email = 'Unknown',
-    this.phoneNumber = 'Unknown',
-    this.name = 'You Guys',
-    this.address = 'Unknown',
+    this.name = 'Unknown',
+    this.location = 'Unknown',
     this.imageUrl =
         'https://upload.wikimedia.org/wikipedia/vi/b/b1/1989Deluxe.jpeg',
+    this.timeZone = 0,
+    this.point = 0,
   }) {
     if (authToken == '') return;
     fetchAndSetUser();
@@ -34,7 +38,7 @@ class User with ChangeNotifier {
   Future<void> fetchAndSetUser([context]) async {
     print('fetching user');
     final url =
-        'https://coffee-shop-1989-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId.json?auth=$authToken';
+        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId.json?auth=$authToken';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -53,7 +57,7 @@ class User with ChangeNotifier {
   Future<void> addUser(String email) async {
     print('adding user');
     final url =
-        'https://coffee-shop-1989-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId.json?auth=$authToken';
+        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId.json?auth=$authToken';
     try {
       final response = await http.patch(
         Uri.parse(url),
@@ -77,12 +81,12 @@ class User with ChangeNotifier {
     String? newImageUrl,
   }) async {
     final url =
-        'https://coffee-shop-1989-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId.json?auth=$authToken';
+        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId.json?auth=$authToken';
 
     newEmail = newEmail == null ? email : newEmail;
-    newPhoneNumber = newPhoneNumber == null ? phoneNumber : newPhoneNumber;
+    newPhoneNumber = newPhoneNumber == null ? phone : newPhoneNumber;
     newName = newName == null ? name : newName;
-    newAddress = newAddress == null ? address : newAddress;
+    newAddress = newAddress == null ? location : newAddress;
     newImageUrl = newImageUrl == null ? imageUrl : newImageUrl;
 
     await http.patch(
@@ -96,9 +100,9 @@ class User with ChangeNotifier {
       }),
     );
     email = newEmail;
-    phoneNumber = newPhoneNumber;
+    phone = newPhoneNumber;
     name = newName;
-    address = newAddress;
+    location = newAddress;
     imageUrl = newImageUrl;
     notifyListeners();
   }

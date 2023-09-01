@@ -1,10 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:focused_menu/focused_menu.dart';
-import 'package:focused_menu/modals.dart';
 import 'package:provider/provider.dart';
 
-import '../helpers/structure.dart' as st;
+import '../models/structure.dart' as st;
 import '../helpers/style.dart';
 
 import '../providers/user.dart';
