@@ -26,7 +26,7 @@ class FigmaTextStyles {
   static TextStyle get h1 => const TextStyle(
         fontSize: 55,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-ExtraBold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w700,
         height: 66 / 55,
@@ -36,7 +36,7 @@ class FigmaTextStyles {
   static TextStyle get h2 => const TextStyle(
         fontSize: 40,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Bold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w700,
         height: 48 / 40,
@@ -46,7 +46,7 @@ class FigmaTextStyles {
   static TextStyle get h3 => const TextStyle(
         fontSize: 30,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Bold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w700,
         height: 36 / 30,
@@ -56,7 +56,7 @@ class FigmaTextStyles {
   static TextStyle get h4 => const TextStyle(
         fontSize: 21,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Bold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w700,
         height: 25.2 / 21,
@@ -66,7 +66,7 @@ class FigmaTextStyles {
   static TextStyle get b => const TextStyle(
         fontSize: 18,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Regular',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w400,
         height: 21.6 / 18,
@@ -76,7 +76,7 @@ class FigmaTextStyles {
   static TextStyle get p => const TextStyle(
         fontSize: 16,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Regular',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w400,
         height: 22.39 / 16,
@@ -86,7 +86,7 @@ class FigmaTextStyles {
   static TextStyle get t => const TextStyle(
         fontSize: 12,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Regular',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w400,
         height: 16.79 / 12,
@@ -96,7 +96,7 @@ class FigmaTextStyles {
   static TextStyle get mH1 => const TextStyle(
         fontSize: 36,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-ExtraBold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w700,
         height: 43.2 / 36,
@@ -106,7 +106,7 @@ class FigmaTextStyles {
   static TextStyle get mH2 => const TextStyle(
         fontSize: 26,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Bold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w700,
         height: 31.2 / 26,
@@ -116,7 +116,7 @@ class FigmaTextStyles {
   static TextStyle get mH3 => const TextStyle(
         fontSize: 20,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-SemiBold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w600,
         height: 24 / 20,
@@ -126,7 +126,7 @@ class FigmaTextStyles {
   static TextStyle get mH4 => const TextStyle(
         fontSize: 18,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Regular',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w400,
         height: 21.6 / 18,
@@ -136,7 +136,7 @@ class FigmaTextStyles {
   static TextStyle get mB => const TextStyle(
         fontSize: 16,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Regular',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w400,
         height: 19.2 / 16,
@@ -146,7 +146,7 @@ class FigmaTextStyles {
   static TextStyle get mP => const TextStyle(
         fontSize: 14,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Regular',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w400,
         height: 19.59 / 14,
@@ -156,7 +156,7 @@ class FigmaTextStyles {
   static TextStyle get mT => const TextStyle(
         fontSize: 12,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Regular',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w400,
         height: 16.79 / 12,
@@ -166,7 +166,7 @@ class FigmaTextStyles {
   static TextStyle get buttons => const TextStyle(
         fontSize: 21,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Bold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w700,
         height: 25.2 / 21,
@@ -176,7 +176,7 @@ class FigmaTextStyles {
   static TextStyle get mButton => const TextStyle(
         fontSize: 18,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-SemiBold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w600,
         height: 21.6 / 18,
@@ -186,7 +186,7 @@ class FigmaTextStyles {
   static TextStyle get sButton => const TextStyle(
         fontSize: 16,
         decoration: TextDecoration.none,
-        fontFamily: 'Poppins-Bold',
+        fontFamily: 'Poppins',
         fontStyle: FontStyle.normal,
         fontWeight: FontWeight.w700,
         height: 19.2 / 16,
