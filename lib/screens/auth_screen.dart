@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../providers/auth.dart';
+import '../screens/sign_up.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -14,6 +15,8 @@ class AuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
+
+    double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
     // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
     // transformConfig.translate(-10.0);
 
@@ -23,13 +26,13 @@ class AuthScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      body: SingleChildScrollView (
+      body: SafeArea(child: SingleChildScrollView (
         child: Column (
           children: <Widget>[
           /* Upper half*/
           
               Container(
-                height: deviceSize.height * 0.45,
+                height: safeHeight * 0.55,
                 color: const Color.fromRGBO(243, 250, 255, 1),
                 child: Center(
                   child: Column(
@@ -63,14 +66,11 @@ class AuthScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                         )
                       )
-                    ],
-                  ),
-                )
-              ),
+                    ],),)),
 
             /* Lower half */
               Container(
-                height: deviceSize.height * 0.55,
+                height: safeHeight * 0.45,
                 width: deviceSize.width,
                 decoration : BoxDecoration(
                   borderRadius: radius,
@@ -82,15 +82,13 @@ class AuthScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    const Row(children: [
-                      Text(
-                        "Signin with",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 21,
-                        ),
-                      )
-                    ],),
+                    const Text(
+                      "Sign in with",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 18,
+                      ),
+                    ),
 
                     Row (
                       children: <Widget>[
@@ -121,7 +119,9 @@ class AuthScreen extends StatelessWidget {
                     const Row (
                       children: <Widget>[
                         Expanded(child: Divider()),
-                        Text("OR"),
+                        Padding(padding: EdgeInsets.all(10)),
+                        Text("or"),
+                        Padding(padding: EdgeInsets.all(10)),
                         Expanded(child: Divider()),
                       ],
                     ),
@@ -130,11 +130,16 @@ class AuthScreen extends StatelessWidget {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             hintText: 'Email',
-                        ),
                       ),
+                    ),
 
                     ElevatedButton(
-                      onPressed: () {}, 
+                      onPressed: () {
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignUpScreen()),
+                      );
+                      }, 
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xff2fd1c5),
                         shape: RoundedRectangleBorder(
@@ -147,10 +152,7 @@ class AuthScreen extends StatelessWidget {
                   ]
                 ),
               )
-          ]
-        )
-      ),
-    );
+          ])),));
   }
 }
 
