@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import '../helpers/style.dart';
 import '../providers/auth.dart';
 import '../screens/sign_up.dart';
 
@@ -26,133 +27,173 @@ class AuthScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      body: SafeArea(child: SingleChildScrollView (
-        child: Column (
-          children: <Widget>[
-          /* Upper half*/
-          
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              /* Upper half*/
+
               Container(
-                height: safeHeight * 0.55,
-                color: const Color.fromRGBO(243, 250, 255, 1),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      
-                      const SizedBox(
-                        width: 113,
-                        height: 113,
-                        child : Image(
-                          image: AssetImage('assets/img/logo.png')
+                  height: safeHeight * 0.55,
+                  color: const Color.fromRGBO(243, 250, 255, 1),
+                  padding: const EdgeInsets.all(24),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: 113,
+                          height: 113,
+                          child:
+                              Image(image: AssetImage('assets/img/logo.png')),
                         ),
-                      ),
-
-                      const Text(
-                        "CoDev", 
-                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 30,),
-                      ),
-
-                      const Padding(padding: EdgeInsets.all(5)),
-
-                      SizedBox(
-                        width: deviceSize.width * 0.7,
-                        child: const Text(
+                        Text(
+                          "CoDev",
+                          style: FigmaTextStyles.h3,
+                        ),
+                        const Padding(padding: EdgeInsets.all(5)),
+                        Text(
                           "AI pair learner that navigate the path to  developer mastery. Track progress and tailor your learning adventure.",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400, 
-                            fontSize: 16,
-                            fontFamily: String.fromEnvironment('Lato'),
+                          style: FigmaTextStyles.p.copyWith(
+                            color: FigmaColors.sUNRISETextGrey,
                           ),
                           textAlign: TextAlign.center,
-                        )
-                      )
-                    ],),)),
+                        ),
+                      ],
+                    ),
+                  )),
 
-            /* Lower half */
+              /* Lower half */
               Container(
                 height: safeHeight * 0.45,
                 width: deviceSize.width,
-                decoration : BoxDecoration(
+                decoration: BoxDecoration(
                   borderRadius: radius,
-                  color : Colors.white,
+                  color: Colors.white,
                 ),
-
-                padding : const EdgeInsets.all(20),
-
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    const Text(
+                    Text(
                       "Sign in with",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 18,
-                      ),
+                      style: FigmaTextStyles.h4,
                     ),
-
-                    Row (
+                    Row(
                       children: <Widget>[
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: (){}, 
-                            icon: const SizedBox(width: 24, height:24, child : Image(image: AssetImage('assets/img/Google-logo.png'))), 
-                            label:const Text("Google"),
+                            onPressed: () {},
+                            icon: const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: Image(
+                                    image: AssetImage(
+                                        'assets/img/Google-logo.png'))),
+                            label: Text(
+                              "Google",
+                              style: FigmaTextStyles.mButton,
+                            ),
                             style: ButtonStyle(
-                              minimumSize: MaterialStateProperty.all<Size>(Size(deviceSize.width*0.4, 64)),
-                            )
+                              minimumSize: MaterialStateProperty.all<Size>(
+                                Size(deviceSize.width * 0.4, 64),
+                              ),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        Padding(padding: EdgeInsets.all(deviceSize.width * 0.01)),
+                        SizedBox(
+                          width: deviceSize.width * 0.05,
+                        ),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: (){}, 
-                            icon: const SizedBox(width: 24, height:24, child : Image(image: AssetImage('assets/img/Apple-logo.png'))), 
-                            label:const Text("Apple"),
+                            onPressed: () {},
+                            icon: const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: Image(
+                                    image: AssetImage(
+                                        'assets/img/Apple-logo.png'))),
+                            label: Text(
+                              "Apple",
+                              style: FigmaTextStyles.mButton,
+                            ),
                             style: ButtonStyle(
-                              minimumSize: MaterialStateProperty.all<Size>(Size(deviceSize.width*0.4, 64)),
-                            )
+                              minimumSize: MaterialStateProperty.all<Size>(
+                                Size(deviceSize.width * 0.4, 64),
+                              ),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    
-                    const Row (
+                    Row(
                       children: <Widget>[
                         Expanded(child: Divider()),
-                        Padding(padding: EdgeInsets.all(10)),
-                        Text("or"),
-                        Padding(padding: EdgeInsets.all(10)),
+                        SizedBox(
+                          width: deviceSize.width * 0.05,
+                        ),
+                        Text(
+                          "Or",
+                          style: FigmaTextStyles.b,
+                        ),
+                        SizedBox(
+                          width: deviceSize.width * 0.05,
+                        ),
                         Expanded(child: Divider()),
                       ],
                     ),
-
-                    const TextField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Email',
-                      ),
+                    TextField(
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Email',
+                          hintStyle: FigmaTextStyles.p.copyWith(
+                            color: FigmaColors.sUNRISETextGrey,
+                          ),
+                          labelStyle: FigmaTextStyles.p.copyWith(
+                            color: FigmaColors.sUNRISECharcoal,
+                          )),
                     ),
-
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignUpScreen()),
-                      );
-                      }, 
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SignUpScreen()),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xff2fd1c5),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)
-                        ),
+                            borderRadius: BorderRadius.circular(10.0)),
                         minimumSize: const Size(327, 50), //////// HERE
                       ),
-                      child: const Text("Continue", style: TextStyle(color: Colors.white)),
+                      child: Text(
+                        "Continue",
+                        style: FigmaTextStyles.mButton.copyWith(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      ),
                     ),
-                  ]
+                  ],
                 ),
               )
-          ])),));
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
