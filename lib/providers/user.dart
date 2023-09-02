@@ -1,3 +1,5 @@
+import 'progress.dart';
+import 'tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -13,6 +15,8 @@ class User with ChangeNotifier {
   String imageUrl;
   int timeZone;
   int point;
+  TaskList? taskList;
+  LearningProgress? learningProgress;
 
   User({
     this.authToken = '',
@@ -43,9 +47,24 @@ class User with ChangeNotifier {
     try {
       final response = await http.get(Uri.parse(url));
       final extractedData = json.decode(response.body);
-      print(response.body);
+      // print(response.body);
       if (extractedData == null) {
         return;
+      }
+
+      email = extractedData['email'];
+      phone = extractedData['phoneNumber'];
+      name = extractedData['name'];
+      location = extractedData['location'];
+      imageUrl = extractedData['imageUrl'];
+      timeZone = extractedData['timeZone'];
+      point = extractedData['point'];
+
+      learningProgress = LearningProgress.fromJson(extractedData['progress']);
+
+      if (context != null) {
+        taskList = Provider.of<TaskList>(context, listen: false);
+        await taskList!.fetchAndSetTaskList();
       }
 
       notifyListeners();
@@ -73,7 +92,7 @@ class User with ChangeNotifier {
     }
   }
 
-  Future<void> updateUser({
+  Future<void> updateUserInfo({
     String? newEmail,
     String? newPhoneNumber,
     String? newName,
@@ -105,5 +124,63 @@ class User with ChangeNotifier {
     location = newAddress;
     imageUrl = newImageUrl;
     notifyListeners();
+  }
+
+  // toggle chapter done
+  Future<void> updateProgress({
+    fieldName = '',
+    courseName = '',
+    chapterName = '',
+  }) async {
+    learningProgress?.toggleChapterDone(fieldName, courseName, chapterName);
+    final url =
+        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId/progress/$fieldName.json?auth=$authToken';
+    try {
+      final response = await http.patch(
+        Uri.parse(url),
+        body: json.encode(
+          {
+            'courses': {
+              '$courseName': {
+                'chapters': {
+                  '$chapterName': {
+                    'done': true,
+                  }
+                },
+                'done': learningProgress
+                    ?.findFieldByName(fieldName)
+                    .findCourseByName(courseName)
+                    .done,
+              }
+            },
+            'progress': learningProgress?.findFieldByName(fieldName).progress,
+          },
+        ),
+      );
+      print(response.body);
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  // add new field to learning progress
+  Future<void> addField(String fieldName) async {
+    learningProgress?.addField(fieldName);
+    final url =
+        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId/progress/$fieldName.json?auth=$authToken';
+    try {
+      final response = await http.patch(
+        Uri.parse(url),
+        body: learningProgress?.findFieldByName(fieldName).toJson(),
+      );
+
+      print(response.body);
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
   }
 }
