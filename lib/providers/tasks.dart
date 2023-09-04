@@ -10,8 +10,8 @@ class Task {
   final String stage;
   final String course;
   final String chapter;
-  final int startTime;
-  final int endTime;
+  final DateTime startTime;
+  final DateTime endTime;
   final int state;
 
   Task({
