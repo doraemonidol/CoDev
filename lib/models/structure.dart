@@ -1,4 +1,6 @@
-class Stack<E> {
+import 'package:flutter/material.dart';
+
+class MyStack<E> {
   final _list = <E>[];
 
   void push(E value) => _list.add(value);
