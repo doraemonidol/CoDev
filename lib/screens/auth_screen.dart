@@ -34,7 +34,7 @@ class AuthScreen extends StatelessWidget {
               /* Upper half*/
 
               Container(
-                  height: safeHeight * 0.45,
+                  height: safeHeight * 0.55,
                   color: const Color.fromRGBO(243, 250, 255, 1),
                   padding: const EdgeInsets.all(24),
                   child: Center(
@@ -65,7 +65,7 @@ class AuthScreen extends StatelessWidget {
 
               /* Lower half */
               Container(
-                height: safeHeight * 0.55,
+                height: safeHeight * 0.45,
                 width: deviceSize.width,
                 decoration: BoxDecoration(
                   borderRadius: radius,
@@ -155,17 +155,15 @@ class AuthScreen extends StatelessWidget {
                       ],
                     ),
                     TextField(
-                      style: FigmaTextStyles.b,
                       decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Email',
-                        hintStyle: FigmaTextStyles.b.copyWith(
-                          color: FigmaColors.sUNRISETextGrey,
-                        ),
-                        labelStyle: FigmaTextStyles.b.copyWith(
-                          color: FigmaColors.sUNRISECharcoal,
-                        ),
-                      ),
+                          border: OutlineInputBorder(),
+                          hintText: 'Email',
+                          hintStyle: FigmaTextStyles.p.copyWith(
+                            color: FigmaColors.sUNRISETextGrey,
+                          ),
+                          labelStyle: FigmaTextStyles.p.copyWith(
+                            color: FigmaColors.sUNRISECharcoal,
+                          )),
                     ),
                     ElevatedButton(
                       onPressed: () {
