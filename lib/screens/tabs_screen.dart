@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/structure.dart' as st;
+import '../models/structure.dart';
 import '../helpers/style.dart';
 
 import '../providers/user.dart';
@@ -21,13 +21,14 @@ enum pages {
 }
 
 class TabsScreen extends StatefulWidget {
+  static const routeName = '/tabs-screen';
   State<TabsScreen> createState() => _TabsScreenState();
 }
 
 class _TabsScreenState extends State<TabsScreen> {
   int _selectedPageIndex = 0;
   int _prevSelectedPageIndex = 0;
-  final pageStack = st.Stack<int>();
+  final pageStack = MyStack<int>();
 
   @override
   void initState() {

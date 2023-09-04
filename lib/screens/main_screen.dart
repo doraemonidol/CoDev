@@ -1,3 +1,4 @@
+import 'package:codev/screens/on_boarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -16,6 +17,7 @@ final subtitles = [
 ];
 
 class MainScreen extends StatefulWidget {
+  static const routeName = '/main-screen';
   const MainScreen({super.key});
 
   @override
@@ -99,7 +101,10 @@ class _MainScreenState extends State<MainScreen> {
                           borderRadius: BorderRadius.circular(24.0),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushNamed(OnBoardingScreen.routeName);
+                      },
                       child: Text(
                         'Get Started',
                         style: FigmaTextStyles.mButton

@@ -1,3 +1,5 @@
+import 'package:codev/screens/main_screen.dart';
+import 'package:codev/screens/on_boarding_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -152,8 +154,8 @@ class MyApp extends StatelessWidget {
 // If you do not have a themeMode switch, uncomment this line
 // to let the device system mode control the theme mode:
           themeMode: ThemeMode.system,
-          home: auth.isAuth
-              ? TabsScreen()
+          home: true // auth.isAuth
+              ? MainScreen() // TabsScreen()
               : FutureBuilder(
                   future: auth.tryAutoLogin(context),
                   builder: (cxt, authResultSnapshot) =>
@@ -167,6 +169,9 @@ class MyApp extends StatelessWidget {
             NotificationScreen.routeName: (ctx) => NotificationScreen(),
             ProfileScreen.routeName: (ctx) => ProfileScreen(),
             TasksScreen.routeName: (ctx) => TasksScreen(),
+            OnBoardingScreen.routeName: (ctx) => OnBoardingScreen(),
+            MainScreen.routeName: (ctx) => MainScreen(),
+            TabsScreen.routeName: (ctx) => TabsScreen(),
           },
         ),
       ),
