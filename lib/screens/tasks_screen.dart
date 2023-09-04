@@ -29,7 +29,7 @@ class _TasksScreenState extends State<TasksScreen> {
       "11:30 AM - 12:30 PM",
       "Math",
       "Create a unique emotional story that describes better than words and explore yourself to the finest degree",
-      MyIcons.cube_outline,
+      MyIcons.robot,
       Color(0xFFFF7A7B),
     )];
   final List<ToDoCard> list1 = [

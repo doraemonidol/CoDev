@@ -91,7 +91,6 @@ flutter:
     - family: MyIcons
       fonts:
         - asset: assets/icons/MyIcons.ttf
-        - asset: assets/icons/pencil.ttf
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-Black.ttf
