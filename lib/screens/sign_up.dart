@@ -15,82 +15,115 @@ class SignUpScreen extends StatelessWidget {
     final deviceSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: FigmaColors.sUNRISEBluePrimary,
-      ),
+      appBar: AppBar(),
       backgroundColor: Colors.white,
-      body: SafeArea(child: SingleChildScrollView (
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children:[
-                Text(
-                  "👋🏻 Getting Started",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '👋',
+                      style: FigmaTextStyles.h1,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Getting Started",
+                          style: FigmaTextStyles.h3.copyWith(
+                            color: FigmaColors.sUNRISECharcoal,
+                          ),
+                        ),
+                        SizedBox(height: deviceSize.height * 0.005),
+                        Text(
+                          "Create an account to continue!",
+                          style: FigmaTextStyles.p.copyWith(
+                            color: FigmaColors.sUNRISETextGrey,
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(height: deviceSize.height * 0.05),
+                TextFormField(
+                  style: FigmaTextStyles.b.copyWith(
                     color: FigmaColors.sUNRISECharcoal,
                   ),
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Email',
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.mail_outline_rounded),
+                    hintStyle: FigmaTextStyles.b,
+                    labelStyle: FigmaTextStyles.b,
+                  ),
                 ),
-                Text(
-                  "Create an account to continue!",
-                  style: TextStyle(
-                    color: Colors.grey,
+                SizedBox(height: deviceSize.height * 0.02),
+                TextFormField(
+                  style: FigmaTextStyles.b.copyWith(
+                    color: FigmaColors.sUNRISECharcoal,
+                  ),
+                  textInputAction: TextInputAction.next,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Password',
+                    labelText: 'Password',
+                    prefixIcon: Icon(Icons.lock_outline_rounded),
+                    hintStyle: FigmaTextStyles.b,
+                    labelStyle: FigmaTextStyles.b,
+                    errorStyle: FigmaTextStyles.mP.copyWith(
+                      color: FigmaColors.sUNRISEErrorRed,
+                    ),
+                  ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) => (value?.length)! < 6
+                      ? 'Password must be at least 6 characters long'
+                      : null,
+                ),
+                SizedBox(height: deviceSize.height * 0.02),
+                TextFormField(
+                  style: FigmaTextStyles.b.copyWith(
+                    color: FigmaColors.sUNRISECharcoal,
+                  ),
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Confirm Password',
+                    labelText: 'Confirm Password',
+                    prefixIcon: Icon(Icons.lock_outline_rounded),
+                    hintStyle: FigmaTextStyles.b,
+                    labelStyle: FigmaTextStyles.b,
+                    errorStyle: FigmaTextStyles.mP.copyWith(
+                      color: FigmaColors.sUNRISEErrorRed,
+                    ),
+                  ),
+                ),
+                SizedBox(height: deviceSize.height * 0.05),
+                Center(
+                  child: SizedBox(
+                    width: deviceSize.width * 0.8,
+                    height: deviceSize.height * 0.07,
+                    child: ElevatedButton(
+                        onPressed: () {},
+                        child: Text(
+                          "Create Account",
+                          style: FigmaTextStyles.mButton,
+                        )),
                   ),
                 )
               ],
-            
             ),
-            Padding(padding: EdgeInsets.all(7)),
-             Text("Email"),
-            Padding(padding: EdgeInsets.all(3)),
-             TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Email',
-                prefixIcon: Icon(Icons.mail_outline_rounded),
-              ),
-            ),
-            Padding(padding: EdgeInsets.all(7)),
-             Text("Password"),
-            Padding(padding: EdgeInsets.all(3)),
-             TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Password',
-                prefixIcon: Icon(Icons.lock_outline_rounded),
-              ),
-            ),
-            Padding(padding: EdgeInsets.all(7)),
-             Text("Name"),
-            Padding(padding: EdgeInsets.all(3)),
-             TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Name',
-                prefixIcon: Icon(Icons.person_2_outlined),
-              ),
-            ),
-            Padding(padding: EdgeInsets.all(7)),
-             Text("Phone"),
-            Padding(padding: EdgeInsets.all(3)),
-             TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Phone',
-                prefixIcon: Icon(Icons.phone),
-              ),
-            ),
-          ElevatedButton(onPressed: () {}, child: Text("Click"))
-        ]),
-        )
-      )
-    ));
+          ),
+        ),
+      ),
+    );
   }
 }
