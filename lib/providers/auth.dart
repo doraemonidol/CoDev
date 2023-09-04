@@ -2,11 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 
+import 'package:codev/screens/error_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
+import 'package:flutter/material.dart';
+
 import './user.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'; 
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Auth with ChangeNotifier {
   String _token = '';
@@ -37,10 +42,8 @@ class Auth with ChangeNotifier {
     return _userId;
   }
 
-  Future<void> _authenticate(String email, String password, String urlSegment,
-      BuildContext context) async {
-    final url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyC8LIjb-vxYyM1nHU4WMwjDyOOGiFlTqWM';
+  Future<void> _authenticate(String email, String password, String urlSegment, BuildContext context) async {
+    final url = 'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyC8LIjb-vxYyM1nHU4WMwjDyOOGiFlTqWM';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -80,17 +83,15 @@ class Auth with ChangeNotifier {
       );
       prefs.setString('codev_auth', userData);
     } catch (error) {
-      throw error;
+      rethrow;
     }
   }
 
-  Future<void> signup(
-      String email, String password, BuildContext context) async {
+  Future<void> signup(String email, String password, BuildContext context) async {
     return _authenticate(email, password, 'signUp', context);
   }
 
-  Future<void> login(
-      String email, String password, BuildContext context) async {
+  Future<void> login(String email, String password, BuildContext context) async {
     return _authenticate(email, password, 'signInWithPassword', context);
   }
 
@@ -131,4 +132,23 @@ class Auth with ChangeNotifier {
     _autoLogout(context);
     return true;
   }
+
+  Future<firebase.UserCredential> signInWithGoogle(context) async {
+    try {
+      await GoogleSignIn().signOut();
+      final GoogleSignInAccount? user = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication auth = await user!.authentication;
+      final credential = firebase.GoogleAuthProvider.credential(
+        accessToken: auth.accessToken,
+        idToken: auth.idToken,
+      );
+      return await firebase.FirebaseAuth.instance.signInWithCredential(credential);
+    }
+    catch (e) {
+      throw "Process to log in with Google failed. Error: $e";
+    }
+  }
 }
+
+
+

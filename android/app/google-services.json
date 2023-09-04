@@ -15,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "358048944657-tp56k5bdh5gh5717qclo6bpr4infirbs.apps.googleusercontent.com",
+          "client_id": "358048944657-huf4pqojj76itsej5escjg4a16ntql6n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.codev",
+            "certificate_hash": "d15de751436aaaccaa5f2678b487feffbb6217e0"
+          }
+        },
+        {
+          "client_id": "358048944657-79658shdimdns9lh85u5gehvgdmkojd7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -28,14 +36,14 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "358048944657-tp56k5bdh5gh5717qclo6bpr4infirbs.apps.googleusercontent.com",
+              "client_id": "358048944657-79658shdimdns9lh85u5gehvgdmkojd7.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "358048944657-j7g76jq2b9hkf1j51nodjbmou4hgj39k.apps.googleusercontent.com",
+              "client_id": "358048944657-imgsofej9cqls3vcc094jedrhqn8bas8.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.shopApp"
+                "bundle_id": "com.example.codev"
               }
             }
           ]
@@ -51,7 +59,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "358048944657-tp56k5bdh5gh5717qclo6bpr4infirbs.apps.googleusercontent.com",
+          "client_id": "358048944657-79658shdimdns9lh85u5gehvgdmkojd7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -64,14 +72,14 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "358048944657-tp56k5bdh5gh5717qclo6bpr4infirbs.apps.googleusercontent.com",
+              "client_id": "358048944657-79658shdimdns9lh85u5gehvgdmkojd7.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "358048944657-j7g76jq2b9hkf1j51nodjbmou4hgj39k.apps.googleusercontent.com",
+              "client_id": "358048944657-imgsofej9cqls3vcc094jedrhqn8bas8.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.shopApp"
+                "bundle_id": "com.example.codev"
               }
             }
           ]

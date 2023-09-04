@@ -23,7 +23,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await fa.FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  //await fa.FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
   runApp(MyApp());
 }
