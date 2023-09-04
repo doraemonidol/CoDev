@@ -57,32 +57,68 @@ class _TasksScreenState extends State<TasksScreen> {
       body: Column(
         children: [
           Container(
-            width: 348,
-            height: 48,
-            margin: EdgeInsets.only(top: 121),
-            decoration: BoxDecoration(
-              color: FigmaColors.sUNRISEWhite,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: TabBar(
-              padding: EdgeInsets.all(5.0),
-              unselectedLabelStyle: FigmaTextStyles.mP,
-              labelStyle: FigmaTextStyles.sButton,
-              unselectedLabelColor: FigmaColors.sUNRISETextGrey,
-              labelColor: FigmaColors.sUNRISEWhite,
-              dividerColor: Colors.transparent,
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicator: BoxDecoration(
-                color: FigmaColors.sUNRISEBluePrimary,
-                borderRadius: BorderRadius.circular(7),
+            width:375,
+            height:190,
+            padding: EdgeInsets.fromLTRB(10.5, 0, 10.5, 22),
+            color: FigmaColors.sUNRISELightCoral,
+            child: Container(
+              width: 354,
+              height: 48,
+              margin: EdgeInsets.only(top: 121),
+              decoration: BoxDecoration(
+                color: FigmaColors.sUNRISEWhite,
+                borderRadius: BorderRadius.circular(12),
               ),
-              tabs: [
-                Text('To Do', textAlign: TextAlign.center),
-                Text('In Progress', textAlign: TextAlign.center),
-                Text('Completed', textAlign: TextAlign.center),
+              child: TabBar(
+                padding: EdgeInsets.all(3.0),
+                unselectedLabelStyle: FigmaTextStyles.mP,
+                labelStyle: FigmaTextStyles.sButton14,
+                unselectedLabelColor: FigmaColors.sUNRISETextGrey,
+                labelColor: FigmaColors.sUNRISEWhite,
+                dividerColor: Colors.transparent,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: BoxDecoration(
+                  color: FigmaColors.sUNRISEBluePrimary,
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                tabs: [
+                  Text('To Do', textAlign: TextAlign.center),
+                  Text('In Progress', textAlign: TextAlign.center),
+                  Text('Completed', textAlign: TextAlign.center),
+                ],
+              ),
+            ),
+          ),
+          // filter icon and add new lesson here
+          Container(
+            padding: EdgeInsets.fromLTRB(13, 16, 0, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Center(child: Icon(MyIcons.filter_variant, color: FigmaColors.sUNRISELightCharcoal)),
+                  iconSize: 20,
+                  onPressed: (){},
+                  style: IconButton.styleFrom(
+                      backgroundColor: FigmaColors.sUNRISEWhite,
+                      shape: ContinuousRectangleBorder(
+                        side: BorderSide(color: FigmaColors.lightblue, width: 1),
+                        borderRadius: BorderRadius.circular(12.0),
+                      )),
+                ),
+
+                TextButton.icon(
+                  label: DefaultTextStyle(
+                    style: TextStyle(color: FigmaColors.sUNRISEBluePrimary),
+                    child: Text('New Lesson', style: FigmaTextStyles.mB),
+                  ),
+                  icon: const Icon(Icons.add, color: FigmaColors.sUNRISEBluePrimary),
+                  onPressed: (){},
+                ),
               ],
             ),
           ),
+
           Expanded(
             child: TabBarView(
               children: [
@@ -127,35 +163,6 @@ class _PageState extends State<Page> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // filter icon and add new lesson here
-            Container(
-              padding: EdgeInsets.fromLTRB(13, 16, 0, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: Center(child: Icon(MyIcons.filter_variant, color: FigmaColors.sUNRISELightCharcoal)),
-                    iconSize: 20,
-                    onPressed: (){},
-                    style: IconButton.styleFrom(
-                        backgroundColor: FigmaColors.sUNRISEWhite,
-                        shape: ContinuousRectangleBorder(
-                          side: BorderSide(color: FigmaColors.lightblue, width: 1),
-                          borderRadius: BorderRadius.circular(12.0),
-                        )),
-                  ),
-
-                  TextButton.icon(
-                    label: DefaultTextStyle(
-                      style: TextStyle(color: FigmaColors.sUNRISEBluePrimary),
-                      child: Text('New Lesson', style: FigmaTextStyles.mB),
-                    ),
-                    icon: const Icon(Icons.add, color: FigmaColors.sUNRISEBluePrimary),
-                    onPressed: (){},
-                  ),
-                ],
-              ),
-            ),
             Container(
               margin: const EdgeInsets.fromLTRB(23, 16, 0, 0),
               child: Text.rich(
@@ -198,39 +205,44 @@ class _PageState extends State<Page> {
         height: 135 * list.length * 1.0,
         width: 375,
         child: ListView.builder(
+            physics:  NeverScrollableScrollPhysics(),
             itemCount: list.length, // number of tasks in this date
             itemBuilder: (context, index) {
               final ToDoCard card = list[index];
               return Slidable(
                 endActionPane: ActionPane(
-                  extentRatio: 0.5,
+                  extentRatio: 0.3,
                   motion: const StretchMotion(),
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      margin: EdgeInsets.fromLTRB(0,0,5,0),
-                      padding: EdgeInsets.all(0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Color(0xFFFF7A7B),
-                      ),
-                      child: IconButton(onPressed: () {},
-                          icon: const Icon(MyIcons.delete_outline, color: Colors.white)
+                    Expanded(
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        margin: EdgeInsets.fromLTRB(0,0,2.7,0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Color(0xFFFF7A7B),
+                        ),
+                        child: IconButton(onPressed: () {},
+                            icon: const Icon(MyIcons.delete_outline, color: Colors.white)
+                        ),
                       ),
                     ),
-                    Container(
-                      width: 48,
-                      height: 48,
-                      padding: EdgeInsets.all(0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Color(0xFF2FD1C5),
-                      ),
-                      child: IconButton(onPressed: () {},
-                          icon: const Icon(MyIcons.play, color: Colors.white)
+                    Expanded(
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        margin: EdgeInsets.fromLTRB(0,0,2.7,0),
+                        padding: EdgeInsets.all(0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Color(0xFF2FD1C5),
+                        ),
+                        child: IconButton(onPressed: () {},
+                            icon: const Icon(MyIcons.play, color: Colors.white)
+                        ),
                       ),
                     ),
                   ],

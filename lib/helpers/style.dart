@@ -193,4 +193,14 @@ class FigmaTextStyles {
         height: 19.2 / 16,
         letterSpacing: 0,
       );
+
+  static TextStyle get sButton14 => const TextStyle(
+    fontSize: 14.5,
+    decoration: TextDecoration.none,
+    fontFamily: 'Poppins',
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.w700,
+    height: 19.2 / 16,
+    letterSpacing: 0,
+  );
 }
