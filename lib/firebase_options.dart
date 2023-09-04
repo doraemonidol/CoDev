@@ -49,7 +49,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '358048944657',
     projectId: 'codev-cs',
     authDomain: 'codev-cs.firebaseapp.com',
-    databaseURL: 'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'codev-cs.appspot.com',
     measurementId: 'G-VWTQ2KN0ST',
   );
@@ -59,7 +60,8 @@ class DefaultFirebaseOptions {
     appId: '1:358048944657:android:229fc466bedfb1ce8c17b0',
     messagingSenderId: '358048944657',
     projectId: 'codev-cs',
-    databaseURL: 'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'codev-cs.appspot.com',
   );
 
@@ -68,9 +70,11 @@ class DefaultFirebaseOptions {
     appId: '1:358048944657:ios:0f91878a532599fd8c17b0',
     messagingSenderId: '358048944657',
     projectId: 'codev-cs',
-    databaseURL: 'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'codev-cs.appspot.com',
-    iosClientId: '358048944657-imgsofej9cqls3vcc094jedrhqn8bas8.apps.googleusercontent.com',
+    iosClientId:
+        '358048944657-imgsofej9cqls3vcc094jedrhqn8bas8.apps.googleusercontent.com',
     iosBundleId: 'com.example.codev',
   );
 
@@ -79,9 +83,11 @@ class DefaultFirebaseOptions {
     appId: '1:358048944657:ios:0615741c4f8827de8c17b0',
     messagingSenderId: '358048944657',
     projectId: 'codev-cs',
-    databaseURL: 'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'codev-cs.appspot.com',
-    iosClientId: '358048944657-le118inhlujb6ttqu314l6pc1lqc18s3.apps.googleusercontent.com',
+    iosClientId:
+        '358048944657-le118inhlujb6ttqu314l6pc1lqc18s3.apps.googleusercontent.com',
     iosBundleId: 'com.example.codev.RunnerTests',
   );
 }

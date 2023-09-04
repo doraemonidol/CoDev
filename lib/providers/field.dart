@@ -65,20 +65,8 @@ class FieldList with ChangeNotifier {
                 return Course(
                   name: course['name'],
                   description: course['description'],
-                  chapters: course['chapters'].map((chapter) {
-                    return Chapter(
-                      name: chapter['name'],
-                      description: chapter['description'],
-                      sources: chapter['sources'],
-                      estimateTime: chapter['estimateTime'],
-                      prerequisiteChapters: chapter['prerequisiteChapters']
-                          .map((prerequisiteChapter) {
-                        return findByName(prerequisiteChapter);
-                      }).toList(),
-                    );
-                  }).toList(),
-                  prerequisiteCourses: course['prerequisiteCourses']
-                      .map((prerequisiteCourse) {
+                  prerequisiteCourses:
+                      course['prerequisiteCourses'].map((prerequisiteCourse) {
                     return findByName(prerequisiteCourse);
                   }).toList(),
                 );
@@ -87,7 +75,7 @@ class FieldList with ChangeNotifier {
           }).toList(),
         );
       }).toList();
-    
+
       notifyListeners();
     } catch (error) {
       throw error;
