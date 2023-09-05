@@ -24,6 +24,16 @@ class FigmaColors {
 class FigmaTextStyles {
   const FigmaTextStyles();
 
+  static TextStyle get h0 => const TextStyle(
+    fontSize: 12,
+    decoration: TextDecoration.none,
+    fontFamily: 'Lato',
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.w700,
+    height: 16.79 / 12,
+    letterSpacing: 0,
+  );
+
   static TextStyle get h1 => const TextStyle(
     fontSize: 55,
     decoration: TextDecoration.none,
