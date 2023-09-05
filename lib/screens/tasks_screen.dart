@@ -1,3 +1,4 @@
+import 'package:codev/screens/detailed_task_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -36,7 +37,9 @@ class _TasksScreenState extends State<TasksScreen> {
       course: 'Python',
       chapter: 'Chapter 2',
       startTime: DateTime.now(),
-      endTime: DateTime.now(),
+      endTime: DateTime.now().add(
+        Duration(hours: 1),
+      ),
       color: FigmaColors.sUNRISEBluePrimary,
       icon: MyIcons.cube_outline,
       state: 0,
@@ -59,6 +62,17 @@ class _TasksScreenState extends State<TasksScreen> {
       chapter: 'Chapter 4',
       startTime: DateTime(2023, 9, 17, 11, 30),
       endTime: DateTime(2023, 9, 17, 12, 30),
+      color: FigmaColors.sUNRISEBluePrimary,
+      icon: MyIcons.cube_outline,
+      state: 0,
+    ),
+    Task(
+      field: 'Data Science',
+      stage: 'Stage 1',
+      course: 'Python',
+      chapter: 'Chapter 5',
+      startTime: DateTime(2022, 9, 17, 11, 30),
+      endTime: DateTime(2022, 9, 17, 12, 30),
       color: FigmaColors.sUNRISEBluePrimary,
       icon: MyIcons.cube_outline,
       state: 0,
@@ -218,7 +232,10 @@ class _PageState extends State<Page> {
                                     0
                                 ? 'Today, ${DateFormat('EEEE d').format(dates[index])}'
                                 : DateFormat('EEEE, MMMM d')
-                                    .format(dates[index]),
+                                        .format(dates[index]) +
+                                    (dates[index].year == DateTime.now().year
+                                        ? ''
+                                        : ', ${dates[index].year}'),
                             style: FigmaTextStyles.mB
                                 .copyWith(color: FigmaColors.sUNRISETextGrey)),
                       ],
@@ -315,6 +332,8 @@ class _PageState extends State<Page> {
       builder: (context) => GestureDetector(
         onTap: () {
           setState(() => _expandedIndex = index);
+          Navigator.pushNamed(context, DetailedTaskScreen.routeName,
+              arguments: card);
         },
         child: Container(
           margin: const EdgeInsets.only(top: 12),

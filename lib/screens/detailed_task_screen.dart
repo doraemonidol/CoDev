@@ -1,18 +1,14 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codev/providers/tasks.dart';
+import 'package:codev/screens/quiz_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:codev/icon/my_icons.dart';
-class ToDoCard {
-  String date;
-  String time;
-  String title;
-  String description;
-  IconData icon;
-  Color color;
-  ToDoCard(this.date, this.time, this.title, this.description, this.icon, this.color);
-}
+import 'package:intl/intl.dart';
 
 class DetailedTaskScreen extends StatefulWidget {
+  static const routeName = '/detailed-task-screen';
   const DetailedTaskScreen({super.key});
 
   @override
@@ -20,142 +16,147 @@ class DetailedTaskScreen extends StatefulWidget {
 }
 
 class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
-  final ToDoCard card =
-  ToDoCard(
-    "Monday 17 August",
-    "11:30 AM - 12:30 PM",
-    "Math",
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,",
-    MyIcons.robot,
-    Color(0xFFFF7A7B),
-  );
-
-  final states = ['To Do', 'In Progress', 'Completed'];
-  int seconds = maxSeconds;
-  static int maxSeconds = 60;
-  String stringTextTime = sampleTextTime;
-  static String sampleTextTime = '1:34h';
-
+  Task? task;
+  double val = 50;
   String? value;
-  Timer? timer;
-  double val = 48;
-
-  void startTimer({bool reset = true}){
-    if (reset){
-      resetTimer();
-    }
-    timer = Timer.periodic (const Duration(seconds: 1), (_) {
-      if (seconds > 0) {
-        setState(() => seconds--);
-      }
-      else {
-        stopTimer(reset: false);
-      }
-    });
-  }
-
-  void resetTimer() => setState(() => seconds = maxSeconds);
-
-  void stopTimer({bool reset = true}){
-    if (reset){
-      resetTimer();
-    }
-    setState(() => timer?.cancel());
-  }
+  Size? deviceSize;
+  double? safeHeight;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: FigmaColors.sUNRISELightCoral,
-    body: Column(
-      children: [
-        // Dropdown menu item and edit button
-        firstPart(),
+  Widget build(BuildContext context) {
+    this.task = ModalRoute.of(context)!.settings.arguments as Task;
+    deviceSize = MediaQuery.of(context).size;
+    safeHeight = deviceSize!.height - MediaQuery.of(context).padding.top;
 
-        // Card Information
-        secondPart(),
-
-        // Card Timer
-        thirdPart(),
-
-        SizedBox(height:20),
-        //Slider
-        SliderTheme(
-          data: const SliderThemeData(
-              trackHeight: 12,
-              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 20),
-              overlayShape: RoundSliderOverlayShape(overlayRadius: 6),
-              activeTickMarkColor: Colors.transparent,
-              inactiveTickMarkColor: Colors.transparent
-          ),
-          child: Container(
-            margin: EdgeInsets.all(16),
-            child: Slider(
-              value: val,
-              min: 0,
-              max: maxSeconds * 1.0,
-              divisions: maxSeconds,
-              activeColor: const Color(0xFF2FD1C5),
-              inactiveColor: Colors.white,
-              label: '${val.round()}%',
-              onChanged: (val) => setState(() => this.val = val),
-              thumbColor: Colors.white,
-            ),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Task Details',
+          style: FigmaTextStyles.mButton,
         ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+      ),
+      backgroundColor: FigmaColors.sUNRISELightCoral,
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          children: [
+            // Dropdown menu item and edit button
+            firstPart(),
+            SizedBox(height: 20),
 
-        buildButtons(),
-        SizedBox(height:15),
-        const SelectableText('Study now!', style: TextStyle(fontSize: 22, color: Color(0xFF00394C)),)
-      ],
-    ),
-  );
+            // // Card Information
+            secondPart(),
+            SizedBox(height: 20),
+
+            // // Card Timer
+            thirdPart(),
+
+            SizedBox(height: 20),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                LinearProgressIndicator(
+                  value: val / 120,
+                  minHeight: 36,
+                  backgroundColor: Colors.white,
+                  // change color of progress bar as val increase
+                  valueColor: AlwaysStoppedAnimation<Color>(Color.lerp(
+                      Color.lerp(Colors.red, Colors.yellow, val / 100),
+                      Color.lerp(Colors.yellow, Colors.green, val / 100),
+                      val / 100)!),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                Text(
+                  '${val.toInt()}% completed',
+                  style: FigmaTextStyles.mH4.copyWith(
+                    color: FigmaColors.systemDark,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(QuizScreen.routeName);
+              },
+              style: IconButton.styleFrom(
+                  backgroundColor: const Color(0xFF2FD1C5)),
+              iconSize: 60,
+              icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Study now!',
+              style: FigmaTextStyles.mButton.copyWith(color: Color(0xFF00394C)),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget firstPart() => Container(
-    margin: EdgeInsets.fromLTRB(16,96,16,0),
-    child: Row(
-      children: [
-        Expanded(
-          child: Container(
-            height: 48,
-            margin: const EdgeInsets.fromLTRB(0, 0, 12, 0),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-                color: Colors.white,
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 48,
+                margin: const EdgeInsets.fromLTRB(0, 0, 12, 0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFC4D7FF),
+                      width: 2,
+                    )),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                      focusColor: Colors.white,
+                      value: task!.state == 0
+                          ? 'To Do'
+                          : task!.state == 1
+                              ? 'In Progress'
+                              : 'Completed',
+                      iconSize: 36,
+                      isExpanded: true,
+                      icon: const Icon(Icons.arrow_drop_down_sharp,
+                          color: Color(0xFF585A66)),
+                      items: TaskState.values
+                          .map((e) => buildMenuItem(e == TaskState.todo
+                              ? 'To Do'
+                              : e == TaskState.inProgress
+                                  ? 'In Progress'
+                                  : 'Completed'))
+                          .toList(),
+                      onChanged: (value) => setState(() => this.value = value)),
+                ),
+              ),
+            ),
+            Container(
+              width: 48,
+              height: 48,
+              padding: EdgeInsets.all(0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFC4D7FF), width: 2)
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                  focusColor: Colors.white,
-                  value: value,
-                  iconSize: 36,
-                  isExpanded: true,
-                  icon: const Icon(Icons.arrow_drop_down_sharp, color: Color(0xFF585A66)),
-                  items: states.map(buildMenuItem).toList(),
-                  onChanged: (value) => setState(() => this.value = value)),
-            ),
-          ),
+                color: FigmaColors.sUNRISEBluePrimary,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.border_color, color: Colors.white),
+                onPressed: () {},
+              ),
+            )
+          ],
         ),
-        Container(
-          width: 48,
-          height: 48,
-          padding: EdgeInsets.all(0),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: FigmaColors.sUNRISEBluePrimary ,
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.border_color, color: Colors.white),
-            onPressed: () {},
-          ),
-        )
-      ],
-    ),
-  );
+      );
 
-  DropdownMenuItem<String> buildMenuItem(String item) =>
-      DropdownMenuItem(value: item,
+  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
+        value: item,
         child: SelectableText(
           item,
           style: FigmaTextStyles.p.copyWith(color: FigmaColors.sUNRISETextGrey),
@@ -163,75 +164,48 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
       );
 
   Widget secondPart() => Container(
-    margin: const EdgeInsets.fromLTRB(16,14,16,0),
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-    decoration: BoxDecoration(
-      color: FigmaColors.sUNRISEWhite,
-      borderRadius: BorderRadius.circular(12),
-      border: Border(
-        top: BorderSide(color: card.color, width: 1),
-        right: BorderSide(color: card.color, width: 1),
-        bottom: BorderSide(color: card.color, width: 1),
-        left: BorderSide(color: card.color, width:5),
-      ),
-    ),
-    child:Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(card.icon, color: card.color),
-        SizedBox(height: 16),
-        SelectableText(card.title, style: FigmaTextStyles.sButton.copyWith(color: FigmaColors.systemDark)),
-        Text(card.description,maxLines: 20, overflow: TextOverflow.ellipsis, style: FigmaTextStyles.mT.copyWith(color: FigmaColors.systemGrey)),
-      ],
-    ),
-  );
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: FigmaColors.sUNRISEWhite,
+          borderRadius: BorderRadius.circular(12),
+          border: Border(
+            top: BorderSide(color: task!.color, width: 1),
+            right: BorderSide(color: task!.color, width: 1),
+            bottom: BorderSide(color: task!.color, width: 1),
+            left: BorderSide(color: task!.color, width: 5),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(task!.icon, color: task!.color),
+            SizedBox(height: 16),
+            SelectableText(task!.chapter,
+                style:
+                    FigmaTextStyles.h3.copyWith(color: FigmaColors.systemDark)),
+            Text(
+              task!.field + ' | ' + task!.course,
+              maxLines: 20,
+              overflow: TextOverflow.ellipsis,
+              style:
+                  FigmaTextStyles.mH4.copyWith(color: FigmaColors.systemGrey),
+            ),
+            SizedBox(height: 16),
+            // output description
+          ],
+        ),
+      );
 
   Widget thirdPart() {
-    String dateString = card.date;
-    DateTime parseDate(String dateString) {
-      final monthMap = {
-        'January': 1,
-        'February': 2,
-        'March': 3,
-        'April': 4,
-        'May': 5,
-        'June': 6,
-        'July': 7,
-        'August': 8,
-        'September': 9,
-        'October': 10,
-        'November': 11,
-        'December': 12,
-      };
-
-      final parts = dateString.split(' ');
-
-      final day = int.tryParse(parts[1]);
-      final month = monthMap[parts[2]];
-      final year = DateTime.now().year; //this year - assumption
-
-      if (day != null && month != null) {
-        return DateTime(year, month, day);
-      } else {
-        throw FormatException('Invalid date format: $dateString');
-      }
-    }
-    DateTime parsedDate = parseDate(dateString);
-    DateTime today = DateTime.now();
-
-    bool isToday = today.year == parsedDate.year &&
-        today.month == parsedDate.month &&
-        today.day == parsedDate.day;
     return Container(
-      width: 329,
+      width: double.infinity,
       height: 99,
-      margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
           color: FigmaColors.sUNRISEWhite,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: FigmaColors.lightblue, width: 1.5)
-      ),
+          border: Border.all(color: FigmaColors.lightblue, width: 1.5)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -242,22 +216,26 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
               Text.rich(
                 TextSpan(
                   text: 'Due. ',
-                  style: FigmaTextStyles.mP.copyWith(color: FigmaColors.sUNRISEDarkGrey),
+                  style: FigmaTextStyles.mP
+                      .copyWith(color: FigmaColors.sUNRISEDarkGrey),
                   children: [
                     TextSpan(
-                      text: isToday ? 'Today, ' : '',
-                      style: FigmaTextStyles.mB14.copyWith(color: FigmaColors.sUNRISETextGrey),
-                    ),
-                    TextSpan(
-                      text: card.date,
-                      style: FigmaTextStyles.mB14.copyWith(color: FigmaColors.sUNRISETextGrey),
+                      text: task!.startTime.difference(DateTime.now()).inDays ==
+                              0
+                          ? 'Today, ${DateFormat('EEEE d').format(task!.startTime)}'
+                          : DateFormat('EEEE, MMMM d').format(task!.startTime),
+                      style: FigmaTextStyles.mB14
+                          .copyWith(color: FigmaColors.sUNRISETextGrey),
                     ),
                   ],
                 ),
               ),
               SizedBox(height: 5),
-              SelectableText(
-                card.time, style: FigmaTextStyles.mT.copyWith(color: FigmaColors.systemGrey),
+              //output start time and end time in this format 11:30 AM - 12:30 PM
+              Text(
+                '${DateFormat('h:mm a').format(task!.startTime)} - ${DateFormat('h:mm a').format(task!.endTime)}',
+                style:
+                    FigmaTextStyles.mT.copyWith(color: FigmaColors.systemGrey),
               ),
             ],
           ),
@@ -267,47 +245,41 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
     );
   }
 
-  Widget buildButtons(){
-    final isRunning = timer == null ? false : timer!.isActive;
-    final isCompleted = seconds == maxSeconds || seconds == 0;
-
-    return isRunning || !isCompleted
-        ? IconButton(
-        onPressed: () {stopTimer(reset: false);},
-        style: IconButton.styleFrom(backgroundColor: const Color(0xFF2FD1C5)),
-        iconSize: 60,
-        icon: const Icon(Icons.stop, color: Colors.white))
-        : IconButton(
-        onPressed: () {startTimer();},
-        style: IconButton.styleFrom(backgroundColor: const Color(0xFF2FD1C5)),
-        iconSize: 60,
-        icon: const Icon(Icons.play_arrow_rounded, color: Colors.white));
-  }
-
   Widget buildTimer() => SizedBox(
-    width: 60,
-    height: 60,
-    child: Stack(
-      fit: StackFit.expand,
-      children: [
-        CircularProgressIndicator(
-          value: seconds / maxSeconds,
-          strokeWidth: 4,
-          valueColor: const AlwaysStoppedAnimation(Color(0xFFFFB017)),
-          backgroundColor: const Color(0xFFE4EDFF),
+        width: deviceSize!.width * 0.175,
+        height: deviceSize!.width * 0.175,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            CircularProgressIndicator(
+              value: task!.endTime.difference(DateTime.now()).inSeconds / 1000,
+              strokeWidth: 6,
+              valueColor: const AlwaysStoppedAnimation(Color(0xFFFFB017)),
+              backgroundColor: const Color(0xFFE4EDFF),
+            ),
+            Center(child: buildTime()),
+          ],
         ),
-        Center(child: buildTime()),
-      ],
+      );
 
-    ),
-  );
-
-  Widget buildTime(){
+  Widget buildTime() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Icon(Icons.timer, color: Color(0xFF2FD1C5), size: 20),
-        Text('$seconds s', style: FigmaTextStyles.mB14.copyWith(color: FigmaColors.sUNRISETextGrey)),
+        FittedBox(
+          child: Text(
+              // output time left
+              task!.endTime.difference(DateTime.now()).inSeconds < 0
+                  ? '0 s'
+                  : (task!.endTime.difference(DateTime.now()).inHours != 0
+                      ? '${task!.endTime.difference(DateTime.now()).inHours}h ${task!.endTime.difference(DateTime.now()).inMinutes.remainder(60)}m'
+                      : (task!.endTime.difference(DateTime.now()).inMinutes != 0
+                          ? '${task!.endTime.difference(DateTime.now()).inMinutes}m ${task!.endTime.difference(DateTime.now()).inSeconds.remainder(60)}s'
+                          : '${task!.endTime.difference(DateTime.now()).inSeconds} s')),
+              style: FigmaTextStyles.mT
+                  .copyWith(color: FigmaColors.sUNRISETextGrey)),
+        ),
       ],
     );
   }
