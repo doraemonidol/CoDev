@@ -50,6 +50,7 @@ dependencies:
   focused_menu: ^1.0.5
   cloud_firestore: ^4.9.1
   flutter_local_notifications: ^15.1.1
+  circle_progress_bar: ^0.1.1
 
 dev_dependencies:
   flutter_test:

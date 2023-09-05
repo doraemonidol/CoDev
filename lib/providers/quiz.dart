@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Quiz {
   final String quizID;
   final DateTime createDate;
-  final List<Question> quests;
+  final List<dynamic> quests;
 
   Quiz({
     required this.quizID,
@@ -13,13 +13,11 @@ class Quiz {
 }
 
 class Question {
-  final String questID;
-  final String statement; 
-  final List<String?> options;
-  final int answer;
+  late String statement; 
+  late List<dynamic> options;
+  late int answer;
 
   Question({
-    required this.questID,
     required this.statement,
     required this.options,
     required this.answer,

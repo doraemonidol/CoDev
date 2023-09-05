@@ -1,7 +1,10 @@
+import 'package:codev/providers/user.dart';
 import 'package:codev/screens/detailed_task_screen.dart';
+import 'package:codev/screens/endquiz_screen.dart';
 import 'package:codev/screens/main_screen.dart';
 import 'package:codev/screens/on_boarding_screen.dart';
 import 'package:codev/screens/quiz_screen.dart';
+import 'package:codev/screens/signup_screen.dart';
 import 'package:codev/screens/test_fs.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:firebase_core/firebase_core.dart';
@@ -41,6 +44,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (ctx) => Auth(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => User(),
         ),
         // ChangeNotifierProxyProvider<Auth, Products>(
         //   update: (ctx, auth, previousProduct) => Products(
@@ -158,7 +164,7 @@ class MyApp extends StatelessWidget {
 // If you do not have a themeMode switch, uncomment this line
 // to let the device system mode control the theme mode:
           themeMode: ThemeMode.system,
-          home: true // auth.isAuth
+          home:  auth.isAuth // auth.isAuth
               ? TabsScreen()
               : FutureBuilder(
             future: auth.tryAutoLogin(context),
@@ -178,6 +184,8 @@ class MyApp extends StatelessWidget {
             TabsScreen.routeName: (ctx) => TabsScreen(),
             DetailedTaskScreen.routeName: (ctx) => DetailedTaskScreen(),
             QuizScreen.routeName: (ctx) => QScreen(),
+            EndQuiz.routeName: (ctx) => EndQuiz(),
+            SignUpScreen.routeName: (ctx) => SignUpScreen(),
           },
         ),
       ),

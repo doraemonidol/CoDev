@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+import 'package:codev/screens/main_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import './user.dart';
-import 'package:flutter/widgets.dart'; 
+import './user.dart' as CoDevUser;
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,10 +40,12 @@ class Auth with ChangeNotifier {
     return _userId;
   }
 
-  Future<void> _authenticate(String email, String password, String urlSegment, BuildContext context) async {
-    final url = 'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyC8LIjb-vxYyM1nHU4WMwjDyOOGiFlTqWM';
+  Future<void> _authenticate(String email, String password, String urlSegment,
+      BuildContext context) async {
+    final url =
+        'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyC8LIjb-vxYyM1nHU4WMwjDyOOGiFlTqWM';
     try {
-      final response = await http.post(
+      await http.post(
         Uri.parse(url),
         body: json.encode(
           {
@@ -52,44 +54,49 @@ class Auth with ChangeNotifier {
             'returnSecureToken': true,
           },
         ),
-      );
-      final responseData = json.decode(response.body);
-      if (responseData['error'] != null) {
-        throw HttpException(responseData['error']['message']);
-      }
-      _token = responseData['idToken'];
-      _userId = responseData['localId'];
-      _expiryDate = DateTime.now().add(
-        Duration(
-          seconds: int.parse(
-            responseData['expiresIn'],
+      )
+      .then((response) async {
+        final responseData = json.decode(response.body);
+        if (responseData['error'] != null) {
+          throw HttpException(responseData['error']['message']);
+        }
+        _token = responseData['idToken'];
+        _userId = responseData['localId'];
+        _expiryDate = DateTime.now().add(
+          Duration(
+            seconds: int.parse(
+              responseData['expiresIn'],
+            ),
           ),
-        ),
-      );
-      _autoLogout(context!);
-      if (urlSegment == 'signUp') {
-        Provider.of<User>(context!, listen: false).addUser(email);
-      }
-      notifyListeners();
-      final prefs = await SharedPreferences.getInstance();
-      final userData = json.encode(
-        {
-          'token': _token,
-          'userId': _userId,
-          'expiryDate': _expiryDate!.toIso8601String(),
-        },
-      );
-      prefs.setString('codev_auth', userData);
+        );
+        _autoLogout(context);
+        if (urlSegment == 'signUp') {
+          Provider.of<CoDevUser.User>(context, listen: false).addUser(email);
+        }
+        notifyListeners();
+        final prefs = await SharedPreferences.getInstance();
+        final userData = json.encode(
+          {
+            'token': _token,
+            'userId': _userId,
+            'expiryDate': _expiryDate!.toIso8601String(),
+          },
+        );
+        prefs.setString('codev_auth', userData);
+      })
+      .onError((error, stackTrace) => throw error.toString());
     } catch (error) {
       rethrow;
     }
   }
 
-  Future<void> signup(String email, String password, BuildContext context) async {
+  Future<void> signup(
+      String email, String password, BuildContext context) async {
     return _authenticate(email, password, 'signUp', context);
   }
 
-  Future<void> login(String email, String password, BuildContext context) async {
+  Future<void> login(
+      String email, String password, BuildContext context) async {
     return _authenticate(email, password, 'signInWithPassword', context);
   }
 
@@ -131,7 +138,7 @@ class Auth with ChangeNotifier {
     return true;
   }
 
-  Future<firebase.UserCredential> signInWithGoogle(context) async {
+  Future<firebase.UserCredential> _signInWithGoogle(context) async {
     try {
       await GoogleSignIn().signOut();
       final GoogleSignInAccount? user = await GoogleSignIn().signIn();
@@ -140,25 +147,33 @@ class Auth with ChangeNotifier {
         accessToken: auth.accessToken,
         idToken: auth.idToken,
       );
-      return await firebase.FirebaseAuth.instance.signInWithCredential(credential);
-    }
-    catch (e) {
+      firebase.UserCredential user_cres =  await firebase.FirebaseAuth.instance.signInWithCredential(credential);
+      String? _token_ = await firebase.FirebaseAuth.instance.currentUser!.getIdToken();
+      _token = _token_!;
+      _userId = firebase.FirebaseAuth.instance.currentUser!.uid;
+      _expiryDate = DateTime.now().add(
+        const Duration(
+          minutes: 55,
+        ),
+      );
+      final prefs = await SharedPreferences.getInstance();
+      final userData = json.encode(
+        {
+          'token': _token,
+          'userId': _userId,
+          'expiryDate': _expiryDate!.toIso8601String(),
+        },
+      );
+      prefs.setString('codev_auth', userData);
+      Navigator.of(context).pushNamed(MainScreen.routeName);
+      return user_cres;
+    } catch (e) {
       throw "Process to log in with Google failed. Error: $e";
     }
   }
 
-  Future<bool?>doesEmailExist(String email, BuildContext context) async {
-    await firebase.FirebaseAuth.instance.fetchSignInMethodsForEmail(email)
-    .then((value) {
-      if (value.isEmpty) {
-        return false;
-      }
-      else {
-        return true;
-      }
-    })
-    .onError((error, stackTrace) {
-      throw error.toString();
+  Future<void> signInWithGoogle(context) async {
+    _signInWithGoogle(context).then((value) async {
     });
   }
 }

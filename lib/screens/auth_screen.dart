@@ -1,4 +1,7 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:codev/providers/sign_in_info.dart';
+import 'package:codev/screens/endquiz_screen.dart';
+import 'package:codev/screens/main_screen.dart';
 import 'package:codev/screens/quiz_screen.dart';
 import 'package:codev/screens/tasks_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,25 +14,6 @@ import '../screens/signup_screen.dart';
 enum AuthMode { Signup, Login }
 
 enum Status { SUCESS, FAIL }
-
-class SignInProvider extends ChangeNotifier {
-  static const int FIRST_AUTH_SCREEN = 0;
-
-  static const int SECOND_AUTH_SCREEN = 1;
-
-  int status = FIRST_AUTH_SCREEN;
-
-  void changeAuthScreen() {
-    if (status == FIRST_AUTH_SCREEN) {
-      status = SECOND_AUTH_SCREEN;
-      notifyListeners();
-    }
-  }
-
-  int getStatus() {
-    return status;
-  }
-}
 
 class AuthScreen extends StatelessWidget {
   static const routeName = '/auth';
@@ -133,16 +117,7 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
   final emailReader = TextEditingController();
 
   void onContinueClicked() {
-    Provider.of<Auth>(context, listen: false).doesEmailExist(emailReader.text, context)
-    .then((value) {
-        if (value!) {
-          Provider.of<SignInProvider>(context, listen: false).changeAuthScreen();
-        }
-        else {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpScreen(emailReader.text)));
-        }
-    })
-    .onError((error, stackTrace) => throw error.toString());
+    Provider.of<SignInProvider>(context, listen: false).changeAuthScreen();
   }
 
   @override
@@ -177,10 +152,9 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
               children: <Widget>[
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {
-                      Provider.of<Auth>(context, listen: false)
-                          .signInWithGoogle(context)
-                          .then((value) => null);
+                    onPressed: () async {
+                      await Provider.of<Auth>(context, listen: false)
+                          .signInWithGoogle(context);
                     },
                     icon: SizedBox(
                       width: deviceSize.width * 0.075,
@@ -227,7 +201,7 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
               style: FigmaTextStyles.b.copyWith(
                 color: FigmaColors.sUNRISECharcoal,
               ),
-              obscureText: true,
+              controller: emailReader,
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
                 hintText: 'Email',
@@ -239,26 +213,26 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
                 ),
               ),
             ),
-            Consumer<SignInProvider>(
-              builder: (context, system, child) => ElevatedButton(
-                onPressed: () {
-                  onContinueClicked();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0)),
-                  minimumSize: Size(
-                      deviceSize.width * 0.95, safeHeight * 0.06), //////// HERE
-                ),
-                child: Text(
-                  "Continue",
-                  style: FigmaTextStyles.mButton.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
+            ElevatedButton(
+              onPressed: () {
+                Provider.of<SignInProvider>(context, listen: false)
+                    .receiveEmail(emailReader.text);
+                onContinueClicked();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                minimumSize: Size(
+                    deviceSize.width * 0.95, safeHeight * 0.06), //////// HERE
+              ),
+              child: Text(
+                "Continue",
+                style: FigmaTextStyles.mButton.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -292,6 +266,9 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
     offset = Tween<Offset>(begin: const Offset(0.0, 1.0), end: Offset.zero)
         .animate(controller);
 
+    emailReader.text =
+        Provider.of<SignInProvider>(context, listen: false).email;
+
     switch (controller.status) {
       case AnimationStatus.completed:
         controller.reverse();
@@ -316,8 +293,8 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
         type = ContentType.success;
         break;
       default:
-        title = "Peep Po Peep Peep!";
-        message = "Wrong email, or wrong password. IDK.. You tell me.";
+        title = "We can't detect you.";
+        message = "Peep Po Peep Peep! Nicki.. is that you? ";
         type = ContentType.failure;
         break;
     }
@@ -355,7 +332,7 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
     return SlideTransition(
       position: offset,
       child: Container(
-        height: safeHeight * 0.45,
+        height: safeHeight * 0.55,
         width: deviceSize.width,
         decoration: BoxDecoration(
           borderRadius: radius,
@@ -410,20 +387,16 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
               create: (context) => Auth(),
               child: ElevatedButton(
                 onPressed: () {
-                  // Provider.of<Auth>(context, listen: false).login(emailReader.text, passwordReader.text, context)
-                  // .then((value) {
-                  //   returnResponse(Status.SUCESS, context);
-                  //   Navigator.push(context, MaterialPageRoute(builder:(context) => QScreen(),));
-                  // })
-                  // .onError((error, stackTrace) {
-                  //   returnResponse(Status.FAIL, context);
-                  // });
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QScreen(),
-                    ),
-                  );
+                  Provider.of<SignInProvider>(context, listen: false) .receivePassword(passwordReader.text);
+                  Provider.of<Auth>(context, listen: false) .login(emailReader.text, passwordReader.text, context)
+                  .then((value) {
+                    returnResponse(Status.SUCESS, context);
+                    Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
+                  })
+                  .onError((error, stackTrace) {
+                    returnResponse(Status.FAIL, context);
+                    Navigator.of(context).pushReplacementNamed(SignUpScreen.routeName);
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,

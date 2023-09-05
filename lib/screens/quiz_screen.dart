@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:chiclet/chiclet.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:codev/providers/quiz_info.dart';
+import 'package:codev/screens/endquiz_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:provider/provider.dart';
@@ -26,72 +27,87 @@ class _QScreen extends State<QScreen> {
   }
 
   bool validateQuiz(Quiz quiz) {
-    //check if quiz have options
+
+    if (quiz.quests.isEmpty) return false;
     for (int i = 0; i < quiz.quests.length; ++i) {
-      if (quiz.quests[i].options.length < 4) {
+
+      //check if statement is empty
+      if (quiz.quests[i].statement.isEmpty) {
         return false;
-      } else {
-        if (quiz.quests[i].options[0]!.isEmpty ||
-            quiz.quests[i].options[1]!.isEmpty ||
-            quiz.quests[i].options[2]!.isEmpty ||
-            quiz.quests[i].options[3]!.isEmpty) {
-          return false;
-        }
       }
+
+      //check if quiz have options
+      if (quiz.quests[i].options.length != 4) {
+        return false;
+      } 
+      else if (quiz.quests[i].options[0]!.isEmpty ||
+          quiz.quests[i].options[1]!.isEmpty ||
+          quiz.quests[i].options[2]!.isEmpty ||
+          quiz.quests[i].options[3]!.isEmpty) {
+        return false;
+      }
+
+      //check if answer is in (A, B, C, D)
+      if (quiz.quests[i].answer < 0 || quiz.quests[i].answer > 3) return false;
     }
+
     return true;
   }
 
-  List<String> attachQuestion(String content) {
-    RegExp regExp = RegExp(r'(\d.(.|\n)*?[+]{3}> \d)');
-    List<String> tmp =
-        regExp.allMatches(content).map((z) => z.group(0)!).toList();
-    return tmp;
-  }
+  // List<String> attachQuestion(String content) {
+  //   RegExp regExp = RegExp(r'(\d.(.|\n)*?[+]{3}> \d)');
+  //   List<String> tmp =
+  //       regExp.allMatches(content).map((z) => z.group(0)!).toList();
+  //   return tmp;
+  // }
 
-  Question createQuestionObject(String rawQuest) {
-    RegExp statementRegEx = RegExp(r'([\d]{1,2}[.]([^+|\n])*)');
-    RegExp optionRegEx = RegExp(r'([+|>]{2}[ ]\w[.][ ]{0,1}.*)');
-    RegExp answerRegEx = RegExp(r'([+|>]+ \d)');
+  // Question createQuestionObject(String rawQuest) {
+  //   RegExp statementRegEx = RegExp(r'([\d]{1,2}[.]([^+|\n])*)');
+  //   RegExp optionRegEx = RegExp(r'([+|>]{2}[ ]\w[.][ ]{0,1}.*)');
+  //   RegExp answerRegEx = RegExp(r'([+|>]+ \d)');
 
-    final statement = statementRegEx
-        .firstMatch(rawQuest)!
-        .group(0)
-        .toString()
-        .split('.')[1]
-        .trim();
+  //   final statement = statementRegEx
+  //       .firstMatch(rawQuest)!
+  //       .group(0)
+  //       .toString()
+  //       .split('.')[1]
+  //       .trim();
 
-    List<String> options = optionRegEx
-        .allMatches(rawQuest)
-        .map((z) => z.group(0)!.substring(5).trim())
-        .toList();
+  //   List<String> options = optionRegEx
+  //       .allMatches(rawQuest)
+  //       .map((z) => z.group(0)!.substring(5).trim())
+  //       .toList();
 
-    String answer = answerRegEx
-        .firstMatch(rawQuest)!
-        .group(0)
-        .toString()
-        .substring(4)
-        .trim();
+  //   String answer = answerRegEx
+  //       .firstMatch(rawQuest)!
+  //       .group(0)
+  //       .toString()
+  //       .substring(4)
+  //       .trim();
 
-    return Question(
-        questID: "randomQuestIDThatHaventBeenGeneratedYet",
-        statement: statement,
-        options: options,
-        answer: int.parse(answer));
+  //   return Question(
+  //       statement: statement,
+  //       options: options,
+  //       answer: int.parse(answer));
+  // }
+
+  List<Question> attachQuestion(List<dynamic> data) {
+    List<Question> quests = [];
+    for (var element in data) {
+      Question q = Question(statement: element['question'], options: element['options'], answer: element['answer']);
+      quests.add(q);
+    }
+    return quests;
   }
 
   Quiz createQuiz(String content) {
-    List<String> rawQuestions = attachQuestion(content);
 
-    List<Question> quests = [];
-    for (int i = 0; i < rawQuestions.length; i++) {
-      Question cleanQuest = createQuestionObject(rawQuestions[i]);
-      quests.add(cleanQuest);
-    }
-    return Quiz(
-        quizID: "randomQuizIDThatHaventBeenGeneratedYet",
-        createDate: DateTime.now(),
-        quests: quests);
+    Map<String, dynamic> jsonObject = json.decode(content);
+
+    return Quiz(quizID: "randomQuizThatHasn'tBeenIdentified",
+                createDate: DateTime.now(),
+                quests: attachQuestion(jsonObject['quiz']),
+              );
   }
 
   Future<Quiz?> prepareQuiz(String prompt) async {
@@ -125,22 +141,24 @@ class _QScreen extends State<QScreen> {
         throw "Fail to call GPT API ${response.statusCode}";
       }
     } catch (e) {
+      print(e.toString());
       rethrow;
     }
   }
-
+    
   @override
   Widget build(BuildContext context) {
-    // final task = Task(
-    //   field: "Frontend",
-    //   stage: "Internet",
-    //   course: "How the Internet works?",
-    //   chapter: "History",
-    //   startTime: DateTime(2023, 9, 2),
-    //   endTime: DateTime(2023, 9, 8),
-    //   state: 1,
-    // );
-    final task = ModalRoute.of(context)!.settings.arguments as Task;
+    final task = Task(
+      field: "Frontend",
+      stage: "Internet",
+      course: "How the Internet works?",
+      chapter: "History",
+      startTime: DateTime(2023, 9, 2),
+      endTime: DateTime(2023, 9, 8),
+      state: 1,
+    );
+
+    //final task = ModalRoute.of(context)!.settings.arguments as Task;
 
     return ChangeNotifierProvider<QuizInfo>(
       create: (context) => QuizInfo(),
@@ -151,6 +169,8 @@ class _QScreen extends State<QScreen> {
               if (snapshot.data != null) {
                 Provider.of<QuizInfo>(context, listen: false)
                     .setQuiz(snapshot.data!);
+                Provider.of<QuizInfo>(context, listen: false).setQuizTopic(task.field, task.course);
+                debugPrint(Provider.of<QuizInfo>(context, listen: false).field);
                 return const QuizScreen();
               }
             } else if (snapshot.hasError) {
@@ -391,6 +411,9 @@ class _QuizScreen extends State<QuizScreen>
                                       onPressed: () {
                                         system.slideNextQuestion();
                                         animationPlaying();
+                                        if (system.complete) {
+                                          Navigator.of(context).pushReplacementNamed(EndQuiz.routeName, arguments: {"field": system.field, "lesson": system.lesson});
+                                        }
                                       },
                                       buttonType:
                                           ChicletButtonTypes.roundedRectangle,

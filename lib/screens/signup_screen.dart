@@ -1,23 +1,28 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:codev/providers/sign_in_info.dart';
+import 'package:codev/providers/user.dart';
+import 'package:codev/screens/quiz_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 import '../helpers/style.dart';
 
-enum Status {SUCESS, EMAIL_EXISTS, INVALID_EMAIL, ELSE}
+enum Status { SUCESS, EMAIL_EXISTS, INVALID_EMAIL, ELSE }
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
 
   static const routeName = '/signup';
 
+  const SignUpScreen({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _SignUpScreen();
+}
+
+class _SignUpScreen extends State<SignUpScreen> {
   final emailReader = TextEditingController();
 
   final passwordReader = TextEditingController();
-
-  // ignore: prefer_typing_uninitialized_variables
-  final emailPasser;
-
-  SignUpScreen(this.emailPasser, {super.key});
 
   Future<void> handleSignUp(context) async {
     await Provider.of<Auth>(context, listen: false).signup(
@@ -27,13 +32,24 @@ class SignUpScreen extends StatelessWidget {
     );
   }
 
-  void returnResponse(status, context) {
+  @override
+  void initState() {
+    super.initState();
+  }
 
+  @override
+  void dispose() {
+    super.dispose();
+    emailReader.dispose();
+    passwordReader.dispose();
+  }
+
+  void returnResponse(status, context) {
     String title = "";
     String message = "";
     late ContentType type;
 
-    switch(status) {
+    switch (status) {
       case Status.SUCESS:
         title = "Welcome to CoDev!";
         message = "We've been waiting for you!";
@@ -64,10 +80,10 @@ class SignUpScreen extends StatelessWidget {
       content: AwesomeSnackbarContent(
         title: title,
         message: message,
+
         /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
         contentType: type,
       ),
-      
     );
 
     ScaffoldMessenger.of(context)
@@ -79,8 +95,6 @@ class SignUpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final deviceSize = MediaQuery.of(context).size;
-
-    emailReader.text = emailPasser;
 
     return Scaffold(
       appBar: AppBar(),
@@ -176,42 +190,46 @@ class SignUpScreen extends StatelessWidget {
                     ),
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) => (value! == passwordReader.text) ? null : "It is not the same.",
+                  validator: (value) => (value! == passwordReader.text)
+                      ? null
+                      : "It is not the same.",
                 ),
                 SizedBox(height: deviceSize.height * 0.05),
                 Center(
                   child: SizedBox(
-                    width: deviceSize.width * 0.8,
-                    height: deviceSize.height * 0.07,
-                    child: ChangeNotifierProvider<Auth>(
-                      create:(context) => Auth(),   
-                      child: ElevatedButton(
-                        onPressed: () {
-                            handleSignUp(context)
-                            .then((value) {
-                              returnResponse(Status.SUCESS, context);
-                            })
-                            .onError((error, stackTrace) {
-                              switch(error.toString()) {
-                                case 'HttpException: INVALID_EMAIL':
-                                  returnResponse(Status.INVALID_EMAIL, context);
-                                  break;
-                                case 'HttpException: EMAIL_EXISTS':
-                                  returnResponse(Status.EMAIL_EXISTS, context);
-                                  break;
-                                default:
-                                  returnResponse(Status.ELSE, context);
-                                  break;
-                              }
-                              throw Exception(error);
-                            });
-                        },
-                        child: Text(
-                          "Create Account",
-                          style: FigmaTextStyles.mButton,
-                        )),
-                    )
-                  ),
+                      width: deviceSize.width * 0.8,
+                      height: deviceSize.height * 0.07,
+                      child: ChangeNotifierProvider<User>(
+                        create: (context) => User(),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              handleSignUp(context)
+                              .then((value) {
+                                returnResponse(Status.SUCESS, context);
+                                Navigator.of(context).pushNamed(QuizScreen.routeName);
+                              })
+                              .onError((error, stackTrace) {
+                                switch (error.toString()) {
+                                  case 'HttpException: INVALID_EMAIL':
+                                    returnResponse(
+                                        Status.INVALID_EMAIL, context);
+                                    break;
+                                  case 'HttpException: EMAIL_EXISTS':
+                                    returnResponse(
+                                        Status.EMAIL_EXISTS, context);
+                                    break;
+                                  default:
+                                    returnResponse(Status.ELSE, context);
+                                    break;
+                                }
+                                throw Exception(error);
+                              });
+                            },
+                            child: Text(
+                              "Create Account",
+                              style: FigmaTextStyles.mButton,
+                            )),
+                      )),
                 )
               ],
             ),

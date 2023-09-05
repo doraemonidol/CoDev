@@ -13,6 +13,12 @@ class QuizInfo extends ChangeNotifier {
 
   late Quiz quiz;
 
+  bool complete = false;
+
+  String lesson = "";
+
+  String field = "";
+
   List<bool> answeredStatus = [
     false,
     false,
@@ -39,11 +45,13 @@ class QuizInfo extends ChangeNotifier {
 
   void slideNextQuestion() {
     if (indexQuest == 9) {
-      
+      complete = true;
     }
+
     if (indexQuest < 9 && answeredStatus[indexQuest]) {
         ++indexQuest;
     }
+
     option = 0;
     indexedButton = 0;
     notifyListeners();
@@ -80,4 +88,12 @@ class QuizInfo extends ChangeNotifier {
   Question getCurrentQuestion() {
     return quiz.quests[indexQuest];
   }
+
+  void setQuizTopic(String field, String lesson) {
+    debugPrint("...");
+    this.field = field;
+    this.lesson = lesson;
+    notifyListeners();
+  }
+
 }
