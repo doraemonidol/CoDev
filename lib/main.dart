@@ -176,7 +176,7 @@ class MyApp extends StatelessWidget {
             MainScreen.routeName: (ctx) => MainScreen(),
             TabsScreen.routeName: (ctx) => TabsScreen(),
             DetailedTaskScreen.routeName: (ctx) => DetailedTaskScreen(),
-            QuizScreen.routeName: (ctx) => QuizScreen(),
+            QuizScreen.routeName: (ctx) => QScreen(),
           },
         ),
       ),

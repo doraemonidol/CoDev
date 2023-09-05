@@ -80,7 +80,8 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
 
             IconButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(QuizScreen.routeName);
+                Navigator.of(context)
+                    .pushNamed(QuizScreen.routeName, arguments: task!);
               },
               style: IconButton.styleFrom(
                   backgroundColor: const Color(0xFF2FD1C5)),

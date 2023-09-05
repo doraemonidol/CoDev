@@ -131,15 +131,16 @@ class _QScreen extends State<QScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final task = Task(
-      field: "Frontend",
-      stage: "Internet",
-      course: "How the Internet works?",
-      chapter: "History",
-      startTime: DateTime(2023, 9, 2),
-      endTime: DateTime(2023, 9, 8),
-      state: 1,
-    );
+    // final task = Task(
+    //   field: "Frontend",
+    //   stage: "Internet",
+    //   course: "How the Internet works?",
+    //   chapter: "History",
+    //   startTime: DateTime(2023, 9, 2),
+    //   endTime: DateTime(2023, 9, 8),
+    //   state: 1,
+    // );
+    final task = ModalRoute.of(context)!.settings.arguments as Task;
 
     return ChangeNotifierProvider<QuizInfo>(
       create: (context) => QuizInfo(),
