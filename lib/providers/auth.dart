@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
-
-import 'package:codev/screens/error_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
 import './user.dart';
 import 'package:flutter/widgets.dart'; 
 import 'package:http/http.dart' as http;
@@ -148,7 +146,19 @@ class Auth with ChangeNotifier {
       throw "Process to log in with Google failed. Error: $e";
     }
   }
+
+  Future<bool?>doesEmailExist(String email, BuildContext context) async {
+    await firebase.FirebaseAuth.instance.fetchSignInMethodsForEmail(email)
+    .then((value) {
+      if (value.isEmpty) {
+        return false;
+      }
+      else {
+        return true;
+      }
+    })
+    .onError((error, stackTrace) {
+      throw error.toString();
+    });
+  }
 }
-
-
-

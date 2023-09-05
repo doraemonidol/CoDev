@@ -20,7 +20,6 @@ class QScreen extends StatefulWidget {
 }
 
 class _QScreen extends State<QScreen> {
-
   @override
   void dispose() {
     super.dispose();
@@ -31,14 +30,11 @@ class _QScreen extends State<QScreen> {
     for (int i = 0; i < quiz.quests.length; ++i) {
       if (quiz.quests[i].options.length < 4) {
         return false;
-      }
-      else {
-        if (
-          quiz.quests[i].options[0]!.isEmpty || 
-          quiz.quests[i].options[1]!.isEmpty || 
-          quiz.quests[i].options[2]!.isEmpty || 
-          quiz.quests[i].options[3]!.isEmpty
-        ) {
+      } else {
+        if (quiz.quests[i].options[0]!.isEmpty ||
+            quiz.quests[i].options[1]!.isEmpty ||
+            quiz.quests[i].options[2]!.isEmpty ||
+            quiz.quests[i].options[3]!.isEmpty) {
           return false;
         }
       }
@@ -122,8 +118,7 @@ class _QScreen extends State<QScreen> {
         Quiz quiz = createQuiz(content);
         if (validateQuiz(quiz)) {
           return quiz;
-        }
-        else {
+        } else {
           throw 'Fail to create a quiz';
         }
       } else {
@@ -136,16 +131,16 @@ class _QScreen extends State<QScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-    final task = Task(
-      field: "Frontend",
-      stage: "Internet",
-      course: "How the Internet works?",
-      chapter: "History",
-      startTime: DateTime(2023, 9, 2),
-      endTime: DateTime(2023, 9, 8),
-      state: 1,
-    );
+    // final task = Task(
+    //   field: "Frontend",
+    //   stage: "Internet",
+    //   course: "How the Internet works?",
+    //   chapter: "History",
+    //   startTime: DateTime(2023, 9, 2),
+    //   endTime: DateTime(2023, 9, 8),
+    //   state: 1,
+    // );
+    final task = ModalRoute.of(context)!.settings.arguments as Task;
 
     return ChangeNotifierProvider<QuizInfo>(
       create: (context) => QuizInfo(),
@@ -169,6 +164,7 @@ class _QScreen extends State<QScreen> {
 }
 
 class QuizScreen extends StatefulWidget {
+  static const routeName = '/quiz-screen';
   const QuizScreen({Key? key}) : super(key: key);
   @override
   State<StatefulWidget> createState() => _QuizScreen();
@@ -176,7 +172,6 @@ class QuizScreen extends StatefulWidget {
 
 class _QuizScreen extends State<QuizScreen>
     with SingleTickerProviderStateMixin {
-
   late AnimationController controller;
   late Animation<Offset> offset;
 

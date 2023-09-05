@@ -1,5 +1,8 @@
+import 'package:codev/screens/detailed_task_screen.dart';
 import 'package:codev/screens/main_screen.dart';
 import 'package:codev/screens/on_boarding_screen.dart';
+import 'package:codev/screens/quiz_screen.dart';
+import 'package:codev/screens/test_fs.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +23,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  options: DefaultFirebaseOptions.currentPlatform,
+);
 
   //await fa.FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
@@ -154,7 +157,7 @@ class MyApp extends StatelessWidget {
 // If you do not have a themeMode switch, uncomment this line
 // to let the device system mode control the theme mode:
           themeMode: ThemeMode.system,
-          home: auth.isAuth
+          home: true // auth.isAuth
               ? TabsScreen()
               : FutureBuilder(
                   future: auth.tryAutoLogin(context),
@@ -172,6 +175,8 @@ class MyApp extends StatelessWidget {
             OnBoardingScreen.routeName: (ctx) => OnBoardingScreen(),
             MainScreen.routeName: (ctx) => MainScreen(),
             TabsScreen.routeName: (ctx) => TabsScreen(),
+            DetailedTaskScreen.routeName: (ctx) => DetailedTaskScreen(),
+            QuizScreen.routeName: (ctx) => QScreen(),
           },
         ),
       ),
