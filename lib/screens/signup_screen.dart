@@ -1,14 +1,8 @@
-import 'dart:io';
-import 'dart:ui';
-
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../providers/auth.dart';
 import '../helpers/style.dart';
-import '../providers/auth.dart';
 
 enum Status {SUCESS, EMAIL_EXISTS, INVALID_EMAIL, ELSE}
 
@@ -19,6 +13,11 @@ class SignUpScreen extends StatelessWidget {
   final emailReader = TextEditingController();
 
   final passwordReader = TextEditingController();
+
+  // ignore: prefer_typing_uninitialized_variables
+  final emailPasser;
+
+  SignUpScreen(this.emailPasser, {super.key});
 
   Future<void> handleSignUp(context) async {
     await Provider.of<Auth>(context, listen: false).signup(
@@ -78,7 +77,10 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final deviceSize = MediaQuery.of(context).size;
+
+    emailReader.text = emailPasser;
 
     return Scaffold(
       appBar: AppBar(),
