@@ -21,10 +21,11 @@ import 'screens/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await UserPreferences.init();
 
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   //await fa.FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
@@ -78,24 +79,24 @@ class MyApp extends StatelessWidget {
               drawerElevation: 1.0,
               drawerWidth: 290.0,
               bottomNavigationBarSelectedLabelSchemeColor:
-                  SchemeColor.secondary,
+              SchemeColor.secondary,
               bottomNavigationBarMutedUnselectedLabel: false,
               bottomNavigationBarSelectedIconSchemeColor: SchemeColor.secondary,
               bottomNavigationBarMutedUnselectedIcon: false,
               navigationBarSelectedLabelSchemeColor:
-                  SchemeColor.onSecondaryContainer,
+              SchemeColor.onSecondaryContainer,
               navigationBarSelectedIconSchemeColor:
-                  SchemeColor.onSecondaryContainer,
+              SchemeColor.onSecondaryContainer,
               navigationBarIndicatorSchemeColor: SchemeColor.secondaryContainer,
               navigationBarIndicatorOpacity: 1.00,
               navigationBarElevation: 1.0,
               navigationBarHeight: 72.0,
               navigationRailSelectedLabelSchemeColor:
-                  SchemeColor.onSecondaryContainer,
+              SchemeColor.onSecondaryContainer,
               navigationRailSelectedIconSchemeColor:
-                  SchemeColor.onSecondaryContainer,
+              SchemeColor.onSecondaryContainer,
               navigationRailIndicatorSchemeColor:
-                  SchemeColor.secondaryContainer,
+              SchemeColor.secondaryContainer,
               navigationRailIndicatorOpacity: 1.00,
             ),
             useMaterial3ErrorColors: true,
@@ -128,24 +129,24 @@ class MyApp extends StatelessWidget {
               drawerElevation: 1.0,
               drawerWidth: 290.0,
               bottomNavigationBarSelectedLabelSchemeColor:
-                  SchemeColor.secondary,
+              SchemeColor.secondary,
               bottomNavigationBarMutedUnselectedLabel: false,
               bottomNavigationBarSelectedIconSchemeColor: SchemeColor.secondary,
               bottomNavigationBarMutedUnselectedIcon: false,
               navigationBarSelectedLabelSchemeColor:
-                  SchemeColor.onSecondaryContainer,
+              SchemeColor.onSecondaryContainer,
               navigationBarSelectedIconSchemeColor:
-                  SchemeColor.onSecondaryContainer,
+              SchemeColor.onSecondaryContainer,
               navigationBarIndicatorSchemeColor: SchemeColor.secondaryContainer,
               navigationBarIndicatorOpacity: 1.00,
               navigationBarElevation: 1.0,
               navigationBarHeight: 72.0,
               navigationRailSelectedLabelSchemeColor:
-                  SchemeColor.onSecondaryContainer,
+              SchemeColor.onSecondaryContainer,
               navigationRailSelectedIconSchemeColor:
-                  SchemeColor.onSecondaryContainer,
+              SchemeColor.onSecondaryContainer,
               navigationRailIndicatorSchemeColor:
-                  SchemeColor.secondaryContainer,
+              SchemeColor.secondaryContainer,
               navigationRailIndicatorOpacity: 1.00,
             ),
             useMaterial3ErrorColors: true,
@@ -160,13 +161,13 @@ class MyApp extends StatelessWidget {
           home: true // auth.isAuth
               ? TabsScreen()
               : FutureBuilder(
-                  future: auth.tryAutoLogin(context),
-                  builder: (cxt, authResultSnapshot) =>
-                      authResultSnapshot.connectionState ==
-                              ConnectionState.waiting
-                          ? SplashScreen()
-                          : AuthScreen(),
-                ),
+            future: auth.tryAutoLogin(context),
+            builder: (cxt, authResultSnapshot) =>
+            authResultSnapshot.connectionState ==
+                ConnectionState.waiting
+                ? SplashScreen()
+                : AuthScreen(),
+          ),
           routes: {
             AgendaScreen.routeName: (ctx) => AgendaScreen(),
             NotificationScreen.routeName: (ctx) => NotificationScreen(),
