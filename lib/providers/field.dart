@@ -5,7 +5,7 @@ import 'dart:convert';
 
 class Stage {
   final String name;
-  final List<String> courses;
+  final List<Course> courses;
 
   Stage({
     required this.name,
