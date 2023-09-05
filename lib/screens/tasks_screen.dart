@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:codev/icon/my_icons.dart';
+import 'package:intl/intl.dart';
+
+import '../providers/tasks.dart';
 
 //FigmaTextStyles.mH3.copyWith(color:FigmaColors.sUNRISELightCharcoal,
-enum Actions {delete, access}
+enum Actions { delete, access }
 
 class TasksScreen extends StatefulWidget {
   static const routeName = '/tasks-screen';
@@ -15,293 +18,409 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
-  final List<ToDoCard> list = [
-    ToDoCard(
-      "Monday 17 August",
-      "11:30 AM - 12:30 PM",
-      "Math",
-      "Create a unique emotional story that describes better than words",
-      MyIcons.robot,
-      Color(0xFFFF7A7B),
+  final List<Task> list = [
+    Task(
+      field: 'Database',
+      stage: 'Stage 1',
+      course: 'Python',
+      chapter: 'Chapter 1',
+      startTime: DateTime.now(),
+      endTime: DateTime.now(),
+      color: FigmaColors.sUNRISEBluePrimary,
+      icon: MyIcons.robot,
+      state: 0,
     ),
-    ToDoCard(
-      "Monday 17 August",
-      "11:30 AM - 12:30 PM",
-      "Math",
-      "Create a unique emotional story that describes better than words and explore yourself to the finest degree",
-      MyIcons.robot,
-      Color(0xFFFF7A7B),
-    )];
-  final List<ToDoCard> list1 = [
-    ToDoCard(
-      "Monday 8 August",
-      "11:30 AM - 12:30 PM",
-      "Geometry",
-      "Create a unique emotional story that describes better than words",
-      MyIcons.cube_outline,
-      Color(0xFF26BFBF),
+    Task(
+      field: 'Data Science',
+      stage: 'Stage 1',
+      course: 'Python',
+      chapter: 'Chapter 2',
+      startTime: DateTime.now(),
+      endTime: DateTime.now(),
+      color: FigmaColors.sUNRISEBluePrimary,
+      icon: MyIcons.cube_outline,
+      state: 0,
     ),
-    ToDoCard(
-      "Monday 8 August",
-      "11:30 AM - 12:30 PM",
-      "Geometry",
-      "Create a unique emotional story that describes better than words",
-      MyIcons.cube_outline,
-      Color(0xFF26BFBF),
+    Task(
+      field: 'Data Science',
+      stage: 'Stage 1',
+      course: 'Python',
+      chapter: 'Chapter 3',
+      startTime: DateTime.now(),
+      endTime: DateTime.now(),
+      color: FigmaColors.sUNRISEBluePrimary,
+      icon: MyIcons.cube_outline,
+      state: 0,
+    ),
+    Task(
+      field: 'Data Science',
+      stage: 'Stage 1',
+      course: 'Python',
+      chapter: 'Chapter 4',
+      startTime: DateTime(2023, 9, 17, 11, 30),
+      endTime: DateTime(2023, 9, 17, 12, 30),
+      color: FigmaColors.sUNRISEBluePrimary,
+      icon: MyIcons.cube_outline,
+      state: 0,
     ),
   ];
+
   @override
-  Widget build(BuildContext context) => DefaultTabController(
-    length: 3,
-    child: Scaffold(
-      body: Column(
-        children: [
-          Container(
-            width:375,
-            height:190,
-            padding: EdgeInsets.fromLTRB(10.5, 0, 10.5, 22),
-            color: FigmaColors.sUNRISELightCoral,
-            child: Container(
-              width: 354,
-              height: 48,
-              margin: EdgeInsets.only(top: 121),
-              decoration: BoxDecoration(
-                color: FigmaColors.sUNRISEWhite,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: TabBar(
-                padding: EdgeInsets.all(3.0),
-                unselectedLabelStyle: FigmaTextStyles.mP,
-                labelStyle: FigmaTextStyles.sButton14,
-                unselectedLabelColor: FigmaColors.sUNRISETextGrey,
-                labelColor: FigmaColors.sUNRISEWhite,
-                dividerColor: Colors.transparent,
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicator: BoxDecoration(
-                  color: FigmaColors.sUNRISEBluePrimary,
-                  borderRadius: BorderRadius.circular(7),
+  Widget build(BuildContext context) {
+    final deviceSize = MediaQuery.of(context).size;
+    double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        body: Container(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            children: [
+              Container(
+                height: safeHeight * 0.065,
+                decoration: BoxDecoration(
+                  color: FigmaColors.sUNRISEWhite,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: FigmaColors.sUNRISELightCoral,
+                    width: 2,
+                  ),
                 ),
-                tabs: [
-                  Text('To Do', textAlign: TextAlign.center),
-                  Text('In Progress', textAlign: TextAlign.center),
-                  Text('Completed', textAlign: TextAlign.center),
+                child: TabBar(
+                  padding: EdgeInsets.all(3.0),
+                  unselectedLabelStyle: FigmaTextStyles.mP,
+                  labelStyle: FigmaTextStyles.sButton14,
+                  unselectedLabelColor: FigmaColors.sUNRISETextGrey,
+                  labelColor: FigmaColors.sUNRISEWhite,
+                  dividerColor: Colors.transparent,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicator: BoxDecoration(
+                    color: FigmaColors.sUNRISEBluePrimary,
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  tabs: [
+                    Text('To Do', textAlign: TextAlign.center),
+                    Text('In Progress', textAlign: TextAlign.center),
+                    Text('Completed', textAlign: TextAlign.center),
+                  ],
+                ),
+              ),
+              SizedBox(height: safeHeight * 0.02),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: Center(
+                        child: Icon(MyIcons.filter_variant,
+                            color: FigmaColors.sUNRISELightCharcoal)),
+                    iconSize: 20,
+                    onPressed: () {},
+                    style: IconButton.styleFrom(
+                        backgroundColor: FigmaColors.sUNRISEWhite,
+                        shape: ContinuousRectangleBorder(
+                          side: BorderSide(
+                              color: FigmaColors.lightblue, width: 1),
+                          borderRadius: BorderRadius.circular(12.0),
+                        )),
+                  ),
+                  Spacer(),
+                  TextButton.icon(
+                    label: DefaultTextStyle(
+                      style: TextStyle(color: FigmaColors.sUNRISEBluePrimary),
+                      child: Text('New Lesson', style: FigmaTextStyles.mB),
+                    ),
+                    icon: const Icon(Icons.add,
+                        color: FigmaColors.sUNRISEBluePrimary),
+                    onPressed: () {},
+                  ),
                 ],
               ),
-            ),
-          ),
-          // filter icon and add new lesson here
-          Container(
-            padding: EdgeInsets.fromLTRB(13, 16, 0, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: Center(child: Icon(MyIcons.filter_variant, color: FigmaColors.sUNRISELightCharcoal)),
-                  iconSize: 20,
-                  onPressed: (){},
-                  style: IconButton.styleFrom(
-                      backgroundColor: FigmaColors.sUNRISEWhite,
-                      shape: ContinuousRectangleBorder(
-                        side: BorderSide(color: FigmaColors.lightblue, width: 1),
-                        borderRadius: BorderRadius.circular(12.0),
-                      )),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    Page(list, TaskState.todo),
+                    Page(list, TaskState.inProgress),
+                    Page(list, TaskState.completed),
+                  ],
                 ),
-
-                TextButton.icon(
-                  label: DefaultTextStyle(
-                    style: TextStyle(color: FigmaColors.sUNRISEBluePrimary),
-                    child: Text('New Lesson', style: FigmaTextStyles.mB),
-                  ),
-                  icon: const Icon(Icons.add, color: FigmaColors.sUNRISEBluePrimary),
-                  onPressed: (){},
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-
-          Expanded(
-            child: TabBarView(
-              children: [
-                Page(list, list1, "Due"),
-                Page(list, list1, "In-progress"),
-                Page(list, list1, "Completed"),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
-
-class ToDoCard {
-  String date;
-  String time;
-  String title;
-  String description;
-  IconData icon;
-  Color color;
-  ToDoCard(this.date, this.time, this.title, this.description, this.icon, this.color);
-}
-
 
 class Page extends StatefulWidget {
-  final List<ToDoCard> list, list1;
-  final String curState;
+  final List<Task> list;
+  final TaskState curState;
 
-  const Page(this.list, this.list1, this.curState, {super.key});
+  const Page(this.list, this.curState, {super.key});
 
   @override
   State<Page> createState() => _PageState();
 }
 
 class _PageState extends State<Page> {
-
   @override
-  Widget build(BuildContext context) => Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.fromLTRB(23, 16, 0, 0),
-              child: Text.rich(
-                TextSpan(
-                  text: '${widget.curState}. ',
-                  style: FigmaTextStyles.p.copyWith(color:FigmaColors.sUNRISEDarkGrey),
-                  children: <TextSpan>[
-                    TextSpan(text: 'Today, Monday 17',
-                        style: FigmaTextStyles.mB.copyWith(color:FigmaColors.sUNRISETextGrey)),
-                  ],
-                ),
-              ),
-            ),
-            buildCardList(widget.list),
-            Container(
-              margin: const EdgeInsets.fromLTRB(23,0, 0, 0),
-              child: Text.rich(
-                TextSpan(
-                  text: '${widget.curState}. ',
-                  style: FigmaTextStyles.p.copyWith(color:FigmaColors.sUNRISEDarkGrey),
-                  children: <TextSpan>[
-                    TextSpan(
-                        text: 'Tuesday 18',
-                        style: FigmaTextStyles.mB.copyWith(color:FigmaColors.sUNRISETextGrey))
-                  ],
-                ),
-              ),
-            ),
-            buildCardList(widget.list1),
-          ],
-        ),
-      )
-  );
+  Widget build(BuildContext context) {
+    final List<Task> curStateTaskList = widget.list
+        .where((element) => element.state == widget.curState.index)
+        .toList();
+    // sort curStateTaskList by startTime
+    curStateTaskList.sort((a, b) => a.startTime.compareTo(b.startTime));
+    // get list of dates (day, month, year) unique in curStateTaskList
+    final List<DateTime> dates = [];
+    for (int i = 0; i < curStateTaskList.length; i++) {
+      if (dates.isEmpty) {
+        dates.add(curStateTaskList[i].startTime);
+      } else {
+        bool isExist = false;
+        for (int j = 0; j < dates.length; j++) {
+          if (curStateTaskList[i].startTime.day == dates[j].day &&
+              curStateTaskList[i].startTime.month == dates[j].month &&
+              curStateTaskList[i].startTime.year == dates[j].year) {
+            isExist = true;
+            break;
+          }
+        }
+        if (!isExist) {
+          dates.add(curStateTaskList[i].startTime);
+        }
+      }
+    }
 
-  Widget buildCardList(List<ToDoCard> list) {
-    final _color  = List<Color>.filled(list.length, FigmaColors.sUNRISEWhite, growable: true); //
-    return  SlidableAutoCloseBehavior(
-      closeWhenOpened: true,
-      child: SizedBox(
-        height: 135 * list.length * 1.0,
-        width: 375,
+    return Scaffold(
+      body: SingleChildScrollView(
         child: ListView.builder(
-            physics:  NeverScrollableScrollPhysics(),
-            itemCount: list.length, // number of tasks in this date
-            itemBuilder: (context, index) {
-              final ToDoCard card = list[index];
-              return Slidable(
-                endActionPane: ActionPane(
-                  extentRatio: 0.3,
-                  motion: const StretchMotion(),
-                  children: [
-                    Expanded(
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        margin: EdgeInsets.fromLTRB(0,0,2.7,0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Color(0xFFFF7A7B),
-                        ),
-                        child: IconButton(onPressed: () {},
-                            icon: const Icon(MyIcons.delete_outline, color: Colors.white)
-                        ),
-                      ),
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: dates.length,
+          itemBuilder: (context, index) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(
+                    top: 24,
+                  ),
+                  child: Text.rich(
+                    TextSpan(
+                      text: 'Due ',
+                      style: FigmaTextStyles.p
+                          .copyWith(color: FigmaColors.sUNRISEDarkGrey),
+                      children: <TextSpan>[
+                        TextSpan(
+                            text: dates[index]
+                                        .difference(DateTime.now())
+                                        .inDays ==
+                                    0
+                                ? 'Today, ${DateFormat('EEEE d').format(dates[index])}'
+                                : DateFormat('EEEE, MMMM d')
+                                    .format(dates[index]),
+                            style: FigmaTextStyles.mB
+                                .copyWith(color: FigmaColors.sUNRISETextGrey)),
+                      ],
                     ),
-                    Expanded(
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        margin: EdgeInsets.fromLTRB(0,0,2.7,0),
-                        padding: EdgeInsets.all(0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Color(0xFF2FD1C5),
-                        ),
-                        child: IconButton(onPressed: () {},
-                            icon: const Icon(MyIcons.play, color: Colors.white)
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                child: buildCard(card, index),
-              );
-            }),
+                buildCardList(
+                  curStateTaskList
+                      .where((element) =>
+                          element.startTime.day == dates[index].day &&
+                          element.startTime.month == dates[index].month &&
+                          element.startTime.year == dates[index].year)
+                      .toList(),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget buildCardList(List<Task> list) {
+    final _color = List<Color>.filled(list.length, FigmaColors.sUNRISEWhite,
+        growable: true); //
+
+    final deviceSize = MediaQuery.of(context).size;
+
+    return SlidableAutoCloseBehavior(
+      closeWhenOpened: true,
+      child: Column(
+        children: List.generate(
+          list.length,
+          (index) {
+            final Task card = list[index];
+            return Slidable(
+              endActionPane: ActionPane(
+                extentRatio: 0.32,
+                motion: const StretchMotion(),
+                children: [
+                  Expanded(
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      margin: EdgeInsets.only(
+                        left: 6,
+                        right: 3,
+                      ),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Color(0xFFFF7A7B),
+                      ),
+                      child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(MyIcons.delete_outline,
+                              color: Colors.white)),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      margin: EdgeInsets.only(
+                        left: 3,
+                        right: 6,
+                      ),
+                      padding: EdgeInsets.all(0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Color(0xFF2FD1C5),
+                      ),
+                      child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(MyIcons.play, color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+              child: buildCard(card, index),
+            );
+          },
+        ),
       ),
     );
   }
 
   int _expandedIndex = -1;
 
-  Widget buildCard(ToDoCard card, int index) =>
-      Builder(
-        builder: (context) => GestureDetector(
-          onTap: () {setState(() => _expandedIndex = index);
-          },
-          child: Container(
-            margin: const EdgeInsets.fromLTRB(13.5, 0, 13.5, 10),
-            padding: const EdgeInsets.fromLTRB(12, 8, 6, 8),
-            decoration: BoxDecoration(
-              color: _expandedIndex == index
-                  ? Color(0xFFC4D7FF)
-                  : FigmaColors.sUNRISEWhite,
-              border: Border(
-                top: BorderSide(color: card.color, width: 1),
-                right: BorderSide(color: card.color, width: 1),
-                bottom: BorderSide(color: card.color, width: 1),
-                left: BorderSide(color: card.color, width:5),
-              ),
-              borderRadius: BorderRadius.all(Radius.circular(12)),
+  Widget buildCard(Task card, int index) {
+    final deviceSize = MediaQuery.of(context).size;
+    return Builder(
+      builder: (context) => GestureDetector(
+        onTap: () {
+          setState(() => _expandedIndex = index);
+        },
+        child: Container(
+          margin: const EdgeInsets.only(top: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: _expandedIndex == index
+                ? Color(0xFFC4D7FF)
+                : FigmaColors.sUNRISEWhite,
+            border: Border(
+              top: BorderSide(color: card.color, width: 1),
+              right: BorderSide(color: card.color, width: 1),
+              bottom: BorderSide(color: card.color, width: 1),
+              left: BorderSide(color: card.color, width: 5),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  width: 209,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 209,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
                         Icon(card.icon, color: card.color),
                         SizedBox(width: 10),
-                        Text(card.time, style: FigmaTextStyles.mT.copyWith(color: FigmaColors.systemGrey)),
-                      ],),
-                      Text(
-                        card.title, style: FigmaTextStyles.sButton.copyWith(color: FigmaColors.systemDark)),
-                      Text(card.description, maxLines: 3, overflow: TextOverflow.ellipsis, style: FigmaTextStyles.mT.copyWith(color: FigmaColors.sUNRISETextGrey)),
-                    ],
-                  ),
+                        Text(
+                            card.startTime.hour.toString() +
+                                ':' +
+                                card.startTime.minute.toString() +
+                                ' - ' +
+                                card.endTime.hour.toString() +
+                                ':' +
+                                card.endTime.minute.toString(),
+                            style: FigmaTextStyles.mT
+                                .copyWith(color: FigmaColors.systemGrey)),
+                      ],
+                    ),
+                    Text(card.chapter,
+                        style: FigmaTextStyles.sButton
+                            .copyWith(color: FigmaColors.systemDark)),
+                    Text(card.course,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: FigmaTextStyles.mT
+                            .copyWith(color: FigmaColors.sUNRISETextGrey)),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.more_vert_outlined, color: Color(0xFFD8DEF3)),
-                  onPressed: (){},
-                ),
-              ],
-            ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.more_vert_outlined,
+                    color: Color(0xFFD8DEF3)),
+                onPressed: () {
+                  // show a menu with options to do the task later 1 hour / 1 day or delete the task
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) => Container(
+                      height: deviceSize.height * 0.24,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.assignment_add),
+                            title: Text('Move to In Progress tab',
+                                style: FigmaTextStyles.mB),
+                            iconColor: Theme.of(context).colorScheme.primary,
+                            textColor: Theme.of(context).colorScheme.primary,
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.timer),
+                            title: Text(
+                              'Wait an hour',
+                              style: FigmaTextStyles.mB,
+                            ),
+                            iconColor: Theme.of(context).colorScheme.primary,
+                            textColor: Theme.of(context).colorScheme.primary,
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.calendar_today_rounded),
+                            title: Text(
+                              'I will do this tomorrow',
+                              style: FigmaTextStyles.mB,
+                            ),
+                            iconColor: Theme.of(context).colorScheme.primary,
+                            textColor: Theme.of(context).colorScheme.primary,
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
+  }
 }

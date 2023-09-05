@@ -17,15 +17,24 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,51 +52,12 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCFfFVLFMXVEUznVDvcR2xPmWTIAfyfU8s',
-    appId: '1:358048944657:web:01e14911f14440568c17b0',
-    messagingSenderId: '358048944657',
-    projectId: 'codev-cs',
-    authDomain: 'codev-cs.firebaseapp.com',
-    databaseURL:
-        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'codev-cs.appspot.com',
-    measurementId: 'G-VWTQ2KN0ST',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC8LIjb-vxYyM1nHU4WMwjDyOOGiFlTqWM',
     appId: '1:358048944657:android:229fc466bedfb1ce8c17b0',
     messagingSenderId: '358048944657',
     projectId: 'codev-cs',
-    databaseURL:
-        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL: 'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'codev-cs.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAvCEzPh7ZxASpgeZljTRoa4j6u6M8ylP4',
-    appId: '1:358048944657:ios:0f91878a532599fd8c17b0',
-    messagingSenderId: '358048944657',
-    projectId: 'codev-cs',
-    databaseURL:
-        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'codev-cs.appspot.com',
-    iosClientId:
-        '358048944657-imgsofej9cqls3vcc094jedrhqn8bas8.apps.googleusercontent.com',
-    iosBundleId: 'com.example.codev',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAvCEzPh7ZxASpgeZljTRoa4j6u6M8ylP4',
-    appId: '1:358048944657:ios:0615741c4f8827de8c17b0',
-    messagingSenderId: '358048944657',
-    projectId: 'codev-cs',
-    databaseURL:
-        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'codev-cs.appspot.com',
-    iosClientId:
-        '358048944657-le118inhlujb6ttqu314l6pc1lqc18s3.apps.googleusercontent.com',
-    iosBundleId: 'com.example.codev.RunnerTests',
   );
 }

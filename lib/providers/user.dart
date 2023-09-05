@@ -64,7 +64,7 @@ class User with ChangeNotifier {
 
       if (context != null) {
         taskList = Provider.of<TaskList>(context, listen: false);
-        await taskList!.fetchAndSetTaskList();
+        // await taskList!.fetchAndSetTaskList();
       }
 
       notifyListeners();

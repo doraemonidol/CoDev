@@ -1,14 +1,80 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../providers/auth.dart';
 import '../helpers/style.dart';
+import '../providers/auth.dart';
+
+enum Status {SUCESS, EMAIL_EXISTS, INVALID_EMAIL, ELSE}
 
 class SignUpScreen extends StatelessWidget {
+
   static const routeName = '/signup';
+
+  final emailReader = TextEditingController();
+
+  final passwordReader = TextEditingController();
+
+  Future<void> handleSignUp(context) async {
+    await Provider.of<Auth>(context, listen: false).signup(
+      emailReader.text,
+      passwordReader.text,
+      context,
+    );
+  }
+
+  void returnResponse(status, context) {
+
+    String title = "";
+    String message = "";
+    late ContentType type;
+
+    switch(status) {
+      case Status.SUCESS:
+        title = "Welcome to CoDev!";
+        message = "We've been waiting for you!";
+        type = ContentType.success;
+        break;
+      case Status.EMAIL_EXISTS:
+        title = "You forgot, mate?";
+        message = "Look like you've already signed up! Try sigining in.";
+        type = ContentType.failure;
+        break;
+      case Status.INVALID_EMAIL:
+        title = "Alien detected!";
+        message = "Your email.. doesn't look like an email?";
+        type = ContentType.warning;
+        break;
+      default:
+        title = "Something happened!";
+        message = "but I don't know what it is. Try again!";
+        type = ContentType.help;
+        break;
+    }
+
+    final snackBar = SnackBar(
+      /// need to set following properties for best effect of awesome_snackbar_content
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: title,
+        message: message,
+        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+        contentType: type,
+      ),
+      
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +121,7 @@ class SignUpScreen extends StatelessWidget {
                   style: FigmaTextStyles.b.copyWith(
                     color: FigmaColors.sUNRISECharcoal,
                   ),
+                  controller: emailReader,
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
@@ -70,6 +137,7 @@ class SignUpScreen extends StatelessWidget {
                   style: FigmaTextStyles.b.copyWith(
                     color: FigmaColors.sUNRISECharcoal,
                   ),
+                  controller: passwordReader,
                   textInputAction: TextInputAction.next,
                   obscureText: true,
                   decoration: InputDecoration(
@@ -105,18 +173,42 @@ class SignUpScreen extends StatelessWidget {
                       color: FigmaColors.sUNRISEErrorRed,
                     ),
                   ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) => (value! == passwordReader.text) ? null : "It is not the same.",
                 ),
                 SizedBox(height: deviceSize.height * 0.05),
                 Center(
                   child: SizedBox(
                     width: deviceSize.width * 0.8,
                     height: deviceSize.height * 0.07,
-                    child: ElevatedButton(
-                        onPressed: () {},
+                    child: ChangeNotifierProvider<Auth>(
+                      create:(context) => Auth(),   
+                      child: ElevatedButton(
+                        onPressed: () {
+                            handleSignUp(context)
+                            .then((value) {
+                              returnResponse(Status.SUCESS, context);
+                            })
+                            .onError((error, stackTrace) {
+                              switch(error.toString()) {
+                                case 'HttpException: INVALID_EMAIL':
+                                  returnResponse(Status.INVALID_EMAIL, context);
+                                  break;
+                                case 'HttpException: EMAIL_EXISTS':
+                                  returnResponse(Status.EMAIL_EXISTS, context);
+                                  break;
+                                default:
+                                  returnResponse(Status.ELSE, context);
+                                  break;
+                              }
+                              throw Exception(error);
+                            });
+                        },
                         child: Text(
                           "Create Account",
                           style: FigmaTextStyles.mButton,
                         )),
+                    )
                   ),
                 )
               ],

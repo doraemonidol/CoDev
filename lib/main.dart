@@ -23,7 +23,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await fa.FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  //await fa.FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
   runApp(MyApp());
 }
@@ -154,8 +154,8 @@ class MyApp extends StatelessWidget {
 // If you do not have a themeMode switch, uncomment this line
 // to let the device system mode control the theme mode:
           themeMode: ThemeMode.system,
-          home: true // auth.isAuth
-              ? MainScreen() // TabsScreen()
+          home: auth.isAuth
+              ? TabsScreen()
               : FutureBuilder(
                   future: auth.tryAutoLogin(context),
                   builder: (cxt, authResultSnapshot) =>
