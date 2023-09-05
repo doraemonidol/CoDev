@@ -10,7 +10,7 @@ import '../screens/signup_screen.dart';
 
 enum AuthMode { Signup, Login }
 
-enum Status {SUCESS, FAIL}
+enum Status { SUCESS, FAIL }
 
 class AuthScreen extends StatelessWidget {
   static const routeName = '/auth';
@@ -35,8 +35,8 @@ class AuthScreen extends StatelessWidget {
             children: <Widget>[
               /* Upper half*/
 
-              Container (
-                  height: safeHeight * 0.55,
+              Container(
+                  height: safeHeight * 0.45,
                   color: const Color.fromRGBO(243, 250, 255, 1),
                   padding: const EdgeInsets.all(24),
                   child: Center(
@@ -53,9 +53,7 @@ class AuthScreen extends StatelessWidget {
                           "CoDev",
                           style: FigmaTextStyles.h3,
                         ),
-
                         const Padding(padding: EdgeInsets.all(5)),
-
                         Text(
                           "AI pair learner that navigate the path to  developer mastery. Track progress and tailor your learning adventure.",
                           style: FigmaTextStyles.p.copyWith(
@@ -65,11 +63,13 @@ class AuthScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )
-                  ),
+                  )),
 
               /* Lower half */
-              ChangeNotifierProvider<SignInProvider>(create: (context) => SignInProvider(), child: MainAuthScreen(),)
+              ChangeNotifierProvider<SignInProvider>(
+                create: (context) => SignInProvider(),
+                child: MainAuthScreen(),
+              )
             ],
           ),
         ),
@@ -79,7 +79,6 @@ class AuthScreen extends StatelessWidget {
 }
 
 class SignInProvider extends ChangeNotifier {
-
   static const int FIRST_AUTH_SCREEN = 0;
 
   static const int SECOND_AUTH_SCREEN = 1;
@@ -96,16 +95,13 @@ class SignInProvider extends ChangeNotifier {
   int getStatus() {
     return status;
   }
-
 }
 
 class MainAuthScreen extends StatefulWidget {
   const MainAuthScreen({super.key});
 
-
   @override
   State<StatefulWidget> createState() => _MainAuthScreen();
-
 }
 
 class AuthScreenOption1 extends StatefulWidget {
@@ -113,7 +109,6 @@ class AuthScreenOption1 extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _AuthScreenOption1();
-
 }
 
 class AuthScreenOption2 extends StatefulWidget {
@@ -126,7 +121,6 @@ class AuthScreenOption2 extends StatefulWidget {
 class _AuthScreenOption1 extends State<AuthScreenOption1> {
   @override
   Widget build(BuildContext context) {
-
     final deviceSize = MediaQuery.of(context).size;
 
     double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
@@ -154,16 +148,18 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
           Row(
             children: <Widget>[
               Expanded(
-                child: ChangeNotifierProvider<Auth>(create: (context) => Auth(), child: OutlinedButton.icon(
+                  child: ChangeNotifierProvider<Auth>(
+                create: (context) => Auth(),
+                child: OutlinedButton.icon(
                   onPressed: () {
-                    Provider.of<Auth>(context, listen: false).signInWithGoogle(context);
+                    Provider.of<Auth>(context, listen: false)
+                        .signInWithGoogle(context);
                   },
                   icon: const SizedBox(
                       width: 24,
                       height: 24,
                       child: Image(
-                          image: AssetImage(
-                              'assets/img/Google-logo.png'))),
+                          image: AssetImage('assets/img/Google-logo.png'))),
                   label: Text(
                     "Google",
                     style: FigmaTextStyles.mButton,
@@ -172,15 +168,14 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
                     minimumSize: MaterialStateProperty.all<Size>(
                       Size(deviceSize.width * 0.4, 64),
                     ),
-                    shape: MaterialStateProperty.all<
-                        RoundedRectangleBorder>(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                     ),
                   ),
-                ),)
-              ),
+                ),
+              )),
             ],
           ),
           Row(
@@ -211,7 +206,7 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
                 )),
           ),
           Consumer<SignInProvider>(
-            builder:(context, system, child) => ElevatedButton(
+            builder: (context, system, child) => ElevatedButton(
               onPressed: () async {
                 system.changeAuthScreen();
               },
@@ -232,13 +227,11 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
         ],
       ),
     );
-            
   }
-  
 }
 
-class _AuthScreenOption2 extends State<AuthScreenOption2> with SingleTickerProviderStateMixin {
-
+class _AuthScreenOption2 extends State<AuthScreenOption2>
+    with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late Animation<Offset> offset;
 
@@ -247,32 +240,32 @@ class _AuthScreenOption2 extends State<AuthScreenOption2> with SingleTickerProvi
 
   @override
   void initState() {
-
     super.initState();
 
-    controller = AnimationController(vsync: this, duration: Duration(milliseconds: 400));
+    controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
 
-    offset = Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset.zero).animate(controller);
+    offset = Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset.zero)
+        .animate(controller);
 
     switch (controller.status) {
-        case AnimationStatus.completed:
-          controller.reverse();
-          break;
-        case AnimationStatus.dismissed:
-          controller.forward();
-          break;
-        default:
-          controller.reverse();
+      case AnimationStatus.completed:
+        controller.reverse();
+        break;
+      case AnimationStatus.dismissed:
+        controller.forward();
+        break;
+      default:
+        controller.reverse();
     }
   }
-  
-  void returnResponse(status, context) {
 
+  void returnResponse(status, context) {
     String title = "";
     String message = "";
     late ContentType type;
 
-    switch(status) {
+    switch (status) {
       case Status.SUCESS:
         title = "Welcome to CoDev!";
         message = "We've been waiting for you!";
@@ -284,13 +277,13 @@ class _AuthScreenOption2 extends State<AuthScreenOption2> with SingleTickerProvi
         type = ContentType.failure;
         break;
     }
-    final materialBanner =  MaterialBanner(
+    final materialBanner = MaterialBanner(
       /// need to set following properties for best effect of awesome_snackbar_content
       elevation: 0,
       backgroundColor: Colors.transparent,
       forceActionsBelow: true,
       content: AwesomeSnackbarContent(
-        title: title, 
+        title: title,
         message: message,
         contentType: type,
         inMaterialBanner: true,
@@ -305,7 +298,6 @@ class _AuthScreenOption2 extends State<AuthScreenOption2> with SingleTickerProvi
 
   @override
   Widget build(BuildContext context) {
-
     final deviceSize = MediaQuery.of(context).size;
 
     double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
@@ -315,99 +307,101 @@ class _AuthScreenOption2 extends State<AuthScreenOption2> with SingleTickerProvi
       topRight: Radius.circular(24.0),
     );
 
-    return SlideTransition(position: offset, child : Container(
-      height: safeHeight * 0.45,
-      width: deviceSize.width,
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        color: Colors.white,
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Text(
-            "Get access with",
-            style: FigmaTextStyles.h4,
+    return SlideTransition(
+        position: offset,
+        child: Container(
+          height: safeHeight * 0.45,
+          width: deviceSize.width,
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            color: Colors.white,
           ),
-          TextFormField(
-            style: FigmaTextStyles.b.copyWith(
-              color: FigmaColors.sUNRISECharcoal,
-            ),
-            controller: emailReader,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Email',
-              labelText: 'Email',
-              prefixIcon: Icon(Icons.lock_outline_rounded),
-              hintStyle: FigmaTextStyles.b,
-              labelStyle: FigmaTextStyles.b,
-              errorStyle: FigmaTextStyles.mP.copyWith(
-                color: FigmaColors.sUNRISEErrorRed,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Text(
+                "Get access with",
+                style: FigmaTextStyles.h4,
               ),
-            ),
-          ),
-          TextFormField(
-            style: FigmaTextStyles.b.copyWith(
-              color: FigmaColors.sUNRISECharcoal,
-            ),
-            controller: passwordReader,
-            textInputAction: TextInputAction.next,
-            obscureText: true,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Password',
-              labelText: 'Password',
-              prefixIcon: Icon(Icons.lock_outline_rounded),
-              hintStyle: FigmaTextStyles.b,
-              labelStyle: FigmaTextStyles.b,
-              errorStyle: FigmaTextStyles.mP.copyWith(
-                color: FigmaColors.sUNRISEErrorRed,
-              ),
-            ),
-          ),
-          ChangeNotifierProvider<Auth>(
-            create: (context) => Auth(), 
-            child: ElevatedButton(
-              onPressed: () {
-                // Provider.of<Auth>(context, listen: false).login(emailReader.text, passwordReader.text, context)
-                // .then((value) {
-                //   returnResponse(Status.SUCESS, context);
-                //   Navigator.push(context, MaterialPageRoute(builder:(context) => QScreen(),));
-                // })
-                // .onError((error, stackTrace) {
-                //   returnResponse(Status.FAIL, context);
-                // });
-                Navigator.push(context, MaterialPageRoute(builder:(context) => QScreen(),));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)),
-                minimumSize: const Size(327, 50), //////// HERE
-              ),
-              child: Text(
-                "Log In",
-                style: FigmaTextStyles.mButton.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimary,
+              TextFormField(
+                style: FigmaTextStyles.b.copyWith(
+                  color: FigmaColors.sUNRISECharcoal,
+                ),
+                controller: emailReader,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Email',
+                  labelText: 'Email',
+                  prefixIcon: Icon(Icons.lock_outline_rounded),
+                  hintStyle: FigmaTextStyles.b,
+                  labelStyle: FigmaTextStyles.b,
+                  errorStyle: FigmaTextStyles.mP.copyWith(
+                    color: FigmaColors.sUNRISEErrorRed,
+                  ),
                 ),
               ),
-            ),
+              TextFormField(
+                style: FigmaTextStyles.b.copyWith(
+                  color: FigmaColors.sUNRISECharcoal,
+                ),
+                controller: passwordReader,
+                textInputAction: TextInputAction.next,
+                obscureText: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Password',
+                  labelText: 'Password',
+                  prefixIcon: Icon(Icons.lock_outline_rounded),
+                  hintStyle: FigmaTextStyles.b,
+                  labelStyle: FigmaTextStyles.b,
+                  errorStyle: FigmaTextStyles.mP.copyWith(
+                    color: FigmaColors.sUNRISEErrorRed,
+                  ),
+                ),
+              ),
+              ChangeNotifierProvider<Auth>(
+                create: (context) => Auth(),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Provider.of<Auth>(context, listen: false).login(emailReader.text, passwordReader.text, context)
+                    // .then((value) {
+                    //   returnResponse(Status.SUCESS, context);
+                    //   Navigator.push(context, MaterialPageRoute(builder:(context) => QScreen(),));
+                    // })
+                    // .onError((error, stackTrace) {
+                    //   returnResponse(Status.FAIL, context);
+                    // });
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QScreen(),
+                        ));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    minimumSize: const Size(327, 50), //////// HERE
+                  ),
+                  child: Text(
+                    "Log In",
+                    style: FigmaTextStyles.mButton.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ));     
+        ));
   }
-
-
 }
 
 class _MainAuthScreen extends State<MainAuthScreen> {
-
   @override
   Widget build(BuildContext context) {
-
     final deviceSize = MediaQuery.of(context).size;
 
     double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
@@ -417,7 +411,10 @@ class _MainAuthScreen extends State<MainAuthScreen> {
       topRight: Radius.circular(24.0),
     );
 
-    return Consumer<SignInProvider>(builder: (context, system, child) => (system.getStatus() == 0 ? AuthScreenOption1() : AuthScreenOption2()));
+    return Consumer<SignInProvider>(
+        builder: (context, system, child) => (system.getStatus() == 0
+            ? AuthScreenOption1()
+            : AuthScreenOption2()));
   }
 }
 
