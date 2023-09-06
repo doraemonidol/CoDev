@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codev/providers/auth.dart';
 import 'package:codev/screens/tabs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/radio_button.dart';
 
@@ -16,6 +19,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   int _value = 0;
   @override
   Widget build(BuildContext context) {
+    final userId = Provider.of<Auth>(context, listen: false).userId;
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
@@ -139,10 +143,16 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                                 : Theme.of(context).colorScheme.primary,
                           ),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (_value != 0) {
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                                TabsScreen.routeName, (route) => false);
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(userId)
+                                .update({
+                              'educationLevel': _value,
+                            });
+                            Provider.of<Auth>(context, listen: false)
+                                .setFirstTime(false);
                           }
                         },
                       ),

@@ -1,6 +1,7 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:codev/providers/sign_in_info.dart';
 import 'package:codev/providers/user.dart';
+import 'package:codev/screens/main_screen.dart';
 import 'package:codev/screens/quiz_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,27 +11,21 @@ import '../helpers/style.dart';
 enum Status { SUCESS, EMAIL_EXISTS, INVALID_EMAIL, ELSE }
 
 class SignUpScreen extends StatefulWidget {
-
   static const routeName = '/signup';
+  String? email;
 
-  const SignUpScreen({super.key});
+  SignUpScreen(this.email);
 
   @override
-  State<StatefulWidget> createState() => _SignUpScreen();
+  State<StatefulWidget> createState() => _SignUpScreen(email);
 }
 
 class _SignUpScreen extends State<SignUpScreen> {
   final emailReader = TextEditingController();
-
   final passwordReader = TextEditingController();
+  String? email;
 
-  Future<void> handleSignUp(context) async {
-    await Provider.of<Auth>(context, listen: false).signup(
-      emailReader.text,
-      passwordReader.text,
-      context,
-    );
-  }
+  _SignUpScreen(this.email);
 
   @override
   void initState() {
@@ -93,8 +88,8 @@ class _SignUpScreen extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final deviceSize = MediaQuery.of(context).size;
+    emailReader.text = email!;
 
     return Scaffold(
       appBar: AppBar(),
@@ -202,28 +197,16 @@ class _SignUpScreen extends State<SignUpScreen> {
                       child: ChangeNotifierProvider<User>(
                         create: (context) => User(),
                         child: ElevatedButton(
-                            onPressed: () {
-                              handleSignUp(context)
-                              .then((value) {
-                                returnResponse(Status.SUCESS, context);
-                                Navigator.of(context).pushNamed(QuizScreen.routeName);
-                              })
-                              .onError((error, stackTrace) {
-                                switch (error.toString()) {
-                                  case 'HttpException: INVALID_EMAIL':
-                                    returnResponse(
-                                        Status.INVALID_EMAIL, context);
-                                    break;
-                                  case 'HttpException: EMAIL_EXISTS':
-                                    returnResponse(
-                                        Status.EMAIL_EXISTS, context);
-                                    break;
-                                  default:
-                                    returnResponse(Status.ELSE, context);
-                                    break;
-                                }
-                                throw Exception(error);
-                              });
+                            onPressed: () async {
+                              Provider.of<Auth>(context, listen: false).signup(
+                                emailReader.text,
+                                passwordReader.text,
+                                context,
+                              );
+
+                              Provider.of<SignUpProvider>(context,
+                                      listen: false)
+                                  .init();
                             },
                             child: Text(
                               "Create Account",

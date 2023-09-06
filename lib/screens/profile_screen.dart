@@ -1,3 +1,4 @@
+import 'package:codev/providers/auth.dart';
 import 'package:codev/providers/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:codev/helpers/style.dart';
 import 'package:codev/screens/edit_profile_screen.dart';
+import 'package:codev/providers/user.dart' as CoDevCS;
 
 class UserPreferences {
   static late SharedPreferences _preferences;
@@ -235,7 +237,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         Center(
             child: Text(widget.user.name,
                 style: FigmaTextStyles.mH3.copyWith(color: Color(0xFF2F394B)))),
-        Center(child: buildLogOutButton()),
+        Center(
+          child: TextButton(
+            child: Text('Log Out',
+                style: FigmaTextStyles.mP
+                    .copyWith(color: FigmaColors.sUNRISEBluePrimary)),
+            onPressed: () {
+              print('Log Out');
+              Provider.of<Auth>(context, listen: false).logout();
+              UserPreferences.removeUser();
+            },
+          ),
+        ),
       ],
     );
   }
@@ -295,15 +308,4 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           child: child,
         ),
       );
-
-  bool changeColor = false;
-  Widget buildLogOutButton() {
-    return TextButton(
-      child: Text('Log Out',
-          style: FigmaTextStyles.mP
-              .copyWith(color: FigmaColors.sUNRISEBluePrimary)),
-      onPressed: () {},
-      onHover: (hovered) => setState(() => changeColor = hovered),
-    );
-  }
 }

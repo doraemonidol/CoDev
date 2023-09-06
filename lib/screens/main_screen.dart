@@ -26,99 +26,111 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int activeIndex = 0;
+  bool isDone = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    isDone = false;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final urlOb = 'assets/images/OBJECTS.png';
     final deviceSize = MediaQuery.of(context).size;
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            color: FigmaColors.sUNRISESunray,
-          ),
-          Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              width: deviceSize.width,
-              height: deviceSize.height * 0.4,
-              padding: EdgeInsets.only(
-                top: deviceSize.height * 0.1,
-              ),
-              child: Center(
-                child: Image.asset(
-                  urlOb,
+    return isDone
+        ? OnBoardingScreen()
+        : Scaffold(
+            body: Stack(
+              children: [
+                Container(
+                  color: FigmaColors.sUNRISESunray,
                 ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: deviceSize.height * 0.4,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: deviceSize.height * 0.6,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-              ),
-              //margin: EdgeInsets.symmetric(vertical: 25),
-              padding: EdgeInsets.all(deviceSize.width * 0.1),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  buildIndicator(),
-                  SizedBox(
-                    height: deviceSize.height * 0.025,
-                  ),
-                  Expanded(
-                    child: CarouselSlider.builder(
-                      options: CarouselOptions(
-                          enableInfiniteScroll: false,
-                          onPageChanged: (index, reason) =>
-                              setState(() => activeIndex = index),
-                          viewportFraction: 1.0),
-                      itemCount: 3,
-                      itemBuilder: (context, index, realIndex) {
-                        final title = titles[index];
-                        final subtitle = subtitles[index];
-                        return buildMainScreen(
-                            title, subtitle, index, deviceSize);
-                      },
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    width: deviceSize.width,
+                    height: deviceSize.height * 0.4,
+                    padding: EdgeInsets.only(
+                      top: deviceSize.height * 0.1,
+                    ),
+                    child: Center(
+                      child: Image.asset(
+                        urlOb,
+                      ),
                     ),
                   ),
-                  SizedBox(height: deviceSize.height * 0.025),
-                  Container(
-                    width: deviceSize.width * 0.7,
-                    height: deviceSize.height * 0.08,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FigmaColors.sUNRISEBluePrimary,
-                        shape: ContinuousRectangleBorder(
-                          borderRadius: BorderRadius.circular(24.0),
+                ),
+                Positioned(
+                  top: deviceSize.height * 0.4,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: deviceSize.height * 0.6,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
+                    ),
+                    //margin: EdgeInsets.symmetric(vertical: 25),
+                    padding: EdgeInsets.all(deviceSize.width * 0.1),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        buildIndicator(),
+                        SizedBox(
+                          height: deviceSize.height * 0.025,
                         ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pushNamed(OnBoardingScreen.routeName);
-                      },
-                      child: Text(
-                        'Get Started',
-                        style: FigmaTextStyles.mButton
-                            .copyWith(color: FigmaColors.sUNRISEWhite),
-                      ),
+                        Expanded(
+                          child: CarouselSlider.builder(
+                            options: CarouselOptions(
+                                enableInfiniteScroll: false,
+                                onPageChanged: (index, reason) =>
+                                    setState(() => activeIndex = index),
+                                viewportFraction: 1.0),
+                            itemCount: 3,
+                            itemBuilder: (context, index, realIndex) {
+                              final title = titles[index];
+                              final subtitle = subtitles[index];
+                              return buildMainScreen(
+                                  title, subtitle, index, deviceSize);
+                            },
+                          ),
+                        ),
+                        SizedBox(height: deviceSize.height * 0.025),
+                        Container(
+                          width: deviceSize.width * 0.7,
+                          height: deviceSize.height * 0.08,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: FigmaColors.sUNRISEBluePrimary,
+                              shape: ContinuousRectangleBorder(
+                                borderRadius: BorderRadius.circular(24.0),
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                isDone = true;
+                              });
+                            },
+                            child: Text(
+                              'Get Started',
+                              style: FigmaTextStyles.mButton
+                                  .copyWith(color: FigmaColors.sUNRISEWhite),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   Widget buildMainScreen(

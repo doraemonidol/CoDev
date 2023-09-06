@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+import 'package:codev/providers/sign_in_info.dart';
 import 'package:codev/screens/main_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
@@ -16,9 +17,22 @@ class Auth with ChangeNotifier {
   DateTime? _expiryDate = null;
   String _userId = '';
   Timer? _authTimer = null;
+  bool? _isFirstTime = null;
 
   Auth() {
     //SharedPreferences.setMockInitialValues({});
+  }
+
+  bool get isFirstTime {
+    if (_isFirstTime == null) {
+      return false;
+    }
+    return _isFirstTime!;
+  }
+
+  void setFirstTime(bool value) {
+    _isFirstTime = value;
+    notifyListeners();
   }
 
   bool get isAuth {
@@ -45,7 +59,8 @@ class Auth with ChangeNotifier {
     final url =
         'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyC8LIjb-vxYyM1nHU4WMwjDyOOGiFlTqWM';
     try {
-      await http.post(
+      await http
+          .post(
         Uri.parse(url),
         body: json.encode(
           {
@@ -55,7 +70,7 @@ class Auth with ChangeNotifier {
           },
         ),
       )
-      .then((response) async {
+          .then((response) async {
         final responseData = json.decode(response.body);
         if (responseData['error'] != null) {
           throw HttpException(responseData['error']['message']);
@@ -71,7 +86,8 @@ class Auth with ChangeNotifier {
         );
         _autoLogout(context);
         if (urlSegment == 'signUp') {
-          Provider.of<CoDevUser.User>(context, listen: false).addUser(email);
+          Provider.of<CoDevUser.User>(context, listen: false)
+              .addUser(email, _userId, _token);
         }
         notifyListeners();
         final prefs = await SharedPreferences.getInstance();
@@ -83,8 +99,7 @@ class Auth with ChangeNotifier {
           },
         );
         prefs.setString('codev_auth', userData);
-      })
-      .onError((error, stackTrace) => throw error.toString());
+      }).onError((error, stackTrace) => throw error.toString());
     } catch (error) {
       rethrow;
     }
@@ -92,11 +107,13 @@ class Auth with ChangeNotifier {
 
   Future<void> signup(
       String email, String password, BuildContext context) async {
+    _isFirstTime = true;
     return _authenticate(email, password, 'signUp', context);
   }
 
   Future<void> login(
       String email, String password, BuildContext context) async {
+    _isFirstTime = false;
     return _authenticate(email, password, 'signInWithPassword', context);
   }
 
@@ -147,8 +164,10 @@ class Auth with ChangeNotifier {
         accessToken: auth.accessToken,
         idToken: auth.idToken,
       );
-      firebase.UserCredential user_cres =  await firebase.FirebaseAuth.instance.signInWithCredential(credential);
-      String? _token_ = await firebase.FirebaseAuth.instance.currentUser!.getIdToken();
+      firebase.UserCredential user_cres =
+          await firebase.FirebaseAuth.instance.signInWithCredential(credential);
+      String? _token_ =
+          await firebase.FirebaseAuth.instance.currentUser!.getIdToken();
       _token = _token_!;
       _userId = firebase.FirebaseAuth.instance.currentUser!.uid;
       _expiryDate = DateTime.now().add(
@@ -173,7 +192,6 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> signInWithGoogle(context) async {
-    _signInWithGoogle(context).then((value) async {
-    });
+    _signInWithGoogle(context).then((value) async {});
   }
 }

@@ -1,7 +1,9 @@
+import 'package:codev/providers/sign_in_info.dart';
 import 'package:codev/providers/user.dart';
 import 'package:codev/screens/detailed_task_screen.dart';
 import 'package:codev/screens/endquiz_screen.dart';
 import 'package:codev/screens/main_screen.dart';
+import 'package:codev/screens/new_lesson_screen.dart';
 import 'package:codev/screens/on_boarding_screen.dart';
 import 'package:codev/screens/quiz_screen.dart';
 import 'package:codev/screens/signup_screen.dart';
@@ -48,6 +50,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (ctx) => User(),
         ),
+        ChangeNotifierProvider(
+          create: (ctx) => SignUpProvider(),
+        ),
+        ChangeNotifierProvider<SignInProvider>(
+          create: (context) => SignInProvider(),
+        ),
         // ChangeNotifierProxyProvider<Auth, Products>(
         //   update: (ctx, auth, previousProduct) => Products(
         //     auth.token,
@@ -85,24 +93,24 @@ class MyApp extends StatelessWidget {
               drawerElevation: 1.0,
               drawerWidth: 290.0,
               bottomNavigationBarSelectedLabelSchemeColor:
-              SchemeColor.secondary,
+                  SchemeColor.secondary,
               bottomNavigationBarMutedUnselectedLabel: false,
               bottomNavigationBarSelectedIconSchemeColor: SchemeColor.secondary,
               bottomNavigationBarMutedUnselectedIcon: false,
               navigationBarSelectedLabelSchemeColor:
-              SchemeColor.onSecondaryContainer,
+                  SchemeColor.onSecondaryContainer,
               navigationBarSelectedIconSchemeColor:
-              SchemeColor.onSecondaryContainer,
+                  SchemeColor.onSecondaryContainer,
               navigationBarIndicatorSchemeColor: SchemeColor.secondaryContainer,
               navigationBarIndicatorOpacity: 1.00,
               navigationBarElevation: 1.0,
               navigationBarHeight: 72.0,
               navigationRailSelectedLabelSchemeColor:
-              SchemeColor.onSecondaryContainer,
+                  SchemeColor.onSecondaryContainer,
               navigationRailSelectedIconSchemeColor:
-              SchemeColor.onSecondaryContainer,
+                  SchemeColor.onSecondaryContainer,
               navigationRailIndicatorSchemeColor:
-              SchemeColor.secondaryContainer,
+                  SchemeColor.secondaryContainer,
               navigationRailIndicatorOpacity: 1.00,
             ),
             useMaterial3ErrorColors: true,
@@ -135,24 +143,24 @@ class MyApp extends StatelessWidget {
               drawerElevation: 1.0,
               drawerWidth: 290.0,
               bottomNavigationBarSelectedLabelSchemeColor:
-              SchemeColor.secondary,
+                  SchemeColor.secondary,
               bottomNavigationBarMutedUnselectedLabel: false,
               bottomNavigationBarSelectedIconSchemeColor: SchemeColor.secondary,
               bottomNavigationBarMutedUnselectedIcon: false,
               navigationBarSelectedLabelSchemeColor:
-              SchemeColor.onSecondaryContainer,
+                  SchemeColor.onSecondaryContainer,
               navigationBarSelectedIconSchemeColor:
-              SchemeColor.onSecondaryContainer,
+                  SchemeColor.onSecondaryContainer,
               navigationBarIndicatorSchemeColor: SchemeColor.secondaryContainer,
               navigationBarIndicatorOpacity: 1.00,
               navigationBarElevation: 1.0,
               navigationBarHeight: 72.0,
               navigationRailSelectedLabelSchemeColor:
-              SchemeColor.onSecondaryContainer,
+                  SchemeColor.onSecondaryContainer,
               navigationRailSelectedIconSchemeColor:
-              SchemeColor.onSecondaryContainer,
+                  SchemeColor.onSecondaryContainer,
               navigationRailIndicatorSchemeColor:
-              SchemeColor.secondaryContainer,
+                  SchemeColor.secondaryContainer,
               navigationRailIndicatorOpacity: 1.00,
             ),
             useMaterial3ErrorColors: true,
@@ -164,16 +172,16 @@ class MyApp extends StatelessWidget {
 // If you do not have a themeMode switch, uncomment this line
 // to let the device system mode control the theme mode:
           themeMode: ThemeMode.system,
-          home:  auth.isAuth // auth.isAuth
-              ? TabsScreen()
+          home: auth.isAuth // auth.isAuth
+              ? (auth.isFirstTime ? MainScreen() : TabsScreen())
               : FutureBuilder(
-            future: auth.tryAutoLogin(context),
-            builder: (cxt, authResultSnapshot) =>
-            authResultSnapshot.connectionState ==
-                ConnectionState.waiting
-                ? SplashScreen()
-                : AuthScreen(),
-          ),
+                  future: auth.tryAutoLogin(context),
+                  builder: (cxt, authResultSnapshot) =>
+                      authResultSnapshot.connectionState ==
+                              ConnectionState.waiting
+                          ? SplashScreen()
+                          : AuthScreen(),
+                ),
           routes: {
             AgendaScreen.routeName: (ctx) => AgendaScreen(),
             NotificationScreen.routeName: (ctx) => NotificationScreen(),
@@ -185,7 +193,7 @@ class MyApp extends StatelessWidget {
             DetailedTaskScreen.routeName: (ctx) => DetailedTaskScreen(),
             QuizScreen.routeName: (ctx) => QScreen(),
             EndQuiz.routeName: (ctx) => EndQuiz(),
-            SignUpScreen.routeName: (ctx) => SignUpScreen(),
+            NewLessonScreen.routeName: (ctx) => NewLessonScreen(),
           },
         ),
       ),

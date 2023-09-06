@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'progress.dart';
 import 'tasks.dart';
 import 'package:flutter/material.dart';
@@ -106,17 +108,21 @@ class User with ChangeNotifier {
     }
   }
 
-  Future<void> addUser(String email) async {
+  Future<void> addUser(String email, String uid, String token) async {
     print('adding user');
-    final url =
-        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId.json?auth=$authToken';
-    try {
-      final response = await http.patch(
-        Uri.parse(url),
-        body: json.encode({}),
-      );
+    userId = uid;
+    authToken = token;
 
-      print(response.body);
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(userId).set({
+        'email': email,
+        'phoneNumber': phone,
+        'name': name,
+        'location': location,
+        'imageUrl': imageUrl,
+        'educationLevel': educationLevel,
+        'point': point,
+      });
 
       notifyListeners();
     } catch (error) {

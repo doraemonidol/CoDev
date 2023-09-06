@@ -15,6 +15,8 @@ class SignInProvider extends ChangeNotifier {
     if (status == FIRST_AUTH_SCREEN) {
       status = SECOND_AUTH_SCREEN;
       notifyListeners();
+    } else {
+      status = FIRST_AUTH_SCREEN;
     }
   }
 
@@ -29,5 +31,21 @@ class SignInProvider extends ChangeNotifier {
   void receivePassword(password) {
     this.password = password;
   }
+}
 
+class SignUpProvider extends ChangeNotifier {
+  bool isSigningUp = false;
+
+  void init() {
+    isSigningUp = false;
+  }
+
+  void changeSigningUp() {
+    isSigningUp = !isSigningUp;
+    notifyListeners();
+  }
+
+  bool getIsSigningUp() {
+    return isSigningUp;
+  }
 }
