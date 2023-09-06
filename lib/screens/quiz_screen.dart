@@ -3,6 +3,7 @@ import 'package:chiclet/chiclet.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:codev/providers/quiz_info.dart';
 import 'package:codev/screens/endquiz_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:provider/provider.dart';
@@ -27,10 +28,8 @@ class _QScreen extends State<QScreen> {
   }
 
   bool validateQuiz(Quiz quiz) {
-
     if (quiz.quests.isEmpty) return false;
     for (int i = 0; i < quiz.quests.length; ++i) {
-
       //check if statement is empty
       if (quiz.quests[i].statement.isEmpty) {
         return false;
@@ -39,8 +38,7 @@ class _QScreen extends State<QScreen> {
       //check if quiz have options
       if (quiz.quests[i].options.length != 4) {
         return false;
-      } 
-      else if (quiz.quests[i].options[0]!.isEmpty ||
+      } else if (quiz.quests[i].options[0]!.isEmpty ||
           quiz.quests[i].options[1]!.isEmpty ||
           quiz.quests[i].options[2]!.isEmpty ||
           quiz.quests[i].options[3]!.isEmpty) {
@@ -94,20 +92,23 @@ class _QScreen extends State<QScreen> {
   List<Question> attachQuestion(List<dynamic> data) {
     List<Question> quests = [];
     for (var element in data) {
-      Question q = Question(statement: element['question'], options: element['options'], answer: element['answer']);
+      Question q = Question(
+          statement: element['question'],
+          options: element['options'],
+          answer: element['answer']);
       quests.add(q);
     }
     return quests;
   }
 
   Quiz createQuiz(String content) {
-
     Map<String, dynamic> jsonObject = json.decode(content);
 
-    return Quiz(quizID: "randomQuizThatHasn'tBeenIdentified",
-                createDate: DateTime.now(),
-                quests: attachQuestion(jsonObject['quiz']),
-              );
+    return Quiz(
+      quizID: "randomQuizThatHasn'tBeenIdentified",
+      createDate: DateTime.now(),
+      quests: attachQuestion(jsonObject['quiz']),
+    );
   }
 
   Future<Quiz?> prepareQuiz(String prompt) async {
@@ -123,6 +124,53 @@ class _QScreen extends State<QScreen> {
     });
 
     try {
+      // return Quiz(
+      //   quizID: "randomQuizThatHasn'tBeenIdentified",
+      //   createDate: DateTime.now(),
+      //   quests: [
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0),
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0),
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0),
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0),
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0),
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0),
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0),
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0),
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0),
+      //     Question(
+      //         statement: "What is the capital of Vietnam?",
+      //         options: ["Hanoi", "Ho Chi Minh", "Da Nang", "Hue"],
+      //         answer: 0)
+      //   ],
+      // );
+
       final response = await http.post(
         Uri.parse(apiURL),
         headers: headers,
@@ -145,7 +193,7 @@ class _QScreen extends State<QScreen> {
       rethrow;
     }
   }
-    
+
   @override
   Widget build(BuildContext context) {
     final task = Task(
@@ -169,7 +217,8 @@ class _QScreen extends State<QScreen> {
               if (snapshot.data != null) {
                 Provider.of<QuizInfo>(context, listen: false)
                     .setQuiz(snapshot.data!);
-                Provider.of<QuizInfo>(context, listen: false).setQuizTopic(task.field, task.course);
+                Provider.of<QuizInfo>(context, listen: false)
+                    .setQuizTopic(task.field, task.course);
                 debugPrint(Provider.of<QuizInfo>(context, listen: false).field);
                 return const QuizScreen();
               }
@@ -240,61 +289,57 @@ class _QuizScreen extends State<QuizScreen>
     ).findByName(task.field);*/
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: onExit,
+        ),
+        titleSpacing: 0,
+        title: Consumer<QuizInfo>(
+          builder: (context, system, child) => StepProgressIndicator(
+            totalSteps: 10,
+            currentStep: system.totalCorrect,
+            size: 16,
+            padding: 0.001,
+            selectedColor: Colors.yellow,
+            unselectedColor: Colors.cyan,
+            roundedEdges: const Radius.circular(10),
+            selectedGradientColor: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                FigmaColors.sUNRISELightCharcoal,
+                FigmaColors.sUNRISELightCharcoal,
+              ],
+            ),
+            unselectedGradientColor: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFE5E5E5),
+                Color(0xFFE5E5E5),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: deviceSize.width * 0.02),
+            child: Consumer<QuizInfo>(
+              builder: (context, provider, child) => Text(
+                "${provider.totalCorrect}/10",
+                style: FigmaTextStyles.h4,
+              ),
+            ),
+          ),
+        ],
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            /* Top Bar : Exit, Progress, Statistics*/
-            Expanded(
-              flex: 1,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: IconButton(
-                      icon: const Icon(Icons.door_back_door_outlined),
-                      onPressed: onExit,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 5,
-                    child: Consumer<QuizInfo>(
-                      builder: (context, system, child) =>
-                          StepProgressIndicator(
-                        totalSteps: 10,
-                        currentStep: system.totalCorrect,
-                        size: 13,
-                        padding: 0.001,
-                        selectedColor: Colors.yellow,
-                        unselectedColor: Colors.cyan,
-                        roundedEdges: const Radius.circular(10),
-                        selectedGradientColor: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Colors.yellowAccent, Colors.deepOrange],
-                        ),
-                        unselectedGradientColor: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Colors.black, Colors.blue],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Consumer<QuizInfo>(
-                    builder: (context, provider, child) => Expanded(
-                      flex: 1,
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "${provider.totalCorrect}/10",
-                          style: FigmaTextStyles.h4,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             SizedBox(height: safeHeight * 0.01),
             const Expanded(
               flex: 14,
@@ -317,8 +362,10 @@ class _QuizScreen extends State<QuizScreen>
                                 ElevatedButton(
                                   onPressed: null,
                                   style: ElevatedButton.styleFrom(
-                                    minimumSize: Size(deviceSize.width * 0.7,
-                                        deviceSize.height * 0.06),
+                                    minimumSize: Size(
+                                      300,
+                                      deviceSize.height * 0.07,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
@@ -368,17 +415,27 @@ class _QuizScreen extends State<QuizScreen>
                     SlideTransition(
                       position: offset,
                       child: Container(
-                        padding: EdgeInsets.fromLTRB(0, deviceSize.width * 0.05,
-                            0, deviceSize.width * 0.025),
+                        padding: EdgeInsets.fromLTRB(
+                          0,
+                          deviceSize.width * 0.025,
+                          0,
+                          deviceSize.width * 0.025,
+                        ),
                         height: deviceSize.height / 6,
-                        color: FigmaColors.sUNRISELightCoral,
+                        decoration: BoxDecoration(
+                          color: FigmaColors.sUNRISELightCoral,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(24),
+                            topRight: Radius.circular(24),
+                          ),
+                        ),
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Expanded(
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     SizedBox(
                                       width: deviceSize.width * 0.02,
@@ -386,12 +443,12 @@ class _QuizScreen extends State<QuizScreen>
                                     Expanded(
                                       flex: 1,
                                       child: SizedBox(
-                                        height: safeHeight * 0.035,
-                                        child: const Image(
-                                          image: AssetImage(
-                                              'assets/img/correct.png'),
-                                        ),
-                                      ),
+                                          height: safeHeight * 0.045,
+                                          child: const Icon(
+                                            Icons.check_circle,
+                                            color: Colors.green,
+                                            size: 32,
+                                          )),
                                     ),
                                     Expanded(
                                       flex: 7,
@@ -412,8 +469,19 @@ class _QuizScreen extends State<QuizScreen>
                                         system.slideNextQuestion();
                                         animationPlaying();
                                         if (system.complete) {
-                                          Navigator.of(context).pushReplacementNamed(EndQuiz.routeName, arguments: {"field": system.field, "lesson": system.lesson});
+                                          Navigator.of(context)
+                                              .pushReplacementNamed(
+                                            EndQuiz.routeName,
+                                            arguments: {
+                                              "field": system.field,
+                                              "lesson": system.lesson
+                                            },
+                                          );
                                         }
+
+                                        Provider.of<QuizInfo>(context,
+                                                listen: false)
+                                            .enableButton();
                                       },
                                       buttonType:
                                           ChicletButtonTypes.roundedRectangle,
@@ -437,8 +505,11 @@ class _QuizScreen extends State<QuizScreen>
                     SlideTransition(
                       position: offset,
                       child: Container(
-                        padding: EdgeInsets.fromLTRB(0, deviceSize.width * 0.05,
-                            0, deviceSize.width * 0.025),
+                        padding: EdgeInsets.fromLTRB(
+                            0,
+                            deviceSize.width * 0.025,
+                            0,
+                            deviceSize.width * 0.025),
                         height: deviceSize.height / 6,
                         color: FigmaColors.sUNRISELightCoral,
                         child: Column(
@@ -447,7 +518,7 @@ class _QuizScreen extends State<QuizScreen>
                               Expanded(
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     SizedBox(
                                       width: deviceSize.width * 0.02,
@@ -455,11 +526,11 @@ class _QuizScreen extends State<QuizScreen>
                                     Expanded(
                                       flex: 1,
                                       child: SizedBox(
-                                        width: deviceSize.width * 0.08,
-                                        height: deviceSize.width * 0.08,
-                                        child: const Image(
-                                          image: AssetImage(
-                                              'assets/img/wrong.png'),
+                                        height: safeHeight * 0.045,
+                                        child: const Icon(
+                                          CupertinoIcons.xmark_circle_fill,
+                                          color: FigmaColors.sUNRISEErrorRed,
+                                          size: 32,
                                         ),
                                       ),
                                     ),
@@ -481,6 +552,9 @@ class _QuizScreen extends State<QuizScreen>
                                       onPressed: () {
                                         system.slideNextQuestion();
                                         animationPlaying();
+                                        Provider.of<QuizInfo>(context,
+                                                listen: false)
+                                            .enableButton();
                                       },
                                       buttonType:
                                           ChicletButtonTypes.roundedRectangle,
@@ -543,200 +617,69 @@ class _QuizContent extends State<QuizContent> {
           deviceSize.width * 0.05, 0, deviceSize.width * 0.05, 0),
       child: Column(
         children: [
-          Text(
-            "Choose the correct answers",
-            style: FigmaTextStyles.p.copyWith(),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Choose the correct answers",
+              style: FigmaTextStyles.mP.copyWith(
+                color: FigmaColors.sUNRISETextGrey,
+              ),
+            ),
           ),
           SizedBox(
-            height: safeHeight * 0.02,
+            height: safeHeight * 0.01,
           ),
           Consumer<QuizInfo>(
             builder: (context, system, child) => Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  system.getCurrentQuestion().statement,
-                  style: FigmaTextStyles.h4,
-                )),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                system.getCurrentQuestion().statement,
+                style: FigmaTextStyles.h4.copyWith(
+                  color: FigmaColors.sUNRISELightCharcoal,
+                ),
+              ),
+            ),
           ),
           SizedBox(
             height: safeHeight * 0.02,
           ),
           Consumer<QuizInfo>(
             builder: (context, system, child) => Column(children: [
-              OutlinedButton.icon(
-                onPressed: Provider.of<QuizInfo>(context, listen: false)
-                    .onOptionAClicked,
-                icon: SizedBox(
-                  width: deviceSize.width * 0.17,
-                  height: deviceSize.width * 0.17,
-                  child: const Image(
-                    image: AssetImage('assets/img/OptA.png'),
-                  ),
-                ),
-                label: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                      Provider.of<QuizInfo>(context, listen: false)
-                          .getCurrentQuestion()
-                          .options[0]!,
-                      style: FigmaTextStyles.mP
-                          .copyWith(color: FigmaColors.sUNRISEDarkCharcoal)),
-                ),
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all<Size>(
-                    Size(deviceSize.width * 0.9, deviceSize.height * 0.08),
-                  ),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                  ),
-                  backgroundColor:
-                      MaterialStateProperty.all(FigmaColors.sUNRISEWhite),
-                  side: MaterialStateProperty.all(
-                    BorderSide(
-                      width: 1.0,
-                      color: (system.option == 1)
-                          ? FigmaColors.sUNRISEBluePrimary
-                          : Color(0xFFFFDD563),
-                    ),
-                  ),
-                ),
+              QuizOption(
+                deviceSize: deviceSize,
+                system: system,
+                index: 1,
+                borderColor: Color(0xFFFFDD563),
               ),
               SizedBox(
                 width: deviceSize.width * 0.05,
                 height: deviceSize.width * 0.025,
               ),
-              OutlinedButton.icon(
-                onPressed: Provider.of<QuizInfo>(context, listen: false)
-                    .onOptionBClicked,
-                icon: SizedBox(
-                  width: deviceSize.width * 0.17,
-                  height: deviceSize.width * 0.17,
-                  child: const Image(
-                    image: AssetImage('assets/img/OptB.png'),
-                  ),
-                ),
-                label: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    Provider.of<QuizInfo>(context, listen: false)
-                        .getCurrentQuestion()
-                        .options[1]!,
-                    style: FigmaTextStyles.mP
-                        .copyWith(color: FigmaColors.sUNRISEDarkCharcoal),
-                  ),
-                ),
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all<Size>(
-                    Size(deviceSize.width * 0.9, deviceSize.height * 0.08),
-                  ),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                  ),
-                  backgroundColor:
-                      MaterialStateProperty.all(FigmaColors.sUNRISEWhite),
-                  side: MaterialStateProperty.all(
-                    BorderSide(
-                      width: 1.0,
-                      color: (system.option == 2)
-                          ? FigmaColors.sUNRISEBluePrimary
-                          : Color(0xFFFFDD563),
-                    ),
-                  ),
-                ),
+              QuizOption(
+                deviceSize: deviceSize,
+                system: system,
+                index: 2,
+                borderColor: FigmaColors.sUNRISEWaves,
               ),
               SizedBox(
                 width: deviceSize.width * 0.05,
                 height: deviceSize.width * 0.025,
               ),
-              OutlinedButton.icon(
-                onPressed: Provider.of<QuizInfo>(context, listen: false)
-                    .onOptionCClicked,
-                icon: SizedBox(
-                  width: deviceSize.width * 0.17,
-                  height: deviceSize.width * 0.17,
-                  child: const Image(
-                    image: AssetImage('assets/img/OptC.png'),
-                  ),
-                ),
-                label: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    Provider.of<QuizInfo>(context, listen: false)
-                        .getCurrentQuestion()
-                        .options[2]!,
-                    style: FigmaTextStyles.mP
-                        .copyWith(color: FigmaColors.sUNRISEDarkCharcoal),
-                  ),
-                ),
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all<Size>(
-                    Size(deviceSize.width * 0.9, deviceSize.height * 0.08),
-                  ),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                  ),
-                  backgroundColor:
-                      MaterialStateProperty.all(FigmaColors.sUNRISEWhite),
-                  side: MaterialStateProperty.all(
-                    BorderSide(
-                      width: 1.0,
-                      color: (system.option == 3)
-                          ? FigmaColors.sUNRISEBluePrimary
-                          : Color(0xFFFFDD563),
-                    ),
-                  ),
-                ),
+              QuizOption(
+                deviceSize: deviceSize,
+                system: system,
+                index: 3,
+                borderColor: Color(0xFFB3B4F7),
               ),
               SizedBox(
                 width: deviceSize.width * 0.05,
                 height: deviceSize.width * 0.025,
               ),
-              OutlinedButton.icon(
-                onPressed: Provider.of<QuizInfo>(context, listen: false)
-                    .onOptionDClicked,
-                icon: SizedBox(
-                  width: deviceSize.width * 0.17,
-                  height: deviceSize.width * 0.17,
-                  child: const Image(
-                    image: AssetImage('assets/img/OptD.png'),
-                  ),
-                ),
-                label: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    Provider.of<QuizInfo>(context, listen: false)
-                        .getCurrentQuestion()
-                        .options[3]!,
-                    style: FigmaTextStyles.mP
-                        .copyWith(color: FigmaColors.sUNRISEDarkCharcoal),
-                  ),
-                ),
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all<Size>(
-                    Size(deviceSize.width * 0.9, deviceSize.height * 0.08),
-                  ),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                  ),
-                  backgroundColor:
-                      MaterialStateProperty.all(FigmaColors.sUNRISEWhite),
-                  side: MaterialStateProperty.all(
-                    BorderSide(
-                      width: 1.0,
-                      color: (system.option == 4)
-                          ? FigmaColors.sUNRISEBluePrimary
-                          : Color(0xFFFFDD563),
-                    ),
-                  ),
-                ),
+              QuizOption(
+                deviceSize: deviceSize,
+                system: system,
+                index: 4,
+                borderColor: Color(0xFF93B5FF),
               ),
             ]),
           ),
@@ -746,6 +689,91 @@ class _QuizContent extends State<QuizContent> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class QuizOption extends StatelessWidget {
+  final Size deviceSize;
+  final int index;
+  final Color borderColor;
+  final QuizInfo system;
+
+  const QuizOption({
+    required this.deviceSize,
+    required this.index,
+    required this.borderColor,
+    required this.system,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    bool isChoosen = system.option == index;
+    return OutlinedButton.icon(
+      onPressed: () {
+        Provider.of<QuizInfo>(context, listen: false).onOptionClicked(index);
+      },
+      icon: Container(
+        width: deviceSize.width * 0.14,
+        height: deviceSize.width * 0.14,
+        decoration: BoxDecoration(
+          color: borderColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: EdgeInsets.all(deviceSize.width * 0.015),
+        child: Container(
+          decoration: BoxDecoration(
+            color: FigmaColors.sUNRISEWhite,
+            borderRadius: BorderRadius.circular(600),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            String.fromCharCode(index + 64),
+            style: FigmaTextStyles.h4.copyWith(
+              color: FigmaColors.sUNRISEDarkCharcoal,
+            ),
+          ),
+        ),
+      ),
+      label: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          Provider.of<QuizInfo>(context, listen: false)
+              .getCurrentQuestion()
+              .options[index - 1]!,
+          style: FigmaTextStyles.p.copyWith(
+              color: FigmaColors.sUNRISEDarkCharcoal,
+              fontWeight: isChoosen ? FontWeight.bold : FontWeight.normal),
+        ),
+      ),
+      style: ButtonStyle(
+        overlayColor: MaterialStateProperty.all<Color>(
+          borderColor,
+        ),
+        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+          EdgeInsets.symmetric(
+            horizontal: deviceSize.width * 0.025,
+            vertical: deviceSize.width * 0.025,
+          ),
+        ),
+        minimumSize: MaterialStateProperty.all<Size>(
+          Size(deviceSize.width * 0.9, deviceSize.height * 0.08),
+        ),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+        ),
+        backgroundColor: MaterialStateProperty.all(
+          (system.option == index) ? borderColor : FigmaColors.sUNRISEWhite,
+        ),
+      ).copyWith(
+          side: MaterialStateProperty.all(
+        BorderSide(
+          color: borderColor,
+          width: 2,
+        ),
+      )),
     );
   }
 }

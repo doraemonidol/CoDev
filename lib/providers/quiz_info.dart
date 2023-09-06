@@ -2,7 +2,6 @@ import 'package:codev/providers/quiz.dart';
 import 'package:flutter/material.dart';
 
 class QuizInfo extends ChangeNotifier {
-
   int option = 0;
 
   int indexedButton = 0;
@@ -18,6 +17,8 @@ class QuizInfo extends ChangeNotifier {
   String lesson = "";
 
   String field = "";
+
+  bool disabled = false;
 
   List<bool> answeredStatus = [
     false,
@@ -40,7 +41,12 @@ class QuizInfo extends ChangeNotifier {
     } else {
       indexedButton = 3;
     }
+    disabled = true;
     notifyListeners();
+  }
+
+  void enableButton() {
+    disabled = false;
   }
 
   void slideNextQuestion() {
@@ -49,7 +55,7 @@ class QuizInfo extends ChangeNotifier {
     }
 
     if (indexQuest < 9 && answeredStatus[indexQuest]) {
-        ++indexQuest;
+      ++indexQuest;
     }
 
     option = 0;
@@ -57,29 +63,13 @@ class QuizInfo extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onOptionAClicked() {
-    option = 1;
+  void onOptionClicked(int index) {
+    if (disabled) return;
+    option = index;
     indexedButton = 1;
     notifyListeners();
   }
 
-  void onOptionBClicked() {
-    option = 2;
-    indexedButton = 1;
-    notifyListeners();
-  }
-
-  void onOptionCClicked() {
-    option = 3;
-    indexedButton = 1;
-    notifyListeners();
-  }
-
-  void onOptionDClicked() {
-    option = 4;
-    indexedButton = 1;
-    notifyListeners();
-  }
   void setQuiz(Quiz quiz) {
     this.quiz = quiz;
     notifyListeners();
@@ -95,5 +85,4 @@ class QuizInfo extends ChangeNotifier {
     this.lesson = lesson;
     notifyListeners();
   }
-
 }

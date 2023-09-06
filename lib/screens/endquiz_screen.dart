@@ -16,7 +16,8 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
   late Animation<Offset> offset;
 
   int updateAndGetProgressStatus(String field, String course) {
-    Provider.of<LearningProgress>(context, listen: false).toggleCourseDone(field, course);
+    Provider.of<LearningProgress>(context, listen: false)
+        .toggleCourseDone(field, course);
     Provider.of<LearningField>(context, listen: false).updateProgress();
     return Provider.of<LearningField>(context, listen: false).progress;
   }
@@ -24,11 +25,12 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    
+
     controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
 
-    offset = Tween<Offset>(begin: const Offset(0.0, 0.0), end: const Offset(0.0, -0.85))
+    offset = Tween<Offset>(
+            begin: const Offset(0.0, 0.0), end: const Offset(0.0, -0.85))
         .animate(controller);
 
     Future.delayed(const Duration(milliseconds: 500), () {
@@ -59,146 +61,161 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
 
     double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
 
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
-      body: Column(
+      backgroundColor: FigmaColors.sUNRISESunray,
+      body: Stack(
+        alignment: Alignment.center,
         children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: deviceSize.width,
-                height: deviceSize.height,
-              ),
-              SlideTransition(
-                position: offset, 
-                child: Positioned(
-                  top: safeHeight * 0.097,
-                  child: SizedBox(
-                    width: deviceSize.width * 0.63,
-                    height: deviceSize.width * 0.63,
-                    child: const Image(
-                      image: AssetImage('assets/img/wow_cat.png'),
-                    ),
-                  ),
+          SizedBox(
+            width: deviceSize.width,
+            height: deviceSize.height,
+          ),
+          SlideTransition(
+            position: offset,
+            child: Positioned(
+              top: safeHeight * 0.097,
+              child: SizedBox(
+                width: deviceSize.width * 0.63,
+                height: deviceSize.width * 0.63,
+                child: const Image(
+                  image: AssetImage('assets/img/wow_cat.png'),
                 ),
               ),
-              Positioned(
-                top: safeHeight * 0.37,
-                child: Column(children: [
-                  Container(
-                    width: deviceSize.width * 0.85,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFF77CC3B),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    padding: EdgeInsets.fromLTRB(
-                        deviceSize.width * 0.042,
-                        deviceSize.width * 0.042,
-                        deviceSize.width * 0.042,
-                        deviceSize.width * 0.042),
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "You have completed",
-                            style: FigmaTextStyles.mB
-                                .copyWith(color: FigmaColors.sUNRISEWhite),
-                          ),
-                        ),
-                        SizedBox(
-                          height: safeHeight * 0.007,
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "${args['lesson']}",
-                            style: FigmaTextStyles.mH1
-                                .copyWith(color: FigmaColors.sUNRISEWhite),
-                          ),
-                        ),
-                        SizedBox(
-                          height: safeHeight * 0.007,
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "And",
-                            style: FigmaTextStyles.mB
-                                .copyWith(color: FigmaColors.sUNRISEWhite),
-                          ),
-                        ),
-                        SizedBox(
-                          height: safeHeight * 0.007,
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: SizedBox(
-                            height: deviceSize.width * 0.26,
-                            width: deviceSize.width * 0.26,
-                            child: CircleProgressBar(
-                                foregroundColor: Color(0xFFFFFFB017),
-                                backgroundColor: Colors.black12,
-                                strokeWidth: 20,
-                                value: 0.66,
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "66%", // should be change into "${updateAndGetProgressStatus(args['field'], args['course'])}"
-                                    style: FigmaTextStyles.h4.copyWith(color: FigmaColors.sUNRISEWhite),
-                                  ), 
-                                )),
-                          ),
-                        ),
-                        SizedBox(
-                          height: safeHeight * 0.007,
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "On",
-                            style: FigmaTextStyles.mB
-                                .copyWith(color: FigmaColors.sUNRISEWhite),
-                          ),
-                        ),
-                        SizedBox(
-                          height: safeHeight * 0.007,
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "${args['field']}",
-                            style: FigmaTextStyles.mH1
-                                .copyWith(color: FigmaColors.sUNRISEWhite),
-                          ),
-                        ),
-                      ],
-                    ),
+            ),
+          ),
+          Positioned(
+            top: safeHeight * 0.37,
+            child: Column(
+              children: [
+                Container(
+                  width: deviceSize.width * 0.9,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF77CC3B),
+                    borderRadius: BorderRadius.all(Radius.circular(24)),
                   ),
-                  SizedBox(
-                    height: safeHeight * 0.04,
+                  padding: EdgeInsets.fromLTRB(
+                      deviceSize.width * 0.05,
+                      deviceSize.width * 0.05,
+                      deviceSize.width * 0.05,
+                      deviceSize.width * 0.05),
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "You have completed",
+                          style: FigmaTextStyles.mB
+                              .copyWith(color: FigmaColors.sUNRISEWhite),
+                        ),
+                      ),
+                      SizedBox(
+                        height: safeHeight * 0.007,
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "${args['lesson']}",
+                          style: FigmaTextStyles.mH1
+                              .copyWith(color: FigmaColors.sUNRISEWhite),
+                        ),
+                      ),
+                      SizedBox(
+                        height: safeHeight * 0.007,
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "And",
+                          style: FigmaTextStyles.mB
+                              .copyWith(color: FigmaColors.sUNRISEWhite),
+                        ),
+                      ),
+                      SizedBox(
+                        height: safeHeight * 0.007,
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          height: deviceSize.width * 0.26,
+                          width: deviceSize.width * 0.26,
+                          child: CircleProgressBar(
+                              foregroundColor: Color(0xFFFFFFB017),
+                              backgroundColor: FigmaColors.sUNRISELightCoral,
+                              strokeWidth: 20,
+                              value: 0.66,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "66%", // should be change into "${updateAndGetProgressStatus(args['field'], args['course'])}"
+                                  style: FigmaTextStyles.h4.copyWith(
+                                      color: FigmaColors.sUNRISEWhite),
+                                ),
+                              )),
+                        ),
+                      ),
+                      SizedBox(
+                        height: safeHeight * 0.007,
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "On",
+                          style: FigmaTextStyles.mB
+                              .copyWith(color: FigmaColors.sUNRISEWhite),
+                        ),
+                      ),
+                      SizedBox(
+                        height: safeHeight * 0.007,
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "${args['field']}",
+                          style: FigmaTextStyles.mH1
+                              .copyWith(color: FigmaColors.sUNRISEWhite),
+                        ),
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
+                ),
+                SizedBox(
+                  height: safeHeight * 0.04,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFF4E9C16),
+                        offset: Offset(4, 4),
+                        blurRadius: 0,
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(
-                          deviceSize.width * 0.85, deviceSize.height * 0.06),
+                          deviceSize.width * 0.9, deviceSize.height * 0.075),
                       backgroundColor: const Color(0xFF77CC3B),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                          elevation: 7,
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
                     ),
-                    child: Text("Done",
-                        style: FigmaTextStyles.mButton
-                            .copyWith(color: FigmaColors.sUNRISEWhite)),
+                    child: Text(
+                      "Great!",
+                      style: FigmaTextStyles.buttons
+                          .copyWith(color: FigmaColors.sUNRISEWhite),
+                    ),
                   ),
-                ]),
-              )
-            ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
