@@ -6,6 +6,7 @@ import 'package:codev/icon/my_icons.dart';
 import 'package:intl/intl.dart';
 
 import '../providers/tasks.dart';
+import 'new_lesson_screen.dart';
 
 //FigmaTextStyles.mH3.copyWith(color:FigmaColors.sUNRISELightCharcoal,
 enum Actions { delete, access }
@@ -145,7 +146,9 @@ class _TasksScreenState extends State<TasksScreen> {
                     ),
                     icon: const Icon(Icons.add,
                         color: FigmaColors.sUNRISEBluePrimary),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, NewLessonScreen.routeName);
+                    },
                   ),
                 ],
               ),
