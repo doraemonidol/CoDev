@@ -88,95 +88,99 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
         showModalBottomSheet(
           context: context,
           builder: (BuildContext context){
-            return Container(
-              height:477,
-              width:375,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
+            return SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              scrollDirection: Axis.vertical,
+              child: Container(
+                height:477,
+                width:375,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
                 ),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(25,25,25,0),
+                        child: Text(
+                          card.title,
+                          style: FigmaTextStyles.mH1.copyWith(color: FigmaColors.sUNRISELightCharcoal),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                        ),
+                      ),
+                    SizedBox(height: 5),
+                    SizedBox(
+                      height: 76,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(25,0,25,0),
+                          child: Text(
+                            card.description,
+                            style: FigmaTextStyles.mP.copyWith(color: FigmaColors.sUNRISECharcoal),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 4,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 1),
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(25,0,0,5),
+                          child: Text(
+                            'Current Level',
+                            style: FigmaTextStyles.mP.copyWith(color: FigmaColors.sUNRISETextGrey),
+                          ),
+                        ),
+                      ),
+
+                    Row(
+                        children: [
+                          SizedBox(width: 25),
+                          CustomButton(),
+                          SizedBox(width: 10),
+                          CustomButton(),
+                          SizedBox(width: 10),
+                          CustomButton(),
+                        ]
+                    ),
+                    SizedBox(height: 15),
+                    HorizontalIconList(),
+                    SizedBox(height: 15),
+                    HorizontalColorList(),
+
+                    SizedBox(height: 18),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: FigmaColors.sUNRISEBluePrimary,
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        width: 250,
+                        height: 62,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.fromLTRB(2,0,0,0),
+                            backgroundColor: FigmaColors.sUNRISEBluePrimary,
+                            shape: ContinuousRectangleBorder(
+                                side: BorderSide.none,
+                                borderRadius: BorderRadius.circular(12.0))),
+                            child: Text('Add lesson', style: FigmaTextStyles.mButton.copyWith(color: FigmaColors.sUNRISEWhite), textAlign: TextAlign.center),
+                            onPressed: () {},
+                        ),
+                  ),
+                  ],
+                )
               ),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(25,25,25,0),
-                      child: Text(
-                        card.title,
-                        style: FigmaTextStyles.mH1.copyWith(color: FigmaColors.sUNRISELightCharcoal),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ),
-                    ),
-                  SizedBox(height: 5),
-                  SizedBox(
-                    height: 76,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(25,0,25,0),
-                        child: Text(
-                          card.description,
-                          style: FigmaTextStyles.mP.copyWith(color: FigmaColors.sUNRISECharcoal),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 4,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: 1),
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(25,0,0,5),
-                        child: Text(
-                          'Current Level',
-                          style: FigmaTextStyles.mP.copyWith(color: FigmaColors.sUNRISETextGrey),
-                        ),
-                      ),
-                    ),
-
-                  Row(
-                      children: [
-                        SizedBox(width: 25),
-                        CustomButton(),
-                        SizedBox(width: 10),
-                        CustomButton(),
-                        SizedBox(width: 10),
-                        CustomButton(),
-                      ]
-                  ),
-                  SizedBox(height: 15),
-                  HorizontalIconList(),
-                  SizedBox(height: 15),
-                  HorizontalColorList(),
-
-                  SizedBox(height: 18),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: FigmaColors.sUNRISEBluePrimary,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      width: 250,
-                      height: 62,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.fromLTRB(2,0,0,0),
-                          backgroundColor: FigmaColors.sUNRISEBluePrimary,
-                          shape: ContinuousRectangleBorder(
-                              side: BorderSide.none,
-                              borderRadius: BorderRadius.circular(12.0))),
-                          child: Text('Add lesson', style: FigmaTextStyles.mButton.copyWith(color: FigmaColors.sUNRISEWhite), textAlign: TextAlign.center),
-                          onPressed: () {},
-                      ),
-                ),
-                ],
-              )
             );
         },
         );
