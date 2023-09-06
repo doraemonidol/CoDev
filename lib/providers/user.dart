@@ -13,7 +13,7 @@ class User with ChangeNotifier {
   String name;
   String location;
   String imageUrl;
-  int timeZone;
+  String educationLevel;
   int point;
   TaskList? taskList;
   LearningProgress? learningProgress;
@@ -27,13 +27,46 @@ class User with ChangeNotifier {
     this.location = 'Unknown',
     this.imageUrl =
         'https://upload.wikimedia.org/wikipedia/vi/b/b1/1989Deluxe.jpeg',
-    this.timeZone = 0,
+    this.educationLevel = 'Unknown',
     this.point = 0,
   }) {
     if (authToken == '') return;
     fetchAndSetUser();
     //print(userId);
   }
+  User copy(
+          {String? imagePath,
+          String? name,
+          String? email,
+          String? phone,
+          String? location,
+          String? educationLevel}) =>
+      User(
+        imageUrl: imagePath ?? this.imageUrl,
+        name: name ?? this.name,
+        email: email ?? this.email,
+        phone: phone ?? this.phone,
+        location: location ?? this.location,
+        educationLevel: educationLevel ?? this.educationLevel,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'imagePath': imageUrl,
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'location': location,
+        'educationLevel': educationLevel,
+      };
+
+  static User fromJson(Map<String, dynamic> json) => User(
+        imageUrl: json['imagePath'],
+        name: json['name'],
+        email: json['email'],
+        phone: json['phone'],
+        location: json['location'],
+        educationLevel: json['educationLevel'],
+      );
 
   get token {
     return authToken;
@@ -57,7 +90,7 @@ class User with ChangeNotifier {
       name = extractedData['name'];
       location = extractedData['location'];
       imageUrl = extractedData['imageUrl'];
-      timeZone = extractedData['timeZone'];
+      educationLevel = extractedData['educationLevel'];
       point = extractedData['point'];
 
       learningProgress = LearningProgress.fromJson(extractedData['progress']);
@@ -98,6 +131,7 @@ class User with ChangeNotifier {
     String? newName,
     String? newAddress,
     String? newImageUrl,
+    String? newEducationLevel,
   }) async {
     final url =
         'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId.json?auth=$authToken';
@@ -107,6 +141,8 @@ class User with ChangeNotifier {
     newName = newName == null ? name : newName;
     newAddress = newAddress == null ? location : newAddress;
     newImageUrl = newImageUrl == null ? imageUrl : newImageUrl;
+    newEducationLevel =
+        newEducationLevel == null ? educationLevel : newEducationLevel;
 
     await http.patch(
       Uri.parse(url),
@@ -114,8 +150,9 @@ class User with ChangeNotifier {
         'email': newEmail,
         'phoneNumber': newPhoneNumber,
         'name': newName,
-        'address': newAddress,
+        'location': newAddress,
         'imageUrl': newImageUrl,
+        'educationLevel': newEducationLevel
       }),
     );
     email = newEmail;
