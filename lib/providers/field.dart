@@ -2,6 +2,7 @@ import 'course.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Stage {
   final String name;
@@ -23,62 +24,64 @@ class Field {
   });
 }
 
-class FieldList with ChangeNotifier {
-  List<Field> _fields = [];
-  String userId;
-  String token;
+// fetch the field from firestore: in the collection Roadmap, in the document with ID Vz40NN26K2R7Y9jrKrK4, an array object named "fields", find in it the object has "name" equal to input name
+Future<Field> fetchField(String name) async {
+  final description = await FirebaseFirestore.instance
+      .collection('Roadmap')
+      .doc('Vz40NN26K2R7Y9jrKrK4')
+      .get();
+  final descriptionData = description.data();
+  final fields = descriptionData!['fields'];
+  final field = fields.firstWhere((element) => element['name'] == name);
+  final stages = field['stages'];
+  final stageList = stages.map<Stage>((stage) {
+    final courses = stage['courses'];
+    final courseList = courses.map<Course>((course) {
+      return Course(
+        name: course['name'],
+        description: course['description'],
+        prerequisiteCourses: [],
+      );
+    }).toList();
+    return Stage(
+      name: stage['name'],
+      courses: courseList,
+    );
+  }).toList();
+  return Field(
+    name: field['name'],
+    stages: stageList,
+  );
+}
 
-  FieldList({
-    required this.userId,
-    required this.token,
-    required List<Field> fields,
-  }) : _fields = fields;
-
-  Field findByName(String name) {
-    return _fields.firstWhere((element) => element.name == name);
-  }
-
-  List<Field> get fields {
-    return [..._fields];
-  }
-
-  // fetch and set
-  Future<void> fetchAndSetFieldList() async {
-    print('fetching fieldlist');
-    final url =
-        'https://codev-cs-default-rtdb.asia-southeast1.firebasedatabase.app/users/$userId.json?auth=$token';
-    try {
-      final response = await http.get(Uri.parse(url));
-      final extractedData = json.decode(response.body);
-      // print(response.body);
-      if (extractedData == null) {
-        return;
-      }
-
-      _fields = extractedData['fields'].map((field) {
-        return Field(
-          name: field['name'],
-          stages: field['stages'].map((stage) {
-            return Stage(
-              name: stage['name'],
-              courses: stage['courses'].map((course) {
-                return Course(
-                  name: course['name'],
-                  description: course['description'],
-                  prerequisiteCourses:
-                      course['prerequisiteCourses'].map((prerequisiteCourse) {
-                    return findByName(prerequisiteCourse);
-                  }).toList(),
-                );
-              }).toList(),
-            );
-          }).toList(),
+// fetch the whole field list from firestore: in the collection Roadmap, in the document with ID Vz40NN26K2R7Y9jrKrK4, an array object named "fields"
+Future<List<Field>> fetchFieldList() async {
+  final description = await FirebaseFirestore.instance
+      .collection('Roadmap')
+      .doc('Vz40NN26K2R7Y9jrKrK4')
+      .get();
+  final descriptionData = description.data();
+  final fields = descriptionData!['fields'];
+  final fieldList = fields.map<Field>((field) {
+    final stages = field['stages'];
+    final stageList = stages.map<Stage>((stage) {
+      final courses = stage['courses'];
+      final courseList = courses.map<Course>((course) {
+        return Course(
+          name: course['name'],
+          description: course['description'],
+          prerequisiteCourses: [],
         );
       }).toList();
-
-      notifyListeners();
-    } catch (error) {
-      throw error;
-    }
-  }
+      return Stage(
+        name: stage['name'],
+        courses: courseList,
+      );
+    }).toList();
+    return Field(
+      name: field['name'],
+      stages: stageList,
+    );
+  }).toList();
+  return fieldList;
 }

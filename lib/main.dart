@@ -193,7 +193,6 @@ class MyApp extends StatelessWidget {
             DetailedTaskScreen.routeName: (ctx) => DetailedTaskScreen(),
             QuizScreen.routeName: (ctx) => QScreen(),
             EndQuiz.routeName: (ctx) => EndQuiz(),
-            NewLessonScreen.routeName: (ctx) => NewLessonScreen(),
           },
         ),
       ),

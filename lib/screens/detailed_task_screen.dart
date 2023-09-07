@@ -182,9 +182,6 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
           children: [
             Icon(task!.icon, color: task!.color),
             SizedBox(height: 16),
-            SelectableText(task!.chapter,
-                style:
-                    FigmaTextStyles.h3.copyWith(color: FigmaColors.systemDark)),
             Text(
               task!.field + ' | ' + task!.course,
               maxLines: 20,

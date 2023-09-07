@@ -200,7 +200,6 @@ class _QScreen extends State<QScreen> {
       field: "Frontend",
       stage: "Internet",
       course: "How the Internet works?",
-      chapter: "History",
       startTime: DateTime(2023, 9, 2),
       endTime: DateTime(2023, 9, 8),
       state: 1,
