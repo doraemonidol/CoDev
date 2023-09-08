@@ -5,7 +5,7 @@ import '../providers/tasks.dart';
 import '../providers/field.dart';
 
 void dosth() async {
-  final Future<Field> field3 = fetchField('ai data scientist');
+  final Future<Field> field3 = fetchField('angular');
   // create a list of above fields
   final List<Field> fields = await Future.wait([field3]);
   // get schedule task
