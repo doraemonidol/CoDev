@@ -58,7 +58,7 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
               alignment: Alignment.center,
               children: [
                 LinearProgressIndicator(
-                  value: val / 120,
+                  value: val / 100,
                   minHeight: 36,
                   backgroundColor: Colors.white,
                   // change color of progress bar as val increase
