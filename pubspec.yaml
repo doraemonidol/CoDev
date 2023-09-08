@@ -95,6 +95,11 @@ flutter:
     - family: MyIcons
       fonts:
         - asset: assets/icons/MyIcons.ttf
+
+    - family: Tick
+      fonts:
+        - asset: assets/icons/Tick.ttf
+
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-Black.ttf
