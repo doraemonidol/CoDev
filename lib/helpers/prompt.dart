@@ -1,7 +1,7 @@
-String getPrompt( field, String stage, String course) {
+import '../providers/field.dart';
 
-  String prompt = 
-  """
+String getPrompt(field, String stage, String course) {
+  String prompt = """
 You're a lecturer who are in the field of 'Frontend'. Currently you had taught about 'How the Internet works' in the topic of 'The Internet'. You decide to give students a quiz of [10] questions!! 
 
 Please write out these questions so that they strictly follow the following convention of JSON.
@@ -27,8 +27,7 @@ Your result should contain the JSON only. No other words.
 
 const apiKey = "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";
 const apiURL = "https://api.openai.com/v1/completions";
-const testResult = 
-"""
+const testResult = """
 {
   "quiz": [
     {
@@ -85,3 +84,36 @@ const testResult =
 }
 
 """;
+
+String schedulePrompt(String fields_json) {
+  String prompt = """
+    You are a consultant for a college student. The student give you a list of fields that he want to learn, each field has several stages and each stage has several courses. Your task is to schedule the courses for the student. The student want to learn about 3-4 courses per day.
+    Given the list of fields (including stages and courses) as json, as following:
+  """ +
+      fields_json +
+      """
+Please schedule the courses for the student. It should be about 3-4 tasks each day, each represent a course. 
+Each course must exist in the plan exactly once and their order in each field and stage must be kept.
+The result must strictly be in form of json, as following:
+"tasklists": [
+  {
+    "date": "date_of_tasks",
+    "tasks":[
+      {
+        "field": "field_name",
+        "stage": "stage_name",
+        "course": "course_name",
+        "startTime": "start_time",
+        "endTime": "end_time",
+        "color": "blue" (keep this constant),
+        "icon": "icon" (keep this constant)),
+        "state": "not done" (keep this constant)
+      }
+    ]
+  }
+]
+The tasklists is the array contains each element as a tasklist for each day, "date" in "tasklists" represents the date of the tasklist, "tasks" in "tasklists" represents the array of tasks in that day. Each task has "field", "stage", "course" is a course exists in the input data, "startTime" and "endTime" is the scheduled time of the task, "color" and "icon" and "state" must be kept constant as above.
+Your result must contain the JSON only. No other words.
+""";
+  return prompt;
+}

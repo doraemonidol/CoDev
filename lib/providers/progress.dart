@@ -1,34 +1,14 @@
 import 'package:flutter/material.dart';
-
-class LearningChapter with ChangeNotifier {
-  final String name;
-  bool done = false;
-
-  LearningChapter({
-    required this.name,
-    this.done = false,
-  });
-
-  void toggleDone() {
-    done = !done;
-    notifyListeners();
-  }
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LearningCourse with ChangeNotifier {
   final String name;
   bool done = false;
-  List<LearningChapter> chapters = [];
 
   LearningCourse({
     required this.name,
     this.done = false,
-    this.chapters = const [],
   });
-
-  LearningChapter findChapterByName(String name) {
-    return chapters.firstWhere((element) => element.name == name);
-  }
 
   void toggleDone() {
     done = !done;
@@ -69,12 +49,6 @@ class LearningField with ChangeNotifier {
         return {
           'name': course.name,
           'done': course.done,
-          'chapters': course.chapters.map((chapter) {
-            return {
-              'name': chapter.name,
-              'done': chapter.done,
-            };
-          }).toList(),
         };
       }).toList(),
     };
@@ -102,19 +76,6 @@ class LearningProgress with ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleChapterDone(String field, String course, String chapter) {
-    final fieldIndex = fields.indexWhere((element) => element.name == field);
-    final courseIndex = fields[fieldIndex]
-        .courses
-        .indexWhere((element) => element.name == course);
-    final chapterIndex = fields[fieldIndex]
-        .courses[courseIndex]
-        .chapters
-        .indexWhere((element) => element.name == chapter);
-    fields[fieldIndex].courses[courseIndex].chapters[chapterIndex].toggleDone();
-    notifyListeners();
-  }
-
   void toggleCourseDone(String field, String course) {
     final fieldIndex = fields.indexWhere((element) => element.name == field);
     final courseIndex = fields[fieldIndex]
@@ -131,16 +92,7 @@ class LearningProgress with ChangeNotifier {
         name: field['name'],
         progress: field['progress'],
         courses: field['courses'].map((course) {
-          return LearningCourse(
-            name: course['name'],
-            done: course['done'],
-            chapters: course['chapters'].map((chapter) {
-              return LearningChapter(
-                name: chapter['name'],
-                done: chapter['done'],
-              );
-            }).toList(),
-          );
+          return LearningCourse(name: course['name'], done: course['done']);
         }).toList(),
       );
     }).toList();
@@ -154,4 +106,20 @@ class LearningProgress with ChangeNotifier {
       }).toList(),
     };
   }
+
+  // update to firestore: in the collection users, in the document with ID equal to input ID, update object LearningProgress
+  Future<void> updateLearningProgress(String ID) async {
+    await FirebaseFirestore.instance.collection('users').doc(ID).update({
+      'learningProgress': toJson(),
+    });
+  }
+}
+
+// fetch LearningProgress from firestore: in the collection users, in the document with ID equal to input ID, get object LearningProgress
+Future<LearningProgress> fetchLearningProgress(String ID) async {
+  final description =
+      await FirebaseFirestore.instance.collection('users').doc(ID).get();
+  final descriptionData = description.data();
+  final learningProgress = descriptionData!['learningProgress'];
+  return LearningProgress.fromJson(learningProgress);
 }

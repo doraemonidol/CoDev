@@ -86,8 +86,7 @@ class Auth with ChangeNotifier {
         );
         _autoLogout(context);
         if (urlSegment == 'signUp') {
-          Provider.of<CoDevUser.User>(context, listen: false)
-              .addUser(email, _userId, _token);
+          Provider.of<CoDevUser.User>(context, listen: false).addUser(_userId);
         }
         notifyListeners();
         final prefs = await SharedPreferences.getInstance();
