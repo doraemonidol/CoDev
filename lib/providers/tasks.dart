@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'field.dart';
 import '../helpers/prompt.dart';
+import './progress.dart';
+import 'package:dart_openai/dart_openai.dart';
+import 'dart:io';
 
 enum TaskState { todo, inProgress, completed }
 
@@ -128,7 +131,8 @@ Future<List<Task>> fetchTaskList(String id) async {
   }
 }
 
-Future<List<TaskList>?> fetchScheduledTasks(List<Field> learn) async {
+Future<List<TaskList>?> fetchScheduledTasks(
+    String ID, List<Field> learn) async {
   // turn this field list to json
   final fields = learn.map((field) {
     final stages = field.stages.map((stage) {
@@ -149,63 +153,61 @@ Future<List<TaskList>?> fetchScheduledTasks(List<Field> learn) async {
       'stages': stages,
     };
   }).toList();
-  // turn this fields json to string
-  final fieldsString = jsonEncode(fields);
-  const apiKey = "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";
-  const apiUrl = "https://api.openai.com/v1/completions";
-
-  final headers = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer $apiKey'
-  };
-
-  final body = jsonEncode(
-    {
-      "model": "text-davinci-003",
-      'prompt': schedulePrompt(fieldsString),
-      'max_tokens': 7, // Adjust as needed
-    },
+  // json to string
+  final fields_json = jsonEncode(fields);
+  OpenAI.apiKey = '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';
+  final response = await OpenAI.instance.chat.create(
+    model: 'gpt-3.5-turbo',
+    messages: [
+      OpenAIChatCompletionChoiceMessageModel(
+        content: schedulePrompt(fields_json),
+        role: OpenAIChatMessageRole.user,
+      ),
+    ],
   );
-  try {
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: headers,
-      body: body,
-    );
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      final result = jsonResponse['choices'][0]['text'];
-      // turn result to json
-      final scheduleJson = jsonDecode(result);
-      // turn the above json to list of list of task
-      final schedule = scheduleJson['tasklists'].map<TaskList>((tasklist) {
-        final date = DateTime.parse(tasklist['date']);
-        final tasks = tasklist['tasks'].map<Task>((task) {
-          return Task(
-            field: task['field'],
-            stage: task['stage'],
-            course: task['course'],
-            startTime: DateTime.parse(task['startTime']),
-            endTime: DateTime.parse(task['endTime']),
-            color: Color(task['color']),
-            icon: IconData(task['icon'], fontFamily: 'MaterialIcons'),
-            state: task['state'],
-          );
-        }).toList();
-        return {
-          'date': date,
-          'tasks': tasks,
-        };
-      }).toList();
-      return schedule;
-    } else {
-      print(
-        'Failed to call ChatGPT API: ${response.statusCode} ${response.body}',
-      );
-      return null;
-    }
-  } catch (e) {
-    print("Error calling ChatGPT API: $e");
-    return null;
+  if (response.choices.isEmpty) {
+    throw Exception('No response from OpenAI');
   }
+  /*
+Create object LearningProgress from List<Field> learn: 
+- the List<LearningField> fields corresponding to List<Field> learn
+- in each element in fields, its element name equal to the name of each corresponding element in learn
+- in each element in courses, its element name equal to the name of each corresponding element in the same field
+- each done in course is false 
+*/
+  List<LearningField> learningField = learn.map<LearningField>((field) {
+    return LearningField(
+        name: field.name,
+        progress: 0,
+        courses: field.stages.map<LearningCourse>((stage) {
+          return LearningCourse(name: stage.name, done: false);
+        }).toList());
+  }).toList();
+  final learningProgress = LearningProgress(fields: learningField);
+  // update learingProgress to firestore: in the collection users, in the document with ID equal to input ID, update object learningProgress, or create if not exist
+  await FirebaseFirestore.instance.collection('users').doc(ID).update({
+    'learningProgress': learningProgress.toJson(),
+  });
+  final result = response.choices.first.message.content;
+  final tasklists = jsonDecode(result)['tasklists'];
+  final tasks = tasklists.map<TaskList>((tasklist) {
+    final date = DateTime.parse(tasklist['date']);
+    final tasks = tasklist['tasks'].map<Task>((task) {
+      return Task(
+        field: task['field'],
+        stage: task['stage'],
+        course: task['course'],
+        startTime: DateTime.parse(task['startTime']),
+        endTime: DateTime.parse(task['endTime']),
+        color: Color(task['color']),
+        icon: IconData(task['icon'], fontFamily: 'MaterialIcons'),
+        state: task['state'],
+      );
+    }).toList();
+    return TaskList(
+      date: date,
+      tasks: tasks,
+    );
+  }).toList();
+  return tasks;
 }
