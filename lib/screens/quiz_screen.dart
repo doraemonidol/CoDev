@@ -421,7 +421,7 @@ class _QuizScreen extends State<QuizScreen>
                           deviceSize.width * 0.025,
                         ),
                         height: deviceSize.height / 6,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: FigmaColors.sUNRISELightCoral,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(24),

@@ -2,7 +2,7 @@ import '../providers/field.dart';
 
 String getPrompt(field, String stage, String course) {
   String prompt = """
-You're a lecturer who are in the field of 'Frontend'. Currently you had taught about 'How the Internet works' in the topic of 'The Internet'. You decide to give students a quiz of [10] questions!! 
+You're a lecturer who are in the field of '$field'. Currently you had taught about '$course' in the topic of '$stage'. You decide to give students a quiz of [10] questions!! 
 
 Please write out these questions so that they strictly follow the following convention of JSON.
 {
