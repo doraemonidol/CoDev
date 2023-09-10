@@ -1,4 +1,5 @@
 import 'package:codev/providers/sign_in_info.dart';
+import 'package:codev/providers/tasks.dart';
 import 'package:codev/providers/user.dart';
 import 'package:codev/screens/detailed_task_screen.dart';
 import 'package:codev/screens/endquiz_screen.dart';
@@ -55,6 +56,12 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<SignInProvider>(
           create: (context) => SignInProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => TaskList(
+            date: DateTime.now(),
+            tasks: [],
+          ),
         ),
         // ChangeNotifierProxyProvider<Auth, Products>(
         //   update: (ctx, auth, previousProduct) => Products(

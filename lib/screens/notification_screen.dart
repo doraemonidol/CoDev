@@ -1,10 +1,68 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codev/providers/auth.dart';
 import 'package:codev/providers/tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/icon/my_icons.dart';
 import 'package:codev/icon/tick_icons.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
+import 'detailed_task_screen.dart';
+
+enum NotificationState { read, unread }
+
+class NotificationDetail {
+  Task task;
+  NotificationState status;
+
+  NotificationDetail({
+    required this.task,
+    required this.status,
+  });
+
+  // add notification to firestore
+  Future<void> saveNotification(String userId) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('notifications')
+        .add({
+      'field': task.field,
+      'stage': task.stage,
+      'course': task.course,
+      'startTime': task.startTime,
+      'endTime': task.endTime,
+      'color': task.color.value,
+      'icon': task.icon.codePoint,
+      'state': task.state,
+      'status': status.index,
+    }).then((documentSnapshot) =>
+            print("Added Data with ID: ${documentSnapshot.id}"));
+  }
+
+  // update notification status to firestore
+  Future<void> updateNotificationStatus(
+      String userId, NotificationState newStatus) async {
+    status = newStatus;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('notifications')
+        .where('field', isEqualTo: task.field)
+        .where('stage', isEqualTo: task.stage)
+        .where('course', isEqualTo: task.course)
+        .where('startTime', isEqualTo: task.startTime)
+        .where('endTime', isEqualTo: task.endTime)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        print(element.reference.id);
+        element.reference.update({'status': newStatus.index});
+      });
+    });
+  }
+}
 
 class NotificationScreen extends StatefulWidget {
   static const routeName = '/notification-screen';
@@ -15,52 +73,44 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  final List<Task> card=[
-  Task(
-    field: "Math",
-    stage: "Beginner",
-    course: "Calculus III",
-    startTime: DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
-      11,
-      30,
-    ),
-    endTime: DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-  DateTime.now().day,
-  12,
-  30,
-  ),
-    color: Color(0xFFFF7A7B),
-    icon: MyIcons.robot,
-    state: 1,
-  ),
-    Task(
-      field: "Math",
-      stage: "Beginner",
-      course: "Calculus III",
-      startTime: DateTime(
-        DateTime.now().year,
-        DateTime.now().month,
-        DateTime.now().day,
-        11,
-        30,
-      ),
-      endTime: DateTime(
-        DateTime.now().year,
-        DateTime.now().month,
-        DateTime.now().day,
-        12,
-        30,
-      ),
-      color: Color(0xFFFF7A7B),
-      icon: MyIcons.robot,
-      state: 1,
-    ),
-  ];
+  final List<NotificationDetail> card = [];
+
+  // fetch the notification list from firestore: in the collection users, in the document with ID userId, an array object named "notifications"
+  Future<List<NotificationDetail>> fetchNotificationList(String userId) async {
+    final description = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('notifications')
+        .get();
+    final descriptionData = description.docs;
+    final notificationList = descriptionData.map<NotificationDetail>((noti) {
+      return NotificationDetail(
+        task: Task(
+          field: noti['field'],
+          stage: noti['stage'],
+          course: noti['course'],
+          startTime: noti['startTime'].toDate(),
+          endTime: noti['endTime'].toDate(),
+          color: Color(noti['color']),
+          icon: IconData(noti['icon'], fontFamily: 'MaterialIcons'),
+          state: noti['state'],
+        ),
+        status: NotificationState.values[noti['status']],
+      );
+    }).toList();
+    return notificationList;
+  }
+
+  @override
+  void initState() {
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    fetchNotificationList(userId).then((value) {
+      setState(() {
+        card.addAll(value);
+      });
+    });
+    super.initState();
+  }
 
   double val = 50;
   String? value;
@@ -72,92 +122,139 @@ class _NotificationScreenState extends State<NotificationScreen> {
     deviceSize = MediaQuery.of(context).size;
     safeHeight = deviceSize!.height - MediaQuery.of(context).padding.top;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Notifications',
-          style: FigmaTextStyles.mButton,
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-      ),
-      backgroundColor: FigmaColors.sUNRISELightCoral,
-      body: SingleChildScrollView(
+    return Consumer<TaskList>(
+      builder: (context, cart, child) => SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            for (int i = 0; i < card.length; i++)
-              part(i),
+            for (int i = 0; i < card.length; i++) part(i),
           ],
         ),
       ),
     );
   }
 
-  Widget part(int i) => Center(
-    child: Expanded(
-      child: Container(
-        width: deviceSize!.width*0.85,
-        margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-        padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
-        decoration: BoxDecoration(
-          color: FigmaColors.sUNRISEWhite,
-          borderRadius: BorderRadius.circular(12),
-          border: Border(
-            top: BorderSide(color: card[i].color, width: 1),
-            right: BorderSide(color: card[i].color, width: 1),
-            bottom: BorderSide(color: card[i].color, width: 1),
-            left: BorderSide(color: card[i].color, width: 5),
+  Widget part(int i) {
+    final newCardState =
+        Provider.of<TaskList>(context, listen: false).findTask(card[i].task);
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    if (newCardState != null) {
+      card[i].task.state = newCardState.state;
+    }
+    return Center(
+      child: Expanded(
+        child: Container(
+          width: deviceSize!.width * 0.85,
+          margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+          padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
+          decoration: BoxDecoration(
+            color: FigmaColors.sUNRISEWhite.withOpacity(
+              card[i].status == NotificationState.read ? 0.5 : 1,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border(
+              top: BorderSide(
+                  color: card[i].task.color.withOpacity(
+                        card[i].status == NotificationState.read ? 0.5 : 1,
+                      ),
+                  width: 1),
+              right: BorderSide(
+                  color: card[i].task.color.withOpacity(
+                        card[i].status == NotificationState.read ? 0.5 : 1,
+                      ),
+                  width: 1),
+              bottom: BorderSide(
+                  color: card[i].task.color.withOpacity(
+                        card[i].status == NotificationState.read ? 0.5 : 1,
+                      ),
+                  width: 1),
+              left: BorderSide(
+                  color: card[i].task.color.withOpacity(
+                        card[i].status == NotificationState.read ? 0.5 : 1,
+                      ),
+                  width: 5),
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                card[i]
+                    .updateNotificationStatus(userId, NotificationState.read);
+              });
+              Navigator.pushNamed(context, DetailedTaskScreen.routeName,
+                  arguments: card[i].task);
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox(height: 3),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(card[i].icon, color: card[i].color),
-                    SizedBox(width: 10),
-                    Text(
-                      '${DateFormat('h:mm a').format(card[i].startTime)} - ${DateFormat('h:mm a').format(card[i].endTime)}',
-                      style:
-                      FigmaTextStyles.mT.copyWith(color: FigmaColors.systemGrey),
+                    SizedBox(height: 3),
+                    Row(
+                      children: [
+                        Icon(card[i].task.icon,
+                            color: card[i].task.color.withOpacity(
+                                  card[i].status == NotificationState.read
+                                      ? 0.5
+                                      : 1,
+                                )),
+                        SizedBox(width: 10),
+                        Text(
+                          '${DateFormat('h:mm a').format(card[i].task.startTime)} - ${DateFormat('h:mm a').format(card[i].task.endTime)}',
+                          style: FigmaTextStyles.mT.copyWith(
+                              color: FigmaColors.systemGrey.withOpacity(
+                            card[i].status == NotificationState.read ? 0.5 : 1,
+                          )),
+                        ),
+                      ],
                     ),
+                    SizedBox(height: 5),
+                    Text(
+                      card[i].task.course,
+                      maxLines: 20,
+                      overflow: TextOverflow.ellipsis,
+                      style: FigmaTextStyles.sButton.copyWith(
+                          color: Color(0xFF242736).withOpacity(
+                        card[i].status == NotificationState.read ? 0.5 : 1,
+                      )),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      card[i].task.field + ' | ' + card[i].task.stage,
+                      maxLines: 20,
+                      overflow: TextOverflow.ellipsis,
+                      style: FigmaTextStyles.mT.copyWith(
+                          color: FigmaColors.sUNRISETextGrey.withOpacity(
+                        card[i].status == NotificationState.read ? 0.5 : 1,
+                      )),
+                    ),
+                    SizedBox(height: 5),
                   ],
                 ),
-                SizedBox(height: 5),
-                Text(
-                  card[i].course,
-                  maxLines: 20,
-                  overflow: TextOverflow.ellipsis,
-                  style:
-                  FigmaTextStyles.sButton.copyWith(color: Color(0xFF242736)),
+                IconButton(
+                  onPressed: () {},
+                  icon: card[i].task.state == TaskState.completed.index
+                      ? Icon(
+                          Tick.ok_circled2,
+                          color: Color(0xFF77CC3B).withOpacity(
+                            card[i].status == NotificationState.read ? 0.5 : 1,
+                          ),
+                          size: deviceSize!.width * 0.05,
+                        )
+                      : Icon(
+                          Tick.warning_circle,
+                          color: FigmaColors.sUNRISEErrorRed.withOpacity(
+                            card[i].status == NotificationState.read ? 0.5 : 1,
+                          ),
+                          size: deviceSize!.width * 0.05,
+                        ),
                 ),
-                SizedBox(height: 5),
-                Text(
-                  card[i].field + ' | ' + card[i].stage,
-                  maxLines: 20,
-                  overflow: TextOverflow.ellipsis,
-                  style:
-                  FigmaTextStyles.mT.copyWith(color: FigmaColors.sUNRISETextGrey),
-                ),
-                SizedBox(height: 5),
               ],
             ),
-          IconButton(
-            onPressed: (){},
-            icon: Icon(
-              Tick.warning_circle,
-              color: FigmaColors.sUNRISEErrorRed,
-              size: deviceSize!.width*0.05,
-            ),
           ),
-          ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }

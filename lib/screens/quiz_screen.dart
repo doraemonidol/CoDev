@@ -217,9 +217,9 @@ class _QScreen extends State<QScreen> {
                 Provider.of<QuizInfo>(context, listen: false)
                     .setQuiz(snapshot.data!);
                 Provider.of<QuizInfo>(context, listen: false)
-                    .setQuizTopic(task.field, task.course);
-                debugPrint(Provider.of<QuizInfo>(context, listen: false).field);
-                return const QuizScreen();
+                    .setQuizTopic(task);
+                //debugPrint(Provider.of<QuizInfo>(context, listen: false).field);
+                return QuizScreen(task: task);
               }
             } else if (snapshot.hasError) {
               //return QuizScreen();
@@ -232,8 +232,9 @@ class _QScreen extends State<QScreen> {
 }
 
 class QuizScreen extends StatefulWidget {
+  final Task task;
   static const routeName = '/quiz-screen';
-  const QuizScreen({Key? key}) : super(key: key);
+  QuizScreen({super.key, required this.task});
   @override
   State<StatefulWidget> createState() => _QuizScreen();
 }
@@ -471,10 +472,7 @@ class _QuizScreen extends State<QuizScreen>
                                           Navigator.of(context)
                                               .pushReplacementNamed(
                                             EndQuiz.routeName,
-                                            arguments: {
-                                              "field": system.field,
-                                              "lesson": system.lesson
-                                            },
+                                            arguments: widget.task,
                                           );
                                         }
 

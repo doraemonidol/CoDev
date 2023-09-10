@@ -1,6 +1,8 @@
 import 'package:codev/providers/quiz.dart';
 import 'package:flutter/material.dart';
 
+import 'tasks.dart';
+
 class QuizInfo extends ChangeNotifier {
   int option = 0;
 
@@ -14,9 +16,16 @@ class QuizInfo extends ChangeNotifier {
 
   bool complete = false;
 
-  String lesson = "";
-
-  String field = "";
+  Task task = Task(
+    field: '',
+    stage: '',
+    course: '',
+    startTime: DateTime.now(),
+    endTime: DateTime.now(),
+    color: Colors.blue,
+    icon: Icons.ac_unit,
+    state: 0,
+  );
 
   bool disabled = false;
 
@@ -79,10 +88,9 @@ class QuizInfo extends ChangeNotifier {
     return quiz.quests[indexQuest];
   }
 
-  void setQuizTopic(String field, String lesson) {
+  void setQuizTopic(Task newTask) {
     debugPrint("...");
-    this.field = field;
-    this.lesson = lesson;
+    this.task = newTask;
     notifyListeners();
   }
 }

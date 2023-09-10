@@ -4,6 +4,7 @@ import 'package:codev/helpers/style.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:codev/icon/my_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/tasks.dart';
 import 'new_lesson_screen.dart';
@@ -326,112 +327,114 @@ class _PageState extends State<Page> {
 
   Widget buildCard(Task card, int index) {
     final deviceSize = MediaQuery.of(context).size;
-    return Builder(
-      builder: (context) => GestureDetector(
-        onTap: () {
-          setState(() => _expandedIndex = index);
-          Navigator.pushNamed(context, DetailedTaskScreen.routeName,
-              arguments: card);
-        },
-        child: Container(
-          margin: const EdgeInsets.only(top: 12),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: _expandedIndex == index
-                ? Color(0xFFC4D7FF)
-                : FigmaColors.sUNRISEWhite,
-            border: Border(
-              top: BorderSide(color: card.color, width: 1),
-              right: BorderSide(color: card.color, width: 1),
-              bottom: BorderSide(color: card.color, width: 1),
-              left: BorderSide(color: card.color, width: 5),
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: 209,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(card.icon, color: card.color),
-                        SizedBox(width: 10),
-                        Text(
-                            card.startTime.hour.toString() +
-                                ':' +
-                                card.startTime.minute.toString() +
-                                ' - ' +
-                                card.endTime.hour.toString() +
-                                ':' +
-                                card.endTime.minute.toString(),
-                            style: FigmaTextStyles.mT
-                                .copyWith(color: FigmaColors.systemGrey)),
-                      ],
-                    ),
-                    Text(card.course,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: FigmaTextStyles.mT
-                            .copyWith(color: FigmaColors.sUNRISETextGrey)),
-                  ],
-                ),
+    return Consumer<TaskList>(
+      builder: (context, cart, child) => Builder(
+        builder: (context) => GestureDetector(
+          onTap: () {
+            //setState(() => _expandedIndex = index);
+            Navigator.pushNamed(context, DetailedTaskScreen.routeName,
+                arguments: card);
+          },
+          child: Container(
+            margin: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _expandedIndex == index
+                  ? Color(0xFFC4D7FF)
+                  : FigmaColors.sUNRISEWhite,
+              border: Border(
+                top: BorderSide(color: card.color, width: 1),
+                right: BorderSide(color: card.color, width: 1),
+                bottom: BorderSide(color: card.color, width: 1),
+                left: BorderSide(color: card.color, width: 5),
               ),
-              IconButton(
-                icon: const Icon(Icons.more_vert_outlined,
-                    color: Color(0xFFD8DEF3)),
-                onPressed: () {
-                  // show a menu with options to do the task later 1 hour / 1 day or delete the task
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) => Container(
-                      height: deviceSize.height * 0.24,
-                      child: Column(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: 209,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          ListTile(
-                            leading: Icon(Icons.assignment_add),
-                            title: Text('Move to In Progress tab',
-                                style: FigmaTextStyles.mB),
-                            iconColor: Theme.of(context).colorScheme.primary,
-                            textColor: Theme.of(context).colorScheme.primary,
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.timer),
-                            title: Text(
-                              'Wait an hour',
-                              style: FigmaTextStyles.mB,
-                            ),
-                            iconColor: Theme.of(context).colorScheme.primary,
-                            textColor: Theme.of(context).colorScheme.primary,
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.calendar_today_rounded),
-                            title: Text(
-                              'I will do this tomorrow',
-                              style: FigmaTextStyles.mB,
-                            ),
-                            iconColor: Theme.of(context).colorScheme.primary,
-                            textColor: Theme.of(context).colorScheme.primary,
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
+                          Icon(card.icon, color: card.color),
+                          SizedBox(width: 10),
+                          Text(
+                              card.startTime.hour.toString() +
+                                  ':' +
+                                  card.startTime.minute.toString() +
+                                  ' - ' +
+                                  card.endTime.hour.toString() +
+                                  ':' +
+                                  card.endTime.minute.toString(),
+                              style: FigmaTextStyles.mT
+                                  .copyWith(color: FigmaColors.systemGrey)),
                         ],
                       ),
-                    ),
-                  );
-                },
-              ),
-            ],
+                      Text(card.course,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: FigmaTextStyles.mT
+                              .copyWith(color: FigmaColors.sUNRISETextGrey)),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.more_vert_outlined,
+                      color: Color(0xFFD8DEF3)),
+                  onPressed: () {
+                    // show a menu with options to do the task later 1 hour / 1 day or delete the task
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) => Container(
+                        height: deviceSize.height * 0.24,
+                        child: Column(
+                          children: [
+                            ListTile(
+                              leading: Icon(Icons.assignment_add),
+                              title: Text('Move to In Progress tab',
+                                  style: FigmaTextStyles.mB),
+                              iconColor: Theme.of(context).colorScheme.primary,
+                              textColor: Theme.of(context).colorScheme.primary,
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.timer),
+                              title: Text(
+                                'Wait an hour',
+                                style: FigmaTextStyles.mB,
+                              ),
+                              iconColor: Theme.of(context).colorScheme.primary,
+                              textColor: Theme.of(context).colorScheme.primary,
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.calendar_today_rounded),
+                              title: Text(
+                                'I will do this tomorrow',
+                                style: FigmaTextStyles.mB,
+                              ),
+                              iconColor: Theme.of(context).colorScheme.primary,
+                              textColor: Theme.of(context).colorScheme.primary,
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

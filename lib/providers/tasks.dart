@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:codev/providers/auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'field.dart';
 import '../helpers/prompt.dart';
 import './progress.dart';
@@ -18,7 +20,7 @@ class Task {
   final DateTime endTime;
   final Color color;
   final IconData icon;
-  final int state;
+  int state;
 
   Task({
     required this.field,
@@ -32,7 +34,7 @@ class Task {
   });
 }
 
-class TaskList {
+class TaskList with ChangeNotifier {
   final DateTime date;
   final List<Task> tasks;
 
@@ -40,6 +42,96 @@ class TaskList {
     required this.date,
     required this.tasks,
   });
+
+  // find a task
+  Task? findTask(Task task) {
+    final index = tasks.indexWhere((element) {
+      return element.field == task.field &&
+          element.stage == task.stage &&
+          element.course == task.course &&
+          element.startTime == task.startTime &&
+          element.endTime == task.endTime;
+    });
+    if (index == -1) {
+      return null;
+    } else {
+      return tasks[index];
+    }
+  }
+
+  // set state of a task and send to firebase
+  Future<void> setState(String id, Task task, int state) async {
+    final description =
+        await FirebaseFirestore.instance.collection('users').doc(id).get();
+    final descriptionData = description.data();
+    final tasklists = descriptionData!['tasklists'];
+    final tasklist = tasklists.firstWhere((element) {
+      return element['date'] == date;
+    }, orElse: () {
+      return null;
+    });
+    if (tasklist == null) {
+      throw Exception('No tasklist found');
+    } else {
+      final tasks = tasklist['tasks'].map<Task>((task) {
+        return Task(
+          field: task['field'],
+          stage: task['stage'],
+          course: task['course'],
+          startTime: DateTime.parse(task['startTime']),
+          endTime: DateTime.parse(task['endTime']),
+          color: Color(task['color']),
+          icon: IconData(task['icon'], fontFamily: 'MaterialIcons'),
+          state: task['state'],
+        );
+      }).toList();
+      final index = tasks.indexWhere((element) {
+        return element.field == task.field &&
+            element.stage == task.stage &&
+            element.course == task.course &&
+            element.startTime == task.startTime &&
+            element.endTime == task.endTime;
+      });
+      if (index == -1) {
+        throw Exception('No task found');
+      } else {
+        tasks[index] = Task(
+          field: task.field,
+          stage: task.stage,
+          course: task.course,
+          startTime: task.startTime,
+          endTime: task.endTime,
+          color: task.color,
+          icon: task.icon,
+          state: state,
+        );
+        await FirebaseFirestore.instance.collection('users').doc(id).update({
+          'tasklists': FieldValue.arrayRemove([
+            tasklist,
+          ])
+        });
+        await FirebaseFirestore.instance.collection('users').doc(id).update({
+          'tasklists': FieldValue.arrayUnion([
+            {
+              'date': date.toString(),
+              'tasks': tasks.map((task) {
+                return {
+                  'field': task.field,
+                  'stage': task.stage,
+                  'course': task.course,
+                  'startTime': task.startTime.toString(),
+                  'endTime': task.endTime.toString(),
+                  'color': task.color.value,
+                  'icon': task.icon.codePoint,
+                  'state': task.state,
+                };
+              }).toList(),
+            }
+          ])
+        });
+      }
+    }
+  }
 }
 
 // add an input tasklist to firestore: in the collection users, in the document with ID equal to input ID, in object tasklists, create object with "date" equal to input date, and "tasks" equal to input tasklist. If there is already an object with "date" equal to input date, update its "tasks" to input tasklist.

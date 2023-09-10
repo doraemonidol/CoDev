@@ -1,8 +1,11 @@
 import 'package:codev/helpers/style.dart';
 import 'package:codev/providers/progress.dart';
+import 'package:codev/providers/tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:circle_progress_bar/circle_progress_bar.dart';
 import 'package:provider/provider.dart';
+
+import '../providers/auth.dart';
 
 class EndQuiz extends StatefulWidget {
   static const routeName = '/end-quiz';
@@ -15,10 +18,14 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late Animation<Offset> offset;
 
-  int updateAndGetProgressStatus(String field, String course) {
+  int updateAndGetProgressStatus(Task task) {
     Provider.of<LearningProgress>(context, listen: false)
-        .toggleCourseDone(field, course);
+        .toggleCourseDone(task.field, task.course);
     Provider.of<LearningField>(context, listen: false).updateProgress();
+    Provider.of<TaskList>(context, listen: false).setState(
+        Provider.of<Auth>(context, listen: false).userId,
+        task,
+        TaskState.completed.index);
     return Provider.of<LearningField>(context, listen: false).progress;
   }
 
@@ -61,8 +68,7 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
 
     double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
 
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args = ModalRoute.of(context)!.settings.arguments as Task;
 
     return Scaffold(
       backgroundColor: FigmaColors.sUNRISESunray,
@@ -117,7 +123,7 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "${args['lesson']}",
+                          "${args.course}",
                           style: FigmaTextStyles.mH1
                               .copyWith(color: FigmaColors.sUNRISEWhite),
                         ),
@@ -149,7 +155,7 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
                               child: Align(
                                 alignment: Alignment.center,
                                 child: Text(
-                                  "66%", // should be change into "${updateAndGetProgressStatus(args['field'], args['course'])}"
+                                  "${updateAndGetProgressStatus(args)}",
                                   style: FigmaTextStyles.h4.copyWith(
                                       color: FigmaColors.sUNRISEWhite),
                                 ),
@@ -173,7 +179,7 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "${args['field']}",
+                          "${args.field}",
                           style: FigmaTextStyles.mH1
                               .copyWith(color: FigmaColors.sUNRISEWhite),
                         ),
