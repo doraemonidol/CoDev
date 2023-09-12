@@ -85,35 +85,32 @@ const testResult = """
 
 """;
 
-String schedulePrompt(String fields_json) {
+String schedulePrompt(String fields_json, int num_tasks) {
   String prompt = """
-    You are a consultant for a college student. The student give you a list of fields that he want to learn, each field has several stages and each stage has several courses. Your task is to schedule the courses for the student. The student want to learn about 3-4 courses per day.
-    Given the list of fields (including stages and courses) as json, as following:
+    You are a consultant for a college student. The student give you a list of fields that he want to learn, each field has several courses. Your task is to schedule the courses for the student. The student want to learn about 5-6 courses per day.
+    Given the list of fields, each has a list of courses as json, as following:\n
   """ +
       fields_json +
       """
-Please schedule the courses for the student. It should be about 3-4 tasks each day, each represent a course. 
-Each course must exist in the plan exactly once and their order in each field and stage must be kept.
-The result must strictly be in form of json, as following:
-"tasklists": [
-  {
-    "date": "date_of_tasks",
-    "tasks":[
-      {
-        "field": "field_name",
-        "stage": "stage_name",
-        "course": "course_name",
-        "startTime": "start_time",
-        "endTime": "end_time",
-        "color": "blue" (keep this constant),
-        "icon": "icon" (keep this constant)),
-        "state": "not done" (keep this constant)
-      }
-    ]
-  }
-]
-The tasklists is the array contains each element as a tasklist for each day, "date" in "tasklists" represents the date of the tasklist, "tasks" in "tasklists" represents the array of tasks in that day. Each task has "field", "stage", "course" is a course exists in the input data, "startTime" and "endTime" is the scheduled time of the task, "color" and "icon" and "state" must be kept constant as above.
-Your result must contain the JSON only. No other words.
+\nPlease schedule the courses for the student. It must be about 5-6 tasks each day, each represent a course.
+Each course must exist in the plan exactly once and their order in each field must be kept.
+The fields must be scheduled parallelly, that means the student must learn about 5-6 courses from DIFFERENT fields each day.
+The result must STRICTLY be in the form that, each line contains the index of the course, counting from 0, in order of the input data, and the start time of the task (hour), and the end time of the task (hour), separated by a space. There is a line containing a dot "." at the end of each day. Example result:
+0 10:00 12:00
+1 12:00 14:00
+3 14:00 16:00
+5 16:00 18:00
+7 18:00 20:00
+10 22:00 23:00
+.
+2 10:00 12:00
+4 12:00 14:00
+6 14:00 16:00
+8 16:00 18:00
+9 18:00 20:00
+.
+Please note that the indexes must be fully from 0 to $num_tasks - 1, and there must be exactly $num_tasks lines of indexes in total.
+Your result must contain the result formatted earlier. NO OTHER WORD. PLEASE. NO OTHER WORD.
 """;
   return prompt;
 }

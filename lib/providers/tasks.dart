@@ -16,8 +16,8 @@ class Task {
   final String field;
   final String stage;
   final String course;
-  final DateTime startTime;
-  final DateTime endTime;
+  DateTime startTime;
+  DateTime endTime;
   final Color color;
   final IconData icon;
   int state;
@@ -35,8 +35,8 @@ class Task {
 }
 
 class TaskList with ChangeNotifier {
-  final DateTime date;
-  final List<Task> tasks;
+  DateTime date;
+  List<Task> tasks;
 
   TaskList({
     required this.date,
@@ -194,18 +194,23 @@ Future<void> addTaskList(String id, TaskList taskList) async {
 }
 
 // fetch a TaskList from firestore: in the collection users, in the document with ID equal to input ID, in object tasklists with date equal to current date, find the array object named "tasks"
-Future<List<Task>> fetchTaskList(String id) async {
+Future<TaskList> fetchTaskList(String id) async {
   final description =
       await FirebaseFirestore.instance.collection('users').doc(id).get();
   final descriptionData = description.data();
   final tasklists = descriptionData!['tasklists'];
   final tasklist = tasklists.firstWhere((element) {
-    return element['date'] == DateTime.now();
+    return element['date'] ==
+        DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+        );
   }, orElse: () {
     return null;
   });
   if (tasklist == null) {
-    return [];
+    throw Exception('No tasklist found');
   } else {
     final tasks = tasklist['tasks'].map<Task>((task) {
       return Task(
@@ -219,7 +224,14 @@ Future<List<Task>> fetchTaskList(String id) async {
         state: task['state'],
       );
     }).toList();
-    return tasks;
+    return TaskList(
+      date: DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+      ),
+      tasks: tasks,
+    );
   }
 }
 
@@ -227,79 +239,129 @@ Future<List<TaskList>?> fetchScheduledTasks(
     String ID, List<Field> learn) async {
   // turn this field list to json
   final fields = learn.map((field) {
-    final stages = field.stages.map((stage) {
-      final courses = stage.courses.map((course) {
-        return {
-          'name': course.name,
-          'description': course.description,
-          'prerequisiteCourses': course.prerequisiteCourses,
-        };
-      }).toList();
-      return {
-        'name': stage.name,
-        'courses': courses,
-      };
-    }).toList();
+    final courses = [];
+    field.stages.forEach((stage) {
+      stage.courses.forEach((course) {
+        courses.add({"name": course.name});
+      });
+    });
     return {
       'name': field.name,
-      'stages': stages,
+      'courses': courses,
     };
   }).toList();
   // json to string
-  final fields_json = jsonEncode(fields);
-  OpenAI.apiKey = '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';
-  final response = await OpenAI.instance.chat.create(
-    model: 'gpt-3.5-turbo',
-    messages: [
-      OpenAIChatCompletionChoiceMessageModel(
-        content: schedulePrompt(fields_json),
-        role: OpenAIChatMessageRole.user,
-      ),
-    ],
-  );
-  if (response.choices.isEmpty) {
-    throw Exception('No response from OpenAI');
-  }
-  /*
+  try {
+    // create a list of task in order
+    List<Task> tasks_unscheduled = [];
+    learn.forEach((field) {
+      field.stages.forEach((stage) {
+        stage.courses.forEach((course) {
+          tasks_unscheduled.add(Task(
+            field: field.name,
+            stage: stage.name,
+            course: course.name,
+            startTime: DateTime.now(),
+            endTime: DateTime.now(),
+            state: TaskState.todo.index,
+          ));
+        });
+      });
+    });
+    final fields_json = jsonEncode(fields);
+    OpenAI.apiKey = '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';
+    final response = await OpenAI.instance.chat.create(
+      model: 'gpt-3.5-turbo',
+      messages: [
+        OpenAIChatCompletionChoiceMessageModel(
+          content: schedulePrompt(fields_json, tasks_unscheduled.length),
+          role: OpenAIChatMessageRole.user,
+        ),
+      ],
+      maxTokens: 2000,
+    );
+    if (response.choices.isEmpty) {
+      throw Exception('No response from OpenAI');
+    }
+    debugPrint(response.choices.first.message.content);
+    /*
 Create object LearningProgress from List<Field> learn: 
 - the List<LearningField> fields corresponding to List<Field> learn
 - in each element in fields, its element name equal to the name of each corresponding element in learn
 - in each element in courses, its element name equal to the name of each corresponding element in the same field
 - each done in course is false 
 */
-  List<LearningField> learningField = learn.map<LearningField>((field) {
-    return LearningField(
-        name: field.name,
-        progress: 0,
-        courses: field.stages.map<LearningCourse>((stage) {
-          return LearningCourse(name: stage.name, done: false);
-        }).toList());
-  }).toList();
-  final learningProgress = LearningProgress(fields: learningField);
-  // update learingProgress to firestore: in the collection users, in the document with ID equal to input ID, update object learningProgress, or create if not exist
-  await FirebaseFirestore.instance.collection('users').doc(ID).update({
-    'learningProgress': learningProgress.toJson(),
-  });
-  final result = response.choices.first.message.content;
-  final tasklists = jsonDecode(result)['tasklists'];
-  final tasks = tasklists.map<TaskList>((tasklist) {
-    final date = DateTime.parse(tasklist['date']);
-    final tasks = tasklist['tasks'].map<Task>((task) {
-      return Task(
-        field: task['field'],
-        stage: task['stage'],
-        course: task['course'],
-        startTime: DateTime.parse(task['startTime']),
-        endTime: DateTime.parse(task['endTime']),
-        color: Color(task['color']),
-        icon: IconData(task['icon'], fontFamily: 'MaterialIcons'),
-        state: task['state'],
-      );
+    List<LearningField> learningField = learn.map<LearningField>((field) {
+      return LearningField(
+          name: field.name,
+          progress: 0,
+          courses: field.stages.map<LearningCourse>((stage) {
+            return LearningCourse(name: stage.name, done: false);
+          }).toList());
     }).toList();
-    return TaskList(
-      date: date,
-      tasks: tasks,
+    final learningProgress = LearningProgress(fields: learningField);
+    // update learingProgress to firestore: in the collection users, in the document with ID equal to input ID, update object learningProgress, or create if not exist
+    await FirebaseFirestore.instance.collection('users').doc(ID).update({
+      'learningProgress': learningProgress.toJson(),
+    });
+
+    final result = response.choices.first.message.content;
+    // iterate through each line in result, each line is a task
+    List<TaskList> schedule = [];
+    // get current_date with time = 0:00
+    DateTime current_date = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
     );
-  }).toList();
-  return tasks;
+    TaskList day_list = TaskList(date: current_date, tasks: []);
+    int task_count = 0;
+    result.split('\n').forEach((line) {
+      if (line != '') {
+        if (line == '.') {
+          if (day_list.tasks.isNotEmpty) schedule.add(day_list);
+          current_date = current_date.add(Duration(days: 1));
+          day_list.date = current_date;
+          day_list.tasks = [];
+        } else if (line.codeUnitAt(0) >= 48 && line.codeUnitAt(0) <= 57) {
+          // separate line into index as int, start time, end time as DateTime with date equal current_date, and hour is in the line
+          final index = int.parse(line.split(' ')[0]);
+          final start_time = DateTime(
+            current_date.year,
+            current_date.month,
+            current_date.day,
+            int.parse(line.split(' ')[1].split(':')[0]),
+            int.parse(line.split(' ')[1].split(':')[1]),
+          );
+          final end_time = DateTime(
+            current_date.year,
+            current_date.month,
+            current_date.day,
+            int.parse(line.split(' ')[2].split(':')[0]),
+            int.parse(line.split(' ')[2].split(':')[1]),
+          );
+          // find the task in tasks_unscheduled with index equal to index
+          final task = tasks_unscheduled[index];
+          // set start time and end time of task to start_time and end_time
+          task.startTime = start_time;
+          task.endTime = end_time;
+          // add task to day_list
+          day_list.tasks.add(task);
+          task_count++;
+        }
+      }
+    });
+    if (task_count != tasks_unscheduled.length) {
+      throw Exception(
+          'Tasks are not fully processed (some tasks are missing)! Expected: ' +
+              tasks_unscheduled.length.toString() +
+              ', Actual: ' +
+              task_count.toString() +
+              '.');
+    }
+
+    return schedule;
+  } catch (e) {
+    throw Exception('Invalid response from OpenAI: ' + e.toString());
+  }
 }
