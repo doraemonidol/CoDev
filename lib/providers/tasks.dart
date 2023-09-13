@@ -235,8 +235,7 @@ Future<TaskList> fetchTaskList(String id) async {
   }
 }
 
-Future<List<TaskList>?> fetchScheduledTasks(
-    String ID, List<Field> learn) async {
+Future<List<TaskList>?> getScheduledTasks(String ID, List<Field> learn) async {
   // turn this field list to json
   final fields = learn.map((field) {
     final courses = [];
@@ -359,29 +358,124 @@ Create object LearningProgress from List<Field> learn:
               task_count.toString() +
               '.');
     }
-    // update schedule to firestore: in the collection users, in the document with ID equal to input ID, update object schedule, or create if not exist
-    await FirebaseFirestore.instance.collection('users').doc(ID).update({
-      'schedule': schedule.map((taskList) {
-        return {
-          'date': taskList.date.toString(),
-          'tasks': taskList.tasks.map((task) {
-            return {
-              'field': task.field,
-              'stage': task.stage,
-              'course': task.course,
-              'startTime': task.startTime.toString(),
-              'endTime': task.endTime.toString(),
-              'color': task.color.value,
-              'icon': task.icon.codePoint,
-              'state': task.state,
-            };
-          }).toList(),
-        };
-      }).toList(),
-    });
+    updateSchedule(ID, schedule);
     print("schedule updated for user " + ID);
     return schedule;
   } catch (e) {
     throw Exception('Invalid response from OpenAI: ' + e.toString());
   }
+}
+
+// fetch scheduled tasks from firestore: in the collection users, in the document with ID equal to input ID, find object schedule, return it
+Future<List<TaskList>?> fetchScheduled(String ID) async {
+  final description =
+      await FirebaseFirestore.instance.collection('users').doc(ID).get();
+  final descriptionData = description.data();
+  final schedule = descriptionData!['schedule'];
+  if (schedule == null) {
+    throw Exception('No schedule found');
+  } else {
+    final tasklists = schedule.map<TaskList>((tasklist) {
+      final tasks = tasklist['tasks'].map<Task>((task) {
+        return Task(
+          field: task['field'],
+          stage: task['stage'],
+          course: task['course'],
+          startTime: DateTime.parse(task['startTime']),
+          endTime: DateTime.parse(task['endTime']),
+          color: Color(task['color']),
+          icon: IconData(task['icon'], fontFamily: 'MaterialIcons'),
+          state: task['state'],
+        );
+      }).toList();
+      return TaskList(
+        date: DateTime.parse(tasklist['date']),
+        tasks: tasks,
+      );
+    }).toList();
+    return tasklists;
+  }
+}
+
+// update schedule to firestore: in the collection users, in the document with ID equal to input ID, update object schedule with the input schedule, or create if not exist
+Future<void> updateSchedule(String ID, List<TaskList> schedule) async {
+  await FirebaseFirestore.instance.collection('users').doc(ID).update({
+    'schedule': schedule.map((taskList) {
+      return {
+        'date': taskList.date.toString(),
+        'tasks': taskList.tasks.map((task) {
+          return {
+            'field': task.field,
+            'stage': task.stage,
+            'course': task.course,
+            'startTime': task.startTime.toString(),
+            'endTime': task.endTime.toString(),
+            'color': task.color.value,
+            'icon': task.icon.codePoint,
+            'state': task.state,
+          };
+        }).toList(),
+      };
+    }).toList(),
+  });
+}
+
+// input a schedule and a task name, push it to the next date of the schedule, that is in the tasklist with date equal to the next date, add the task to the end of the tasklist with start time equal to the end time of the last task in the tasklist, and end time equal to the start time plus 2 hours
+Future<void> pushTask(
+    String ID, List<TaskList> schedule, String task_name) async {
+  // get current_date with time = 0:00
+  DateTime current_date = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
+  // get next_date with time = 0:00
+  DateTime next_date = current_date.add(Duration(days: 1));
+  // find tasklist with date equal to next_date
+  final tasklist = schedule.firstWhere((element) {
+    return element.date == next_date;
+  }, orElse: () {
+    // if not found, create new tasklist with date equal to next_date
+    TaskList tasklist = TaskList(date: next_date, tasks: []);
+    schedule.add(tasklist);
+    return tasklist;
+  });
+  // if tasklist is empty, the start_time is of the next_date with hour equal to 10:00
+  DateTime start_time = DateTime(
+    next_date.year,
+    next_date.month,
+    next_date.day,
+    10,
+  );
+  // if tasklist is not empty, the start_time is of the last task in the tasklist with hour equal to the end_time of the last task
+  if (tasklist.tasks.isNotEmpty) {
+    start_time = tasklist.tasks.last.endTime;
+  }
+  DateTime end_time = start_time.add(Duration(hours: 2));
+  // get field, stage, course of new task
+  String field = '';
+  String stage = '';
+  String course = '';
+  schedule.forEach((taskList) {
+    taskList.tasks.forEach((task) {
+      if (task.course == task_name) {
+        field = task.field;
+        stage = task.stage;
+        course = task.course;
+      }
+    });
+  });
+  // create new task
+  final new_task = Task(
+    field: field,
+    stage: stage,
+    course: course,
+    startTime: start_time,
+    endTime: end_time,
+    state: TaskState.todo.index,
+  );
+  // add new task to tasklist
+  tasklist.tasks.add(new_task);
+  // update schedule to firestore
+  await updateSchedule(ID, schedule);
 }

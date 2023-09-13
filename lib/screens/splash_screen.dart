@@ -12,7 +12,7 @@ void dosth() async {
   final List<Field> fields = await Future.wait([field3, field4]);
   // get schedule task
   final Future<List<TaskList>?> taskLists =
-      fetchScheduledTasks("2B9E2a62McR1rhrvuC67fXZSGic2", fields);
+      getScheduledTasks("2B9E2a62McR1rhrvuC67fXZSGic2", fields);
   //print(taskLists);
 }
 
