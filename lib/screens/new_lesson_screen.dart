@@ -3,6 +3,7 @@ import 'package:codev/widgets/horizontal_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
+import 'package:http/http.dart' as http;
 import '../icon/my_icons.dart';
 
 class NewLessonScreen extends StatefulWidget {
@@ -137,7 +138,7 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
               .split(' ')
               .map((word) => word[0].toUpperCase() + word.substring(1))
               .join(' ');
-
+          //print(item['url']);
           return buildNum(
               name, item['url'] == null ? urlOb : item['url'], index);
         },
@@ -146,6 +147,18 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
   }
 
   Widget buildNum(String title, String url, int index) {
+    /*url has the format https://drive.google.com/file/d/<FILE_ID>/view?usp=sharing. Copy the <FILE_ID> and Append it to this link below in the following format: https://drive.google.com/uc?export=view&id=<FILE_ID> */
+    final String url2 = url
+        .replaceAll(
+          'https://drive.google.com/file/d/',
+          'https://drive.google.com/thumbnail?id=',
+        )
+        .replaceAll('/view?usp=sharing', '')
+        .replaceAll('/view?usp=share_link', '');
+
+    print(url);
+    print(url2);
+    //if (!imageReady[index]) checkImageValidity(url2, index);
     return InkWell(
       onTap: () {
         _showModalBottomSheet(context, index: index);
@@ -166,8 +179,17 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
             ),
           ],
           image: DecorationImage(
-            image: NetworkImage(url),
+            image: Image.network(
+              url2,
+              // errorBuilder: (context, error, stackTrace) {
+              //   return;
+              // },
+            ).image,
             fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.5),
+              BlendMode.darken,
+            ),
           ),
           borderRadius: BorderRadius.circular(12),
         ),
