@@ -359,7 +359,27 @@ Create object LearningProgress from List<Field> learn:
               task_count.toString() +
               '.');
     }
-
+    // update schedule to firestore: in the collection users, in the document with ID equal to input ID, update object schedule, or create if not exist
+    await FirebaseFirestore.instance.collection('users').doc(ID).update({
+      'schedule': schedule.map((taskList) {
+        return {
+          'date': taskList.date.toString(),
+          'tasks': taskList.tasks.map((task) {
+            return {
+              'field': task.field,
+              'stage': task.stage,
+              'course': task.course,
+              'startTime': task.startTime.toString(),
+              'endTime': task.endTime.toString(),
+              'color': task.color.value,
+              'icon': task.icon.codePoint,
+              'state': task.state,
+            };
+          }).toList(),
+        };
+      }).toList(),
+    });
+    print("schedule updated for user " + ID);
     return schedule;
   } catch (e) {
     throw Exception('Invalid response from OpenAI: ' + e.toString());
