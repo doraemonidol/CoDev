@@ -52,9 +52,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             .putFile(file);
         var downloadUrl = await snapshot.ref.getDownloadURL();
         if (!context.mounted) return;
-        Provider.of<User>(context, listen: false).imageUrl = downloadUrl;
-        await Provider.of<User>(context, listen: false)
-            .updateUser(Provider.of<Auth>(context, listen: false).userId);
+        user.imageUrl = downloadUrl;
+        await user.updateUser(Provider.of<Auth>(context, listen: false).userId);
         // setState(() {
         //   user.imageUrl = downloadUrl;
         // });
