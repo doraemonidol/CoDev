@@ -149,7 +149,17 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                                 .collection('users')
                                 .doc(userId)
                                 .update({
-                              'educationLevel': _value,
+                              'educationLevel': _value == 1
+                                  ? 'Year 7-9'
+                                  : _value == 2
+                                      ? 'Year 10-11'
+                                      : _value == 3
+                                          ? 'Year 12-13'
+                                          : _value == 4
+                                              ? 'Bachelors'
+                                              : _value == 5
+                                                  ? 'Masters'
+                                                  : 'Worked',
                             });
                             Provider.of<Auth>(context, listen: false)
                                 .setFirstTime(false);
