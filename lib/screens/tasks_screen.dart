@@ -6,6 +6,7 @@ import 'package:codev/icon/my_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/auth.dart';
 import '../providers/tasks.dart';
 import 'new_lesson_screen.dart';
 
@@ -21,60 +22,7 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
-  final List<Task> list = [
-    Task(
-      field: 'Database',
-      stage: 'Stage 1',
-      course: 'Python',
-      startTime: DateTime.now(),
-      endTime: DateTime.now(),
-      color: FigmaColors.sUNRISEBluePrimary,
-      icon: MyIcons.robot,
-      state: 0,
-    ),
-    Task(
-      field: 'Data Science',
-      stage: 'Stage 1',
-      course: 'Python',
-      startTime: DateTime.now(),
-      endTime: DateTime.now().add(
-        Duration(hours: 1),
-      ),
-      color: FigmaColors.sUNRISEBluePrimary,
-      icon: MyIcons.cube_outline,
-      state: 0,
-    ),
-    Task(
-      field: 'Data Science',
-      stage: 'Stage 1',
-      course: 'Python',
-      startTime: DateTime.now(),
-      endTime: DateTime.now(),
-      color: FigmaColors.sUNRISEBluePrimary,
-      icon: MyIcons.cube_outline,
-      state: 0,
-    ),
-    Task(
-      field: 'Data Science',
-      stage: 'Stage 1',
-      course: 'Python',
-      startTime: DateTime(2023, 9, 17, 11, 30),
-      endTime: DateTime(2023, 9, 17, 12, 30),
-      color: FigmaColors.sUNRISEBluePrimary,
-      icon: MyIcons.cube_outline,
-      state: 0,
-    ),
-    Task(
-      field: 'Data Science',
-      stage: 'Stage 1',
-      course: 'Python',
-      startTime: DateTime(2022, 9, 17, 11, 30),
-      endTime: DateTime(2022, 9, 17, 12, 30),
-      color: FigmaColors.sUNRISEBluePrimary,
-      icon: MyIcons.cube_outline,
-      state: 0,
-    ),
-  ];
+  List<TaskList> list = [];
 
   @override
   Widget build(BuildContext context) {
@@ -148,14 +96,27 @@ class _TasksScreenState extends State<TasksScreen> {
                   ),
                 ],
               ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    Page(list, TaskState.todo),
-                    Page(list, TaskState.inProgress),
-                    Page(list, TaskState.completed),
-                  ],
-                ),
+              FutureBuilder(
+                future: fetchScheduled(
+                    Provider.of<Auth>(context, listen: false).userId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else {
+                    list = snapshot.data == null
+                        ? []
+                        : snapshot.data as List<TaskList>;
+                    return Expanded(
+                      child: TabBarView(
+                        children: [
+                          Page(list, TaskState.todo),
+                          Page(list, TaskState.inProgress),
+                          Page(list, TaskState.completed),
+                        ],
+                      ),
+                    );
+                  }
+                },
               ),
             ],
           ),
@@ -166,7 +127,7 @@ class _TasksScreenState extends State<TasksScreen> {
 }
 
 class Page extends StatefulWidget {
-  final List<Task> list;
+  final List<TaskList> list;
   final TaskState curState;
 
   const Page(this.list, this.curState, {super.key});
@@ -178,9 +139,14 @@ class Page extends StatefulWidget {
 class _PageState extends State<Page> {
   @override
   Widget build(BuildContext context) {
-    final List<Task> curStateTaskList = widget.list
-        .where((element) => element.state == widget.curState.index)
-        .toList();
+    final List<Task> curStateTaskList = [];
+    for (int i = 0; i < widget.list.length; i++) {
+      for (int j = 0; j < widget.list[i].tasks.length; j++) {
+        if (widget.list[i].tasks[j].state == widget.curState) {
+          curStateTaskList.add(widget.list[i].tasks[j]);
+        }
+      }
+    }
     // sort curStateTaskList by startTime
     curStateTaskList.sort((a, b) => a.startTime.compareTo(b.startTime));
     // get list of dates (day, month, year) unique in curStateTaskList

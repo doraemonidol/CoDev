@@ -241,7 +241,7 @@ Future<TaskList> fetchTaskList(String id) async {
         startTime: DateTime.parse(task['startTime']),
         endTime: DateTime.parse(task['endTime']),
         color: Color(task['color']),
-        icon: IconData(task['icon'], fontFamily: 'MaterialIcons'),
+        icon: IconData(task['icon'], fontFamily: 'CuppertinoIcons'),
         state: task['state'],
       );
     }).toList();
@@ -472,6 +472,7 @@ Future<List<TaskList>?> fetchScheduled(String ID) async {
   final descriptionData = description.data();
   final schedule = descriptionData!['schedule'];
   if (schedule == null) {
+    return [];
     throw Exception('No schedule found');
   } else {
     final tasklists = schedule.map<TaskList>((tasklist) {
@@ -564,6 +565,7 @@ Future<void> pushTask(
 Future<List<TaskList>?> addFieldToSchedule(
     String ID, Field field, IconData iconData, Color color) async {
   try {
+    print("addFieldToSchedule called");
     final schedule = await fetchScheduled(ID);
     // create a list of field, iterate throught each task in schedule, if the field of the task is not in the list, add it to the list, then add that course to the field
     List<Field> fields = [];
