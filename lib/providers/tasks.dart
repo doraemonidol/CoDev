@@ -9,6 +9,7 @@ import '../helpers/prompt.dart';
 import './progress.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'dart:io';
+import './course.dart';
 
 enum TaskState { todo, inProgress, completed }
 
@@ -249,7 +250,6 @@ Future<List<TaskList>?> getScheduledTasks(String ID, List<Field> learn) async {
       'courses': courses,
     };
   }).toList();
-  // json to string
   try {
     // create a list of task in order
     List<Task> tasks_unscheduled = [];
@@ -478,4 +478,45 @@ Future<void> pushTask(
   tasklist.tasks.add(new_task);
   // update schedule to firestore
   await updateSchedule(ID, schedule);
+}
+
+Future<List<TaskList>?> addFieldToSchedule(String ID, Field field) async {
+  try {
+    final schedule = await fetchScheduled(ID);
+    // create a list of field, iterate throught each task in schedule, if the field of the task is not in the list, add it to the list, then add that course to the field
+    List<Field> fields = [];
+    fields.add(field);
+    schedule!.forEach((taskList) {
+      taskList.tasks.forEach((task) {
+        final exist_field =
+            fields.firstWhere((element) => task.field == element.name);
+        if (exist_field == null) {
+          fields.add(Field(name: task.field, stages: []));
+        }
+        final exist_stage = fields
+            .firstWhere((element) => task.field == element.name)
+            .stages
+            .firstWhere((element) => task.stage == element.name);
+        if (exist_stage == null) {
+          fields
+              .firstWhere((element) => task.field == element.name)
+              .stages
+              .add(Stage(name: task.stage, courses: []));
+        }
+        fields
+            .firstWhere((element) => task.field == element.name)
+            .stages
+            .firstWhere((element) => task.stage == element.name)
+            .courses
+            .add(Course(
+              name: task.course,
+              description: '',
+              prerequisiteCourses: [],
+            ));
+      });
+    });
+    return await getScheduledTasks(ID, fields);
+  } catch (e) {
+    print(e);
+  }
 }
