@@ -9,6 +9,10 @@ import '../icon/my_icons.dart';
 // create horizontal list of any widget with any number of items in it, each widget is rendered as a button that only one widget of the list is chosen at a time
 
 class HorizontalIconList extends StatefulWidget {
+  Function(IconData) onIconSelected;
+
+  HorizontalIconList({required this.onIconSelected});
+
   @override
   State<HorizontalIconList> createState() => _HorizontalIconListState();
 }
@@ -17,16 +21,22 @@ class _HorizontalIconListState extends State<HorizontalIconList> {
   final int numberOfIcons = 9;
 
   final List<IconData> iconDataList = [
-    MyIcons.robot,
-    MyIcons.cube_outline,
+    CupertinoIcons.hourglass,
+    CupertinoIcons.helm,
+    CupertinoIcons.moon_stars,
     CupertinoIcons.device_laptop,
     CupertinoIcons.double_music_note,
     CupertinoIcons.ant,
     CupertinoIcons.bolt,
-    MyIcons.play,
     CupertinoIcons.chevron_left_slash_chevron_right,
     CupertinoIcons.cloud_sun,
   ];
+
+  @override
+  void initState() {
+    widget.onIconSelected(iconDataList[0]);
+    super.initState();
+  }
 
   int currentIconIndex = 0;
 
@@ -48,6 +58,7 @@ class _HorizontalIconListState extends State<HorizontalIconList> {
                   setState(() {
                     currentIconIndex = index;
                   });
+                  widget.onIconSelected(iconData);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: currentIconIndex == index
@@ -74,6 +85,10 @@ class _HorizontalIconListState extends State<HorizontalIconList> {
 }
 
 class HorizontalColorList extends StatefulWidget {
+  Function(Color) onColorSelected;
+
+  HorizontalColorList({required this.onColorSelected});
+
   @override
   _HorizontalColorListState createState() => _HorizontalColorListState();
 }
@@ -95,6 +110,7 @@ class _HorizontalColorListState extends State<HorizontalColorList> {
 
   @override
   void initState() {
+    widget.onColorSelected(iconColors[currentColorIndex]);
     super.initState();
     // Initialize iconColors with random colors
   }
@@ -121,6 +137,7 @@ class _HorizontalColorListState extends State<HorizontalColorList> {
                 setState(() {
                   currentColorIndex = index;
                 });
+                widget.onColorSelected(iconColor);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: iconColor,

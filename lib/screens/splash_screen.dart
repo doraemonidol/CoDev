@@ -11,8 +11,8 @@ void dosth() async {
   // create a list of above fields
   final List<Field> fields = await Future.wait([field3, field4]);
   // get schedule task
-  final Future<List<TaskList>?> taskLists =
-      getScheduledTasks("2B9E2a62McR1rhrvuC67fXZSGic2", fields);
+  // final Future<List<TaskList>?> taskLists =
+  //     getScheduledTasks("2B9E2a62McR1rhrvuC67fXZSGic2", fields);
   //print(taskLists);
 }
 
@@ -20,7 +20,7 @@ class SplashScreen extends StatelessWidget {
   static const routeName = '/splash-screen';
   @override
   Widget build(BuildContext context) {
-    dosth();
+    //dosth();
     return Scaffold(
       body: Center(
         child: Text('Loading...'),

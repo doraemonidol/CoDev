@@ -221,7 +221,7 @@ Future<TaskList> fetchTaskList(String id) async {
         startTime: DateTime.parse(task['startTime']),
         endTime: DateTime.parse(task['endTime']),
         color: Color(task['color']),
-        icon: IconData(task['icon'], fontFamily: 'MaterialIcons'),
+        icon: IconData(task['icon'], fontFamily: 'CuppertinoIcons'),
         state: task['state'],
       );
     }).toList();
@@ -236,7 +236,13 @@ Future<TaskList> fetchTaskList(String id) async {
   }
 }
 
-Future<List<TaskList>?> getScheduledTasks(String ID, List<Field> learn) async {
+Future<List<TaskList>?> getScheduledTasks(
+  String ID,
+  List<Field> learn,
+  IconData iconData,
+  Color color,
+) async {
+  print("getScheduledTasks called");
   // turn this field list to json
   final fields = learn.map((field) {
     final courses = [];
@@ -263,6 +269,8 @@ Future<List<TaskList>?> getScheduledTasks(String ID, List<Field> learn) async {
             startTime: DateTime.now(),
             endTime: DateTime.now(),
             state: TaskState.todo.index,
+            color: color,
+            icon: iconData,
           ));
         });
       });
@@ -373,6 +381,7 @@ Future<List<TaskList>?> fetchScheduled(String ID) async {
   final descriptionData = description.data();
   final schedule = descriptionData!['schedule'];
   if (schedule == null) {
+    return [];
     throw Exception('No schedule found');
   } else {
     final tasklists = schedule.map<TaskList>((tasklist) {
@@ -480,8 +489,14 @@ Future<void> pushTask(
   await updateSchedule(ID, schedule);
 }
 
-Future<List<TaskList>?> addFieldToSchedule(String ID, Field field) async {
+Future<List<TaskList>?> addFieldToSchedule(
+  String ID,
+  Field field,
+  IconData iconData,
+  Color color,
+) async {
   try {
+    print("addFieldToSchedule called");
     final schedule = await fetchScheduled(ID);
     // create a list of field, iterate throught each task in schedule, if the field of the task is not in the list, add it to the list, then add that course to the field
     List<Field> fields = [];
@@ -515,7 +530,12 @@ Future<List<TaskList>?> addFieldToSchedule(String ID, Field field) async {
             ));
       });
     });
-    return await getScheduledTasks(ID, fields);
+    return await getScheduledTasks(
+      ID,
+      fields,
+      iconData,
+      color,
+    );
   } catch (e) {
     print(e);
   }

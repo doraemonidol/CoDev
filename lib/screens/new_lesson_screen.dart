@@ -1,10 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codev/providers/field.dart';
+import 'package:codev/providers/tasks.dart';
 import 'package:codev/widgets/horizontal_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import '../icon/my_icons.dart';
+import '../providers/auth.dart';
 
 class NewLessonScreen extends StatefulWidget {
   static const routeName = '/new-lesson-screen';
@@ -23,93 +28,137 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
   double? safeHeight;
   List list = [];
   String query = '';
+  bool _isLoading = false;
+  IconData? iconData;
+  Color? color;
+
+  // set icondata
+  void setIconData(IconData icon) {
+    iconData = icon;
+  }
+
+  // set color
+  void setColor(Color color) {
+    this.color = color;
+  }
 
   void _showModalBottomSheet(BuildContext context, {String? name, int? index}) {
     final field = name != null
         ? list.firstWhere((element) => element['name'] == query)
         : list[index!];
 
-    print('field: $field');
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          height: safeHeight! * 0.7,
-          padding: EdgeInsets.only(top: 32, left: 32, right: 32, bottom: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
-            ),
-          ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    field['name'],
-                    style: FigmaTextStyles.mH1
-                        .copyWith(color: FigmaColors.sUNRISELightCharcoal),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setStateModalSheet) {
+            return Container(
+              height: safeHeight! * 0.7,
+              padding:
+                  EdgeInsets.only(top: 32, left: 32, right: 32, bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
                 ),
-                SizedBox(height: 5),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-                    style: FigmaTextStyles.mP
-                        .copyWith(color: FigmaColors.sUNRISECharcoal),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 4,
-                  ),
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        field['name'],
+                        style: FigmaTextStyles.mH1
+                            .copyWith(color: FigmaColors.sUNRISELightCharcoal),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        field['description'] ?? '',
+                        style: FigmaTextStyles.mP
+                            .copyWith(color: FigmaColors.sUNRISECharcoal),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 4,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Current Level',
+                        style: FigmaTextStyles.mP
+                            .copyWith(color: FigmaColors.sUNRISETextGrey),
+                      ),
+                    ),
+                    HorizontalTextButtonList(
+                      texts: ['Beginner', 'Intermediate', 'Advanced'],
+                    ),
+                    SizedBox(height: 15),
+                    HorizontalIconList(
+                      onIconSelected: setIconData,
+                    ),
+                    SizedBox(height: 15),
+                    HorizontalColorList(
+                      onColorSelected: setColor,
+                    ),
+                    SizedBox(height: 18),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: FigmaColors.sUNRISEBluePrimary,
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      width: 250,
+                      height: 62,
+                      child: _isLoading
+                          ? Center(child: CircularProgressIndicator())
+                          : ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.fromLTRB(2, 0, 0, 0),
+                                  backgroundColor:
+                                      FigmaColors.sUNRISEBluePrimary,
+                                  shape: ContinuousRectangleBorder(
+                                      side: BorderSide.none,
+                                      borderRadius: BorderRadius.circular(
+                                          deviceSize!.width * 0.1))),
+                              child: Text('Add lesson',
+                                  style: FigmaTextStyles.mButton.copyWith(
+                                      color: FigmaColors.sUNRISEWhite),
+                                  textAlign: TextAlign.center),
+                              onPressed: () async {
+                                setStateModalSheet(() {
+                                  _isLoading = true;
+                                });
+                                print(field['name']);
+                                await fetchField(field['name'])
+                                    .then((value) async {
+                                  await addFieldToSchedule(
+                                    Provider.of<Auth>(context, listen: false)
+                                        .userId,
+                                    value,
+                                    iconData!,
+                                    color!,
+                                  ).then((value) {
+                                    setStateModalSheet(() {
+                                      _isLoading = false;
+                                    });
+                                    Navigator.of(context).pop();
+                                  });
+                                });
+                              },
+                            ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Current Level',
-                    style: FigmaTextStyles.mP
-                        .copyWith(color: FigmaColors.sUNRISETextGrey),
-                  ),
-                ),
-                HorizontalTextButtonList(
-                  texts: ['Beginner', 'Intermediate', 'Advanced'],
-                ),
-                SizedBox(height: 15),
-                HorizontalIconList(),
-                SizedBox(height: 15),
-                HorizontalColorList(),
-                SizedBox(height: 18),
-                Container(
-                  decoration: BoxDecoration(
-                    color: FigmaColors.sUNRISEBluePrimary,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  width: 250,
-                  height: 62,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.fromLTRB(2, 0, 0, 0),
-                        backgroundColor: FigmaColors.sUNRISEBluePrimary,
-                        shape: ContinuousRectangleBorder(
-                            side: BorderSide.none,
-                            borderRadius: BorderRadius.circular(
-                                deviceSize!.width * 0.1))),
-                    child: Text('Add lesson',
-                        style: FigmaTextStyles.mButton
-                            .copyWith(color: FigmaColors.sUNRISEWhite),
-                        textAlign: TextAlign.center),
-                    onPressed: () {},
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
