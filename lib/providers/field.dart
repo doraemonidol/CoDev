@@ -12,6 +12,12 @@ class Stage {
     required this.name,
     required this.courses,
   });
+  Stage getCopy() {
+    return Stage(
+      name: name,
+      courses: courses.map((course) => course.getCopy()).toList(),
+    );
+  }
 }
 
 class Field {
@@ -22,6 +28,12 @@ class Field {
     required this.name,
     required this.stages,
   });
+  Field getCopy() {
+    return Field(
+      name: name,
+      stages: stages.map((stage) => stage.getCopy()).toList(),
+    );
+  }
 }
 
 // fetch the field from firestore: in the collection Roadmap, in the document with ID Vz40NN26K2R7Y9jrKrK4, an array object named "fields", find in it the object has "name" equal to input name

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import './field.dart';
+import './course.dart';
 
 class LearningCourse with ChangeNotifier {
   final String name;
@@ -19,12 +21,12 @@ class LearningCourse with ChangeNotifier {
 class LearningField with ChangeNotifier {
   final String name;
   int progress = 0;
-  List<LearningCourse> courses = [];
+  List<LearningCourse> courses;
 
   LearningField({
     required this.name,
     this.progress = 0,
-    this.courses = const [],
+    required this.courses,
   });
 
   LearningCourse findCourseByName(String name) {
@@ -59,21 +61,27 @@ class LearningProgress with ChangeNotifier {
   List<LearningField> fields = [];
 
   LearningProgress({
-    this.fields = const [],
+    required this.fields,
   });
 
   LearningField findFieldByName(String name) {
     return fields.firstWhere((element) => element.name == name);
   }
 
-  void addField(String name) {
+  void addField(Field field) {
     fields.add(
       LearningField(
-        name: name,
-        courses: [],
+        name: field.name,
+        courses: field.stages[0].courses
+            .map((course) => LearningCourse(name: course.name))
+            .toList(),
       ),
     );
     notifyListeners();
+  }
+
+  bool isField(LearningField field) {
+    return fields.any((element) => element.name == field.name);
   }
 
   void toggleCourseDone(String field, String course) {
@@ -116,10 +124,29 @@ class LearningProgress with ChangeNotifier {
 }
 
 // fetch LearningProgress from firestore: in the collection users, in the document with ID equal to input ID, get object LearningProgress
-Future<LearningProgress> fetchLearningProgress(String ID) async {
+Future<LearningProgress?> fetchLearningProgress(String ID) async {
   final description =
       await FirebaseFirestore.instance.collection('users').doc(ID).get();
   final descriptionData = description.data();
+  if (descriptionData!['learningProgress'] == null) return null;
   final learningProgress = descriptionData!['learningProgress'];
-  return LearningProgress.fromJson(learningProgress);
+  List<LearningField> tmp = [];
+  LearningProgress progress = LearningProgress(fields: tmp);
+  learningProgress['fields'].forEach((field) {
+    List<LearningCourse> tmp1 = [];
+    LearningField learningField = LearningField(
+      name: field['name'],
+      progress: field['progress'],
+      courses: tmp1,
+    );
+    field['courses'].forEach((course) {
+      LearningCourse learningCourse = LearningCourse(
+        name: course['name'],
+        done: course['done'],
+      );
+      learningField.courses.add(learningCourse);
+    });
+    progress.fields.add(learningField);
+  });
+  return progress;
 }

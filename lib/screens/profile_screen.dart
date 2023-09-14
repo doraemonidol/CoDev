@@ -36,18 +36,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> uploadProfileImage() async {
     final androidInfo = await DeviceInfoPlugin().androidInfo;
-    var permissionStatus = (androidInfo.version.sdkInt <= 32) ? await Permission.storage.request() : await Permission.photos.request();
+    var permissionStatus = (androidInfo.version.sdkInt <= 32)
+        ? await Permission.storage.request()
+        : await Permission.photos.request();
     if (permissionStatus.isGranted) {
-      final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      final XFile? image =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       if (image != null) {
         var file = File(image.path);
         if (!context.mounted) return;
         var imageName = Provider.of<Auth>(context, listen: false).userId;
-        var snapshot = await FirebaseStorage.instance.ref().child('images/$imageName').putFile(file);
+        var snapshot = await FirebaseStorage.instance
+            .ref()
+            .child('images/$imageName')
+            .putFile(file);
         var downloadUrl = await snapshot.ref.getDownloadURL();
         if (!context.mounted) return;
         Provider.of<User>(context, listen: false).imageUrl = downloadUrl;
-        await Provider.of<User>(context, listen: false).updateUser(Provider.of<Auth>(context, listen: false).userId);
+        await Provider.of<User>(context, listen: false)
+            .updateUser(Provider.of<Auth>(context, listen: false).userId);
         // setState(() {
         //   user.imageUrl = downloadUrl;
         // });
@@ -276,7 +283,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         const SizedBox(height: 24),
         Center(
             child: Text(widget.user.name,
-                style: FigmaTextStyles.mH3.copyWith(color: const Color(0xFF2F394B)))),
+                style: FigmaTextStyles.mH3
+                    .copyWith(color: const Color(0xFF2F394B)))),
         Center(
           child: TextButton(
             child: Text('Log Out',

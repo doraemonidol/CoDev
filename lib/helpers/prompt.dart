@@ -1,4 +1,6 @@
 import '../providers/field.dart';
+import 'package:flutter/material.dart';
+import 'dart:convert';
 
 String getPrompt(field, String stage, String course) {
   String prompt = """
@@ -86,6 +88,7 @@ const testResult = """
 """;
 
 String schedulePrompt(String fields_json, int num_tasks) {
+  int range = num_tasks - 1;
   String prompt = """
     You are a consultant for a college student. The student give you a list of fields that he want to learn, each field has several courses. Your task is to schedule the courses for the student. The student want to learn about 5-6 courses per day.
     Given the list of fields, each has a list of courses as json, as following:\n
@@ -95,21 +98,22 @@ String schedulePrompt(String fields_json, int num_tasks) {
 \nPlease schedule the courses for the student. It must be about 5-6 tasks each day, each represent a course.
 Each course must exist in the plan exactly once and their order in each field must be kept.
 The fields must be scheduled parallelly, that means the student must learn about 5-6 courses from DIFFERENT fields each day.
-The result must STRICTLY be in the form that, each line contains the index of the course, counting from 0, in order of the input data, and the start time of the task (hour), and the end time of the task (hour), separated by a space. There is a line containing a dot "." at the end of each day. Example result:
+The result must STRICTLY be in the form that, each line contains the index of the course, counting from 0, in order of the input data, and the start time of the task (hour), and the end time of the task (hour), separated by a space. There is a line containing a dot "." at the end of each day. 
+For example, if there are 11 courses in 2 fields, and courses indexed 0,1,2,3,4,5 are in field 1, and courses indexed 6,7,8,9,10 are in field 2, and the schedule is as following:
 0 10:00 12:00
 1 12:00 14:00
-3 14:00 16:00
-5 16:00 18:00
-7 18:00 20:00
-10 22:00 23:00
-.
-2 10:00 12:00
-4 12:00 14:00
 6 14:00 16:00
-8 16:00 18:00
-9 18:00 20:00
+2 16:00 18:00
+7 18:00 20:00
+3 22:00 23:00
 .
-Please note that the indexes must be fully from 0 to $num_tasks - 1, and there must be exactly $num_tasks lines of indexes in total.
+8 10:00 12:00
+4 12:00 14:00
+5 14:00 16:00
+9 16:00 18:00
+10 18:00 20:00
+.
+Please note that the indexes MUST be different, MUST be in the range from 0 to $range, MUST NOT exceed $range, and there must be exactly $num_tasks lines of indexes in total, and for each 5-6 consecutive lines of indexes, there must be a line with a dot ".".
 Your result must contain the result formatted earlier. NO OTHER WORD. PLEASE. NO OTHER WORD.
 """;
   return prompt;

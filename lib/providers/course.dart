@@ -12,4 +12,11 @@ class Course with ChangeNotifier {
     required this.description,
     required this.prerequisiteCourses,
   });
+  Course getCopy() {
+    return Course(
+      name: name,
+      description: description,
+      prerequisiteCourses: prerequisiteCourses,
+    );
+  }
 }

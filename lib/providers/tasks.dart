@@ -33,6 +33,19 @@ class Task {
     this.icon = Icons.check_circle_outline,
     required this.state,
   });
+
+  Task getCopy() {
+    return Task(
+      field: field,
+      stage: stage,
+      course: course,
+      startTime: startTime,
+      endTime: endTime,
+      color: color,
+      icon: icon,
+      state: state,
+    );
+  }
 }
 
 class TaskList with ChangeNotifier {
@@ -43,6 +56,13 @@ class TaskList with ChangeNotifier {
     required this.date,
     required this.tasks,
   });
+
+  TaskList getCopy() {
+    return TaskList(
+      date: date,
+      tasks: tasks.map((task) => task.getCopy()).toList(),
+    );
+  }
 
   // find a task
   Task? findTask(Task task) {
@@ -236,7 +256,43 @@ Future<TaskList> fetchTaskList(String id) async {
   }
 }
 
-Future<List<TaskList>?> getScheduledTasks(String ID, List<Field> learn) async {
+// update schedule to firestore: in the collection users, in the document with ID equal to input ID, update object schedule with the input schedule, or create if not exist
+Future<void> updateSchedule(String ID, List<TaskList> schedule) async {
+  // check if exists schedule
+  final description =
+      await FirebaseFirestore.instance.collection('users').doc(ID).get();
+  final descriptionData = description.data();
+  final scheduleData = descriptionData!['schedule'];
+  if (scheduleData != null) {
+    await FirebaseFirestore.instance.collection('users').doc(ID).update({
+      'schedule': FieldValue.delete(),
+    });
+  }
+  await FirebaseFirestore.instance.collection('users').doc(ID).update({
+    'schedule': schedule.map((taskList) {
+      return {
+        'date': taskList.date.toString(),
+        'tasks': taskList.tasks.map((task) {
+          return {
+            'field': task.field,
+            'stage': task.stage,
+            'course': task.course,
+            'startTime': task.startTime.toString(),
+            'endTime': task.endTime.toString(),
+            'color': task.color.value,
+            'icon': task.icon.codePoint,
+            'state': task.state,
+          };
+        }).toList(),
+      };
+    }).toList(),
+  });
+  print("added");
+}
+
+Future<List<TaskList>?> getScheduledTasks(
+    String ID, List<Field> learn, IconData iconData, Color color,
+    {int depth = 1}) async {
   // turn this field list to json
   final fields = learn.map((field) {
     final courses = [];
@@ -263,6 +319,8 @@ Future<List<TaskList>?> getScheduledTasks(String ID, List<Field> learn) async {
             startTime: DateTime.now(),
             endTime: DateTime.now(),
             state: TaskState.todo.index,
+            color: color,
+            icon: iconData,
           ));
         });
       });
@@ -282,27 +340,6 @@ Future<List<TaskList>?> getScheduledTasks(String ID, List<Field> learn) async {
     if (response.choices.isEmpty) {
       throw Exception('No response from OpenAI');
     }
-    debugPrint(response.choices.first.message.content);
-    /*
-Create object LearningProgress from List<Field> learn: 
-- the List<LearningField> fields corresponding to List<Field> learn
-- in each element in fields, its element name equal to the name of each corresponding element in learn
-- in each element in courses, its element name equal to the name of each corresponding element in the same field
-- each done in course is false 
-*/
-    List<LearningField> learningField = learn.map<LearningField>((field) {
-      return LearningField(
-          name: field.name,
-          progress: 0,
-          courses: field.stages.map<LearningCourse>((stage) {
-            return LearningCourse(name: stage.name, done: false);
-          }).toList());
-    }).toList();
-    final learningProgress = LearningProgress(fields: learningField);
-    // update learingProgress to firestore: in the collection users, in the document with ID equal to input ID, update object learningProgress, or create if not exist
-    await FirebaseFirestore.instance.collection('users').doc(ID).update({
-      'learningProgress': learningProgress.toJson(),
-    });
 
     final result = response.choices.first.message.content;
     // iterate through each line in result, each line is a task
@@ -313,14 +350,23 @@ Create object LearningProgress from List<Field> learn:
       DateTime.now().month,
       DateTime.now().day,
     );
+    DateTime getDateCopy(DateTime x) {
+      return DateTime(
+        x.year,
+        x.month,
+        x.day,
+      );
+    }
+
+    ;
     TaskList day_list = TaskList(date: current_date, tasks: []);
     int task_count = 0;
     result.split('\n').forEach((line) {
       if (line != '') {
         if (line == '.') {
-          if (day_list.tasks.isNotEmpty) schedule.add(day_list);
+          if (day_list.tasks.isNotEmpty) schedule.add(day_list.getCopy());
           current_date = current_date.add(Duration(days: 1));
-          day_list.date = current_date;
+          day_list.date = getDateCopy(current_date);
           day_list.tasks = [];
         } else if (line.codeUnitAt(0) >= 48 && line.codeUnitAt(0) <= 57) {
           // separate line into index as int, start time, end time as DateTime with date equal current_date, and hour is in the line
@@ -340,16 +386,18 @@ Create object LearningProgress from List<Field> learn:
             int.parse(line.split(' ')[2].split(':')[1]),
           );
           // find the task in tasks_unscheduled with index equal to index
-          final task = tasks_unscheduled[index];
+          final task = tasks_unscheduled[index].getCopy();
           // set start time and end time of task to start_time and end_time
           task.startTime = start_time;
           task.endTime = end_time;
           // add task to day_list
-          day_list.tasks.add(task);
+          day_list.tasks.add(task.getCopy());
           task_count++;
         }
       }
     });
+    // if final line is not ".", add day_list to schedule
+    if (day_list.tasks.isNotEmpty) schedule.add(day_list.getCopy());
     if (task_count != tasks_unscheduled.length) {
       throw Exception(
           'Tasks are not fully processed (some tasks are missing)! Expected: ' +
@@ -358,11 +406,62 @@ Create object LearningProgress from List<Field> learn:
               task_count.toString() +
               '.');
     }
+    // update learningProgress to firestore after receiving response from OpenAI
+    LearningProgress? learningProgress = await fetchLearningProgress(ID);
+    if (learningProgress == null) {
+      List<LearningField> tmp = [];
+      learningProgress = LearningProgress(fields: tmp);
+    }
+    List<LearningField> learningField = [];
+    learn.forEach((field) {
+      field.stages.forEach((stage) {
+        stage.courses.forEach((course) {
+          learningField.add(LearningField(
+            name: field.name,
+            courses: [
+              LearningCourse(
+                name: course.name,
+                done: false,
+              )
+            ],
+          ));
+        });
+      });
+    });
+    learningField.forEach(
+      (element) {
+        if (learningProgress!.isField(element) == false) {
+          learningProgress.fields.add(element);
+        }
+      },
+    );
+    // check if exists learningProgress
+    final description =
+        await FirebaseFirestore.instance.collection('users').doc(ID).get();
+    final descriptionData = description.data();
+    if (descriptionData!['learningProgress'] != null) {
+      await FirebaseFirestore.instance.collection('users').doc(ID).update({
+        'learningProgress': FieldValue.delete(),
+      });
+    }
+    await FirebaseFirestore.instance.collection('users').doc(ID).set({
+      'learningProgress': learningProgress.toJson(),
+    });
+    // update schedule to firestore after receiving response from OpenAI
     updateSchedule(ID, schedule);
     print("schedule updated for user " + ID);
     return schedule;
   } catch (e) {
-    throw Exception('Invalid response from OpenAI: ' + e.toString());
+    print("error: " +
+        e.toString() +
+        " depth: " +
+        depth.toString() +
+        " trying again");
+    if (depth <= 10) {
+      return getScheduledTasks(ID, learn, iconData, color, depth: depth + 1);
+    } else {
+      throw Exception('Server error too many times');
+    }
   }
 }
 
@@ -384,7 +483,7 @@ Future<List<TaskList>?> fetchScheduled(String ID) async {
           startTime: DateTime.parse(task['startTime']),
           endTime: DateTime.parse(task['endTime']),
           color: Color(task['color']),
-          icon: IconData(task['icon'], fontFamily: 'MaterialIcons'),
+          icon: IconData(task['icon'], fontFamily: 'CupertinoIcons'),
           state: task['state'],
         );
       }).toList();
@@ -397,29 +496,6 @@ Future<List<TaskList>?> fetchScheduled(String ID) async {
   }
 }
 
-// update schedule to firestore: in the collection users, in the document with ID equal to input ID, update object schedule with the input schedule, or create if not exist
-Future<void> updateSchedule(String ID, List<TaskList> schedule) async {
-  await FirebaseFirestore.instance.collection('users').doc(ID).update({
-    'schedule': schedule.map((taskList) {
-      return {
-        'date': taskList.date.toString(),
-        'tasks': taskList.tasks.map((task) {
-          return {
-            'field': task.field,
-            'stage': task.stage,
-            'course': task.course,
-            'startTime': task.startTime.toString(),
-            'endTime': task.endTime.toString(),
-            'color': task.color.value,
-            'icon': task.icon.codePoint,
-            'state': task.state,
-          };
-        }).toList(),
-      };
-    }).toList(),
-  });
-}
-
 // input a schedule and a task name, push it to the next date of the schedule, that is in the tasklist with date equal to the next date, add the task to the end of the tasklist with start time equal to the end time of the last task in the tasklist, and end time equal to the start time plus 2 hours
 Future<void> pushTask(
     String ID, List<TaskList> schedule, String task_name) async {
@@ -430,7 +506,12 @@ Future<void> pushTask(
     DateTime.now().day,
   );
   // get next_date with time = 0:00
-  DateTime next_date = current_date.add(Duration(days: 1));
+  DateTime next_date = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
+  next_date = next_date.add(Duration(days: 1));
   // find tasklist with date equal to next_date
   final tasklist = schedule.firstWhere((element) {
     return element.date == next_date;
@@ -480,7 +561,8 @@ Future<void> pushTask(
   await updateSchedule(ID, schedule);
 }
 
-Future<List<TaskList>?> addFieldToSchedule(String ID, Field field) async {
+Future<List<TaskList>?> addFieldToSchedule(
+    String ID, Field field, IconData iconData, Color color) async {
   try {
     final schedule = await fetchScheduled(ID);
     // create a list of field, iterate throught each task in schedule, if the field of the task is not in the list, add it to the list, then add that course to the field
@@ -515,7 +597,7 @@ Future<List<TaskList>?> addFieldToSchedule(String ID, Field field) async {
             ));
       });
     });
-    return await getScheduledTasks(ID, fields);
+    return await getScheduledTasks(ID, fields, iconData, color);
   } catch (e) {
     print(e);
   }

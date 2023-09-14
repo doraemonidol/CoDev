@@ -24,7 +24,6 @@ class AuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-
     double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
     // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
     // transformConfig.translate(-10.0);
@@ -273,7 +272,6 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
   @override
   void initState() {
     super.initState();
-
     controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 400));
 

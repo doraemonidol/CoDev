@@ -56,7 +56,6 @@ class User with ChangeNotifier {
       'educationLevel': educationLevel,
       'point': point,
       'tasklists': [],
-      'learningProgress': LearningProgress().toJson(),
     });
   }
 
