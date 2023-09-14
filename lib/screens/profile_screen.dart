@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:codev/providers/auth.dart';
 import 'package:codev/providers/user.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -26,6 +32,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> uploadProfileImage() async {
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    var permissionStatus = (androidInfo.version.sdkInt <= 32) ? await Permission.storage.request() : await Permission.photos.request();
+    if (permissionStatus.isGranted) {
+      final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        var file = File(image.path);
+        if (!context.mounted) return;
+        var imageName = Provider.of<Auth>(context, listen: false).userId;
+        var snapshot = await FirebaseStorage.instance.ref().child('images/$imageName').putFile(file);
+        var downloadUrl = await snapshot.ref.getDownloadURL();
+        if (!context.mounted) return;
+        Provider.of<User>(context, listen: false).imageUrl = downloadUrl;
+        await Provider.of<User>(context, listen: false).updateUser(Provider.of<Auth>(context, listen: false).userId);
+        // setState(() {
+        //   user.imageUrl = downloadUrl;
+        // });
+      }
+    }
   }
 
   @override
@@ -52,14 +79,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 body: Column(
                     // physics: BouncingScrollPhysics(),
                     children: [
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       ProfileWidget(
                         user: user,
-                        onClicked: () async {},
+                        onClicked: uploadProfileImage,
                       ),
                       Expanded(
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: FigmaColors.sUNRISEWhite,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(24),
@@ -77,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       )
                     ]));
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         });
   }
@@ -127,13 +154,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         border: Border(
           bottom: last
               ? BorderSide.none
-              : BorderSide(
+              : const BorderSide(
                   color: FigmaColors.lightblue,
                   width: 1,
                 ),
         ),
       ),
-      padding: EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.symmetric(vertical: 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -160,14 +187,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
                   style: FigmaTextStyles.h0
                       .copyWith(color: FigmaColors.sUNRISETextGrey)),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(detail,
                   style: FigmaTextStyles.mB
                       .copyWith(color: FigmaColors.sUNRISETextGrey),
@@ -190,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           height: 48,
           child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(2, 0, 0, 0),
+                padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
                 backgroundColor: FigmaColors.sUNRISEBluePrimary,
                 shape: ContinuousRectangleBorder(
                   side: BorderSide.none,
@@ -246,10 +273,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             Positioned(bottom: 0, right: 0, child: buildEditIcon()),
           ],
         )),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         Center(
             child: Text(widget.user.name,
-                style: FigmaTextStyles.mH3.copyWith(color: Color(0xFF2F394B)))),
+                style: FigmaTextStyles.mH3.copyWith(color: const Color(0xFF2F394B)))),
         Center(
           child: TextButton(
             child: Text('Log Out',
@@ -293,12 +320,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Widget buildEditIcon() => buildBorder(
         borderRadius: 6.0,
         paddingAll: 2.0,
-        color: Color(0xFFF5FBFF),
+        color: const Color(0xFFF5FBFF),
         child: buildBorder(
           paddingAll: 2.0,
-          color: Color(0xFF2FD1C5),
+          color: const Color(0xFF2FD1C5),
           borderRadius: 5.0,
-          child: Icon(
+          child: const Icon(
             Icons.add_photo_alternate_outlined,
             size: 20,
             color: Colors.white,

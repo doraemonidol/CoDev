@@ -53,6 +53,10 @@ dependencies:
   circle_progress_bar: ^0.1.1
   dart_openai: ^4.0.0
   envied: ^0.3.0+3
+  image_picker: ^1.0.4
+  firebase_storage: ^11.2.6
+  permission_handler: ^11.0.0
+  device_info_plus: ^9.0.3
 
 dev_dependencies:
   flutter_test:
