@@ -26,44 +26,29 @@ class User with ChangeNotifier {
     this.educationLevel = 'Unknown',
     this.point = 0,
   }) {}
-  User copy(
-          {String? imagePath,
-          String? name,
-          String? email,
-          String? phone,
-          String? location,
-          String? educationLevel}) =>
-      User(
-        imageUrl: imagePath ?? this.imageUrl,
-        name: name ?? this.name,
-        email: email ?? this.email,
-        phone: phone ?? this.phone,
-        location: location ?? this.location,
-        educationLevel: educationLevel ?? this.educationLevel,
-      );
 
   Map<String, dynamic> toJson() => {
-        'imagePath': imageUrl,
+        'imageUrl': imageUrl,
         'name': name,
         'email': email,
-        'phone': phone,
+        'phoneNumber': phone,
         'location': location,
         'educationLevel': educationLevel,
       };
 
   static User fromJson(Map<String, dynamic> json) => User(
-        imageUrl: json['imagePath'],
+        imageUrl: json['imageUrl'],
         name: json['name'],
         email: json['email'],
-        phone: json['phone'],
+        phone: json['phoneNumber'],
         location: json['location'],
-        educationLevel: json['educationLevel'],
+        educationLevel: json['educationLevel'].toString(),
       );
 
   // add this user data to firebase, in collection users, in document with ID equal to input ID
   Future<void> addUser(String ID) async {
     await FirebaseFirestore.instance.collection('users').doc(ID).set({
-      'phone': phone,
+      'phoneNumber': phone,
       'email': email,
       'name': name,
       'location': location,
@@ -77,8 +62,10 @@ class User with ChangeNotifier {
 
   // update this user data to firebase, in collection users, in document with ID equal to input ID
   Future<void> updateUser(String ID) async {
+    print('updateUser $ID');
+    print('updateUser $phone');
     await FirebaseFirestore.instance.collection('users').doc(ID).update({
-      'phone': phone,
+      'phoneNumber': phone,
       'email': email,
       'name': name,
       'location': location,
@@ -95,7 +82,7 @@ Future<User> fetchUser(String ID) async {
       await FirebaseFirestore.instance.collection('users').doc(ID).get();
   final descriptionData = description.data();
   return User()
-    ..phone = descriptionData!['phone']
+    ..phone = descriptionData!['phoneNumber']
     ..email = descriptionData['email']
     ..name = descriptionData['name']
     ..location = descriptionData['location']

@@ -27,7 +27,6 @@ import 'screens/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await UserPreferences.init();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

@@ -1,21 +1,24 @@
+import 'package:codev/providers/auth.dart';
 import 'package:codev/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/screens/profile_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../helpers/style.dart';
 import '../main.dart';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key});
+  final User? user;
+  const EditProfilePage({Key? key, this.user}) : super(key: key);
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  User? user;
   Size? deviceSize;
   double? safeHeight;
+  User? editUser;
 
   @override
   void initState() {
@@ -24,11 +27,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    user = UserPreferences.getUser(context);
+    editUser = widget.user!;
     deviceSize = MediaQuery.of(context).size;
     safeHeight = deviceSize!.height -
         MediaQuery.of(context).padding.top -
         MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
       backgroundColor: FigmaColors.sUNRISESunray,
       appBar: AppBar(
@@ -44,23 +48,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
             SizedBox(height: 20),
             TextFieldWidget(
                 label: 'Full Name',
-                text: user!.name,
-                onChanged: (name) => user = user!.copy(name: name)),
+                text: editUser!.name == 'Unknown' ? '' : editUser!.name,
+                onChanged: (name) => editUser!.name = name),
             SizedBox(height: 20),
             TextFieldWidget(
                 label: 'Phone Number',
-                text: user!.phone,
-                onChanged: (phone) => user = user!.copy(phone: phone)),
-            SizedBox(height: 20),
-            TextFieldWidget(
-                label: 'Email',
-                text: user!.email,
-                onChanged: (email) => user = user!.copy(email: email)),
+                text: editUser!.phone == 'Unknown' ? '' : editUser!.phone,
+                onChanged: (phone) => editUser!.phone = phone),
             SizedBox(height: 20),
             TextFieldWidget(
                 label: 'Location',
-                text: user!.location,
-                onChanged: (location) => user = user!.copy(location: location)),
+                text: editUser!.location == 'Unknown' ? '' : editUser!.location,
+                onChanged: (location) => editUser!.location = location),
             SizedBox(height: 20),
 
             // dropdown list to choose education level
@@ -81,7 +80,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton(
-                  value: user!.educationLevel,
+                  value: editUser!.educationLevel,
                   items: [
                     DropdownMenuItem(
                       child: Text(
@@ -143,7 +142,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ],
                   onChanged: (value) {
                     setState(() {
-                      user = user!.copy(educationLevel: value.toString());
+                      editUser!.educationLevel = value!;
                     });
                   },
                 ),
@@ -189,9 +188,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
           icon: Text('Save',
               style: FigmaTextStyles.mButton
                   .copyWith(color: FigmaColors.sUNRISEWhite)),
-          onPressed: () {
-            UserPreferences.setUser(user!);
-            Navigator.of(context).pop();
+          onPressed: () async {
+            await editUser!
+                .updateUser(
+                  Provider.of<Auth>(context, listen: false).userId,
+                )
+                .then((value) => Navigator.of(context).pop());
           },
           label: const Icon(
             Icons.save,

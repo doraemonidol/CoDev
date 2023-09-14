@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:codev/providers/auth.dart';
 import 'package:codev/providers/user.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,30 +9,6 @@ import 'dart:convert';
 import 'package:codev/helpers/style.dart';
 import 'package:codev/screens/edit_profile_screen.dart';
 import 'package:codev/providers/user.dart' as CoDevCS;
-
-class UserPreferences {
-  static late SharedPreferences _preferences;
-  static const _keyUser = 'codev_user';
-
-  UserPreferences._();
-
-  static Future init() async =>
-      _preferences = await SharedPreferences.getInstance();
-
-  static Future setUser(User user) async {
-    final json = jsonEncode(user.toJson());
-    await _preferences.setString(_keyUser, json);
-  }
-
-  static User getUser(BuildContext context) {
-    final json = _preferences.getString(_keyUser);
-    return json == null
-        ? Provider.of<User>(context)
-        : User.fromJson(jsonDecode(json));
-  }
-
-  static Future removeUser() async => await _preferences.remove(_keyUser);
-}
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = '/profile-screen';
@@ -44,6 +21,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   Size? deviceSize;
   double? safeHeight;
+  late CoDevCS.User user;
 
   @override
   void initState() {
@@ -52,40 +30,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = UserPreferences.getUser(context);
+    // fetch user data from firestore with id get from provider auth Provider.of<Auth>(context,listen: false,).userId;
+
     deviceSize = MediaQuery.of(context).size;
     safeHeight = deviceSize!.height -
         MediaQuery.of(context).padding.top -
         MediaQuery.of(context).padding.bottom;
-    return Scaffold(
-        backgroundColor: FigmaColors.sUNRISESunray,
-        body: Column(
-            // physics: BouncingScrollPhysics(),
-            children: [
-              SizedBox(height: 20),
-              ProfileWidget(
-                user: user,
-                onClicked: () async {},
-              ),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: FigmaColors.sUNRISEWhite,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+
+    return StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(Provider.of<Auth>(context, listen: false).userId)
+            .snapshots(),
+        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.hasData) {
+            print(snapshot.data!.data());
+            user = CoDevCS.User.fromJson(
+                snapshot.data!.data() as Map<String, dynamic>);
+            return Scaffold(
+                backgroundColor: FigmaColors.sUNRISESunray,
+                body: Column(
+                    // physics: BouncingScrollPhysics(),
                     children: [
-                      buildDetailedInformation(user),
-                      buildEditButton(context, setState),
-                    ],
-                  ),
-                ),
-              )
-            ]));
+                      SizedBox(height: 20),
+                      ProfileWidget(
+                        user: user,
+                        onClicked: () async {},
+                      ),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: FigmaColors.sUNRISEWhite,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(24),
+                              topRight: Radius.circular(24),
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              buildDetailedInformation(user),
+                              buildEditButton(context, setState),
+                            ],
+                          ),
+                        ),
+                      )
+                    ]));
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        });
   }
 
   Widget buildDetailedInformation(User user) {
@@ -99,11 +93,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildInfo(CupertinoIcons.phone, "Phone Number", user.phone),
-          buildInfo(CupertinoIcons.mail, "Email", user.email),
-          buildInfo(CupertinoIcons.location, "Location", user.location),
-          buildInfo(CupertinoIcons.book, "Education Level", user.educationLevel,
-              last: true),
+          buildInfo(
+            CupertinoIcons.phone,
+            "Phone Number",
+            user.phone,
+          ),
+          buildInfo(
+            CupertinoIcons.mail,
+            "Email",
+            user.email,
+          ),
+          buildInfo(
+            CupertinoIcons.location,
+            "Location",
+            user.location,
+          ),
+          buildInfo(
+            CupertinoIcons.book,
+            "Education Level",
+            user.educationLevel,
+            last: true,
+          ),
         ],
       ),
     );
@@ -193,9 +203,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: FigmaTextStyles.mButton
                       .copyWith(color: FigmaColors.sUNRISEWhite)),
               onPressed: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => EditProfilePage()),
-                );
+                await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EditProfilePage(
+                    user: user,
+                  ),
+                ));
+                print('done editing');
                 setState(() {});
               },
               label: const Icon(Icons.border_color,
@@ -205,7 +218,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class ProfileWidget extends StatefulWidget {
-  final User user;
+  final CoDevCS.User user;
   final VoidCallback onClicked;
   final bool isEdit;
 
@@ -245,7 +258,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             onPressed: () {
               print('Log Out');
               Provider.of<Auth>(context, listen: false).logout();
-              UserPreferences.removeUser();
             },
           ),
         ),
