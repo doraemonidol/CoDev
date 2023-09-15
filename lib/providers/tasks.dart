@@ -422,23 +422,21 @@ Future<List<TaskList>?> getScheduledTasks(BuildContext context, String ID,
       List<LearningField> tmp = [];
       learningProgress = LearningProgress(fields: tmp);
     }
-    List<LearningField> learningField = [];
+    List<LearningField> learningFields = [];
     learn.forEach((field) {
+      List<LearningCourse> tmp2 = [];
+      LearningField learningField = LearningField(
+        name: field.name,
+        courses: tmp2,
+      );
       field.stages.forEach((stage) {
         stage.courses.forEach((course) {
-          learningField.add(LearningField(
-            name: field.name,
-            courses: [
-              LearningCourse(
-                name: course.name,
-                done: false,
-              )
-            ],
-          ));
+          learningField.courses.add(LearningCourse(name: course.name));
         });
       });
+      learningFields.add(learningField);
     });
-    learningField.forEach(
+    learningFields.forEach(
       (element) {
         if (learningProgress!.isField(element) == false) {
           learningProgress.fields.add(element);
