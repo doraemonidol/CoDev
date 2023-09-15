@@ -102,7 +102,11 @@ class TaskList with ChangeNotifier {
           startTime: DateTime.parse(task['startTime']),
           endTime: DateTime.parse(task['endTime']),
           color: Color(task['color']),
-          icon: IconData(task['icon'], fontFamily: 'MaterialIcons'),
+          icon: IconData(
+            task['icon'],
+            fontFamily: 'CupertinoIcons',
+            fontPackage: 'cupertino_icons',
+          ),
           state: task['state'],
         );
       }).toList();
@@ -241,7 +245,11 @@ Future<TaskList> fetchTaskList(String id) async {
         startTime: DateTime.parse(task['startTime']),
         endTime: DateTime.parse(task['endTime']),
         color: Color(task['color']),
-        icon: IconData(task['icon'], fontFamily: 'CuppertinoIcons'),
+        icon: IconData(
+          task['icon'],
+          fontFamily: 'CupertinoIcons',
+          fontPackage: 'cupertino_icons',
+        ),
         state: task['state'],
       );
     }).toList();
@@ -290,8 +298,8 @@ Future<void> updateSchedule(String ID, List<TaskList> schedule) async {
   print("added");
 }
 
-Future<List<TaskList>?> getScheduledTasks(
-    String ID, List<Field> learn, IconData iconData, Color color,
+Future<List<TaskList>?> getScheduledTasks(BuildContext context, String ID,
+    List<Field> learn, Map<String, IconData> iconData, Map<String, Color> color,
     {int depth = 1}) async {
   // turn this field list to json
   final fields = learn.map((field) {
@@ -307,6 +315,8 @@ Future<List<TaskList>?> getScheduledTasks(
     };
   }).toList();
   try {
+    Map<String, IconData> iconMap;
+
     // create a list of task in order
     List<Task> tasks_unscheduled = [];
     learn.forEach((field) {
@@ -319,8 +329,8 @@ Future<List<TaskList>?> getScheduledTasks(
             startTime: DateTime.now(),
             endTime: DateTime.now(),
             state: TaskState.todo.index,
-            color: color,
-            icon: iconData,
+            color: color[field.name]!,
+            icon: iconData[field.name]!,
           ));
         });
       });
@@ -444,12 +454,14 @@ Future<List<TaskList>?> getScheduledTasks(
         'learningProgress': FieldValue.delete(),
       });
     }
-    await FirebaseFirestore.instance.collection('users').doc(ID).set({
+    await FirebaseFirestore.instance.collection('users').doc(ID).update({
       'learningProgress': learningProgress.toJson(),
     });
     // update schedule to firestore after receiving response from OpenAI
     updateSchedule(ID, schedule);
     print("schedule updated for user " + ID);
+
+    // Provider.of<TaskList>(context, listen: false).notify();
     return schedule;
   } catch (e) {
     print("error: " +
@@ -458,7 +470,8 @@ Future<List<TaskList>?> getScheduledTasks(
         depth.toString() +
         " trying again");
     if (depth <= 10) {
-      return getScheduledTasks(ID, learn, iconData, color, depth: depth + 1);
+      return getScheduledTasks(context, ID, learn, iconData, color,
+          depth: depth + 1);
     } else {
       throw Exception('Server error too many times');
     }
@@ -467,6 +480,7 @@ Future<List<TaskList>?> getScheduledTasks(
 
 // fetch scheduled tasks from firestore: in the collection users, in the document with ID equal to input ID, find object schedule, return it
 Future<List<TaskList>?> fetchScheduled(String ID) async {
+  print("fetchScheduled called");
   final description =
       await FirebaseFirestore.instance.collection('users').doc(ID).get();
   final descriptionData = description.data();
@@ -484,7 +498,11 @@ Future<List<TaskList>?> fetchScheduled(String ID) async {
           startTime: DateTime.parse(task['startTime']),
           endTime: DateTime.parse(task['endTime']),
           color: Color(task['color']),
-          icon: IconData(task['icon'], fontFamily: 'CupertinoIcons'),
+          icon: IconData(
+            task['icon'],
+            fontFamily: 'CupertinoIcons',
+            fontPackage: 'cupertino_icons',
+          ),
           state: task['state'],
         );
       }).toList();
@@ -493,6 +511,7 @@ Future<List<TaskList>?> fetchScheduled(String ID) async {
         tasks: tasks,
       );
     }).toList();
+    print("fetchScheduled done");
     return tasklists;
   }
 }
@@ -562,8 +581,13 @@ Future<void> pushTask(
   await updateSchedule(ID, schedule);
 }
 
-Future<List<TaskList>?> addFieldToSchedule(
-    String ID, Field field, IconData iconData, Color color) async {
+Future<List<TaskList>?> addFieldToSchedule(BuildContext context, String ID,
+    Field field, IconData iconData, Color color) async {
+  Map<String, IconData> iconMap = {};
+  Map<String, Color> colorMap = {};
+
+  iconMap[field.name] = iconData;
+  colorMap[field.name] = color;
   try {
     print("addFieldToSchedule called");
     final schedule = await fetchScheduled(ID);
@@ -571,22 +595,35 @@ Future<List<TaskList>?> addFieldToSchedule(
     List<Field> fields = [];
     fields.add(field);
     schedule!.forEach((taskList) {
+      print(taskList.tasks.length);
       taskList.tasks.forEach((task) {
-        final exist_field =
-            fields.firstWhere((element) => task.field == element.name);
-        if (exist_field == null) {
+        iconMap[task.field] = task.icon;
+        colorMap[task.field] = task.color;
+        bool exist = true;
+        fields.firstWhere((element) => task.field == element.name, orElse: () {
+          exist = false;
+          return Field(name: '', stages: []);
+        });
+        print(exist);
+        if (exist == false) {
           fields.add(Field(name: task.field, stages: []));
         }
-        final exist_stage = fields
+        exist = true;
+        fields
             .firstWhere((element) => task.field == element.name)
             .stages
-            .firstWhere((element) => task.stage == element.name);
-        if (exist_stage == null) {
+            .firstWhere((element) => task.stage == element.name, orElse: () {
+          exist = false;
+          return Stage(name: '', courses: []);
+        });
+        print(exist);
+        if (exist == false) {
           fields
               .firstWhere((element) => task.field == element.name)
               .stages
               .add(Stage(name: task.stage, courses: []));
         }
+
         fields
             .firstWhere((element) => task.field == element.name)
             .stages
@@ -599,7 +636,8 @@ Future<List<TaskList>?> addFieldToSchedule(
             ));
       });
     });
-    return await getScheduledTasks(ID, fields, iconData, color);
+    print(fields);
+    return await getScheduledTasks(context, ID, fields, iconMap, colorMap);
   } catch (e) {
     print(e);
   }

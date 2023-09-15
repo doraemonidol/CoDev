@@ -91,14 +91,17 @@ class _TasksScreenState extends State<TasksScreen> {
                     icon: const Icon(Icons.add,
                         color: FigmaColors.sUNRISEBluePrimary),
                     onPressed: () {
-                      Navigator.pushNamed(context, NewLessonScreen.routeName);
+                      Navigator.pushNamed(context, NewLessonScreen.routeName)
+                          .then((value) {
+                        setState(() {});
+                      });
                     },
                   ),
                 ],
               ),
               FutureBuilder(
                 future: fetchScheduled(
-                    Provider.of<Auth>(context, listen: false).userId),
+                    Provider.of<Auth>(context, listen: true).userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
@@ -106,6 +109,7 @@ class _TasksScreenState extends State<TasksScreen> {
                     list = snapshot.data == null
                         ? []
                         : snapshot.data as List<TaskList>;
+                    print(list);
                     return Expanded(
                       child: TabBarView(
                         children: [
@@ -142,13 +146,14 @@ class _PageState extends State<Page> {
     final List<Task> curStateTaskList = [];
     for (int i = 0; i < widget.list.length; i++) {
       for (int j = 0; j < widget.list[i].tasks.length; j++) {
-        if (widget.list[i].tasks[j].state == widget.curState) {
+        if (widget.list[i].tasks[j].state == widget.curState.index) {
           curStateTaskList.add(widget.list[i].tasks[j]);
         }
       }
     }
     // sort curStateTaskList by startTime
     curStateTaskList.sort((a, b) => a.startTime.compareTo(b.startTime));
+    print(curStateTaskList);
     // get list of dates (day, month, year) unique in curStateTaskList
     final List<DateTime> dates = [];
     for (int i = 0; i < curStateTaskList.length; i++) {
@@ -320,7 +325,7 @@ class _PageState extends State<Page> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                  width: 209,
+                  width: deviceSize.width * 0.6,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -341,6 +346,11 @@ class _PageState extends State<Page> {
                         ],
                       ),
                       Text(card.course,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: FigmaTextStyles.sButton.copyWith(
+                              color: FigmaColors.sUNRISELightCharcoal)),
+                      Text(card.field + ' - ' + card.stage,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                           style: FigmaTextStyles.mT

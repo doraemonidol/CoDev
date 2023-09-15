@@ -139,6 +139,7 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
                                 await fetchField(field['name'])
                                     .then((value) async {
                                   await addFieldToSchedule(
+                                    context,
                                     Provider.of<Auth>(context, listen: false)
                                         .userId,
                                     value,
