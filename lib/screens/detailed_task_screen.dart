@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codev/providers/auth.dart';
+import 'package:codev/providers/progress.dart';
 import 'package:codev/providers/tasks.dart';
 import 'package:codev/screens/quiz_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:codev/icon/my_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class DetailedTaskScreen extends StatefulWidget {
   static const routeName = '/detailed-task-screen';
@@ -17,7 +20,7 @@ class DetailedTaskScreen extends StatefulWidget {
 
 class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
   Task? task;
-  double val = 50;
+  int val = 5;
   String? value;
   Size? deviceSize;
   double? safeHeight;
@@ -43,8 +46,8 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
         child: Column(
           children: [
             // Dropdown menu item and edit button
-            firstPart(),
-            SizedBox(height: 20),
+            // firstPart(),
+            // SizedBox(height: 20),
 
             // // Card Information
             secondPart(),
@@ -54,34 +57,54 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
             thirdPart(),
 
             SizedBox(height: 20),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                LinearProgressIndicator(
-                  value: val / 100,
-                  minHeight: 36,
-                  backgroundColor: Colors.white,
-                  // change color of progress bar as val increase
-                  valueColor: AlwaysStoppedAnimation<Color>(Color.lerp(
-                      Color.lerp(Colors.red, Colors.yellow, val / 100),
-                      Color.lerp(Colors.yellow, Colors.green, val / 100),
-                      val / 100)!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                Text(
-                  '${val.toInt()}% completed',
-                  style: FigmaTextStyles.mH4.copyWith(
-                    color: FigmaColors.systemDark,
-                  ),
-                ),
-              ],
+            FutureBuilder(
+              future: fetchLearningProgressToGetPoint(
+                Provider.of<Auth>(context, listen: false).userId,
+                task!.field,
+                task!.course,
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Error'));
+                } else {
+                  val = snapshot.data as int;
+                  print(val);
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      LinearProgressIndicator(
+                        value: val / 10,
+                        minHeight: 36,
+                        backgroundColor: Colors.white,
+                        // change color of progress bar as val increase
+                        valueColor: AlwaysStoppedAnimation<Color>(Color.lerp(
+                            Color.lerp(Colors.red, Colors.yellow, val / 100),
+                            Color.lerp(Colors.yellow, Colors.green, val / 100),
+                            val / 10)!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      Text(
+                        '${val.toInt() * 10}% completed',
+                        style: FigmaTextStyles.mH4.copyWith(
+                          color: FigmaColors.systemDark,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             SizedBox(height: 20),
 
             IconButton(
               onPressed: () {
                 Navigator.of(context)
-                    .pushNamed(QuizScreen.routeName, arguments: task!);
+                    .pushNamed(QuizScreen.routeName, arguments: task!)
+                    .then((value) {
+                  setState(() {});
+                });
               },
               style: IconButton.styleFrom(
                   backgroundColor: const Color(0xFF2FD1C5)),
@@ -183,7 +206,16 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
             Icon(task!.icon, color: task!.color),
             SizedBox(height: 16),
             Text(
-              task!.field + ' | ' + task!.course,
+              task!.course,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: FigmaTextStyles.h4.copyWith(
+                color: FigmaColors.sUNRISEDarkCharcoal,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              task!.field + ' | ' + task!.stage,
               maxLines: 20,
               overflow: TextOverflow.ellipsis,
               style:
@@ -214,7 +246,7 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
               Text.rich(
                 TextSpan(
                   text: 'Due. ',
-                  style: FigmaTextStyles.mP
+                  style: FigmaTextStyles.p
                       .copyWith(color: FigmaColors.sUNRISEDarkGrey),
                   children: [
                     TextSpan(
@@ -222,7 +254,7 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
                               0
                           ? 'Today, ${DateFormat('EEEE d').format(task!.startTime)}'
                           : DateFormat('EEEE, MMMM d').format(task!.startTime),
-                      style: FigmaTextStyles.mB14
+                      style: FigmaTextStyles.mB
                           .copyWith(color: FigmaColors.sUNRISETextGrey),
                     ),
                   ],

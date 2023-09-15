@@ -1,4 +1,7 @@
 import 'dart:ui';
+import 'package:codev/providers/auth.dart';
+import 'package:codev/providers/tasks.dart';
+import 'package:codev/screens/new_lesson_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +10,7 @@ import '../helpers/style.dart';
 
 import '../providers/user.dart';
 
+import 'detailed_task_screen.dart';
 import 'profile_screen.dart';
 import 'agenda_screen.dart';
 import 'notification_screen.dart';
@@ -75,7 +79,7 @@ class _TabsScreenState extends State<TabsScreen> {
     'Tasks',
     '',
     'Notification',
-    'Personal',
+    'Profile',
   ];
 
   AppBar customizedAppBar(String title) {
@@ -190,12 +194,10 @@ class _TabsScreenState extends State<TabsScreen> {
                                       index == _selectedPageIndex
                                           ? '${listOfStrings[index]}'
                                           : '',
-                                      style: TextStyle(
+                                      style: FigmaTextStyles.mP.copyWith(
                                         color: Theme.of(context)
                                             .colorScheme
                                             .primary,
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 10,
                                       ),
                                     ),
                                   ),
@@ -283,7 +285,31 @@ class _TabsScreenState extends State<TabsScreen> {
                                   child: Container(
                                     width: double.infinity,
                                     child: ElevatedButton.icon(
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        await fetchTaskList(
+                                          Provider.of<Auth>(context,
+                                                  listen: false)
+                                              .userId,
+                                        ).then((taskList) {
+                                          final currentTask =
+                                              taskList.tasks.indexWhere(
+                                            (element) =>
+                                                element.startTime
+                                                    .isBefore(DateTime.now()) &&
+                                                element.endTime.isAfter(
+                                                  DateTime.now(),
+                                                ),
+                                          );
+                                          if (currentTask != -1) {
+                                            Navigator.pushNamed(
+                                              context,
+                                              DetailedTaskScreen.routeName,
+                                              arguments:
+                                                  taskList.tasks[currentTask],
+                                            );
+                                          }
+                                        });
+                                      },
                                       icon: Icon(
                                         Icons.play_circle_outlined,
                                       ),
@@ -330,7 +356,13 @@ class _TabsScreenState extends State<TabsScreen> {
                                   child: Container(
                                     width: double.infinity,
                                     child: ElevatedButton.icon(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.pushNamed(context,
+                                                NewLessonScreen.routeName)
+                                            .then((value) {
+                                          setState(() {});
+                                        });
+                                      },
                                       icon: Icon(
                                           Icons.add_circle_outline_rounded),
                                       label: Text('Learn something new'),

@@ -24,6 +24,10 @@ class TasksScreen extends StatefulWidget {
 class _TasksScreenState extends State<TasksScreen> {
   List<TaskList> list = [];
 
+  void updateScreen() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
@@ -113,9 +117,9 @@ class _TasksScreenState extends State<TasksScreen> {
                     return Expanded(
                       child: TabBarView(
                         children: [
-                          Page(list, TaskState.todo),
-                          Page(list, TaskState.inProgress),
-                          Page(list, TaskState.completed),
+                          Page(list, TaskState.todo, updateScreen),
+                          Page(list, TaskState.inProgress, updateScreen),
+                          Page(list, TaskState.completed, updateScreen),
                         ],
                       ),
                     );
@@ -133,8 +137,9 @@ class _TasksScreenState extends State<TasksScreen> {
 class Page extends StatefulWidget {
   final List<TaskList> list;
   final TaskState curState;
+  final Function updateScreen;
 
-  const Page(this.list, this.curState, {super.key});
+  const Page(this.list, this.curState, this.updateScreen, {super.key});
 
   @override
   State<Page> createState() => _PageState();
@@ -280,7 +285,14 @@ class _PageState extends State<Page> {
                         color: Color(0xFF2FD1C5),
                       ),
                       child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                    context, DetailedTaskScreen.routeName,
+                                    arguments: card)
+                                .then((value) {
+                              widget.updateScreen();
+                            });
+                          },
                           icon: const Icon(MyIcons.play, color: Colors.white)),
                     ),
                   ),
@@ -304,7 +316,10 @@ class _PageState extends State<Page> {
           onTap: () {
             //setState(() => _expandedIndex = index);
             Navigator.pushNamed(context, DetailedTaskScreen.routeName,
-                arguments: card);
+                    arguments: card)
+                .then((value) {
+              widget.updateScreen();
+            });
           },
           child: Container(
             margin: const EdgeInsets.only(top: 12),
@@ -376,7 +391,15 @@ class _PageState extends State<Page> {
                               iconColor: Theme.of(context).colorScheme.primary,
                               textColor: Theme.of(context).colorScheme.primary,
                               onTap: () {
-                                Navigator.of(context).pop();
+                                setTaskState(
+                                  Provider.of<Auth>(context, listen: false)
+                                      .userId,
+                                  card,
+                                  TaskState.inProgress.index,
+                                ).then((value) {
+                                  print('poped');
+                                  Navigator.of(context).pop();
+                                });
                               },
                             ),
                             ListTile(
@@ -406,7 +429,10 @@ class _PageState extends State<Page> {
                           ],
                         ),
                       ),
-                    );
+                    ).then((value) {
+                      print('value: $value');
+                      widget.updateScreen();
+                    });
                   },
                 ),
               ],

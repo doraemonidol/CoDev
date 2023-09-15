@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import './field.dart';
@@ -6,14 +8,21 @@ import './course.dart';
 class LearningCourse with ChangeNotifier {
   final String name;
   bool done = false;
+  int point;
 
   LearningCourse({
     required this.name,
     this.done = false,
+    this.point = 0,
   });
 
   void toggleDone() {
     done = !done;
+    notifyListeners();
+  }
+
+  void setDone(bool state) {
+    done = state;
     notifyListeners();
   }
 }
@@ -51,6 +60,7 @@ class LearningField with ChangeNotifier {
         return {
           'name': course.name,
           'done': course.done,
+          'point': course.point,
         };
       }).toList(),
     };
@@ -73,7 +83,10 @@ class LearningProgress with ChangeNotifier {
       LearningField(
         name: field.name,
         courses: field.stages[0].courses
-            .map((course) => LearningCourse(name: course.name))
+            .map((course) => LearningCourse(
+                  name: course.name,
+                  point: 0,
+                ))
             .toList(),
       ),
     );
@@ -100,7 +113,11 @@ class LearningProgress with ChangeNotifier {
         name: field['name'],
         progress: field['progress'],
         courses: field['courses'].map((course) {
-          return LearningCourse(name: course['name'], done: course['done']);
+          return LearningCourse(
+            name: course['name'],
+            done: course['done'],
+            point: course['point'] ?? 0,
+          );
         }).toList(),
       );
     }).toList();
@@ -143,10 +160,129 @@ Future<LearningProgress?> fetchLearningProgress(String ID) async {
       LearningCourse learningCourse = LearningCourse(
         name: course['name'],
         done: course['done'],
+        point: course['point'] ?? 0,
       );
       learningField.courses.add(learningCourse);
     });
     progress.fields.add(learningField);
   });
   return progress;
+}
+
+// fetch LearningProgress from firestore: in the collection users, in the document with ID equal to input ID, get object LearningProgress to update done of a LearningCourse
+Future<int> fetchLearningProgressToToggleCourseDone(
+    String ID, String field, String course) async {
+  final description =
+      await FirebaseFirestore.instance.collection('users').doc(ID).get();
+  final descriptionData = description.data();
+  if (descriptionData!['learningProgress'] == null) return -1;
+  final learningProgress = descriptionData!['learningProgress'];
+  List<LearningField> tmp = [];
+  LearningProgress progress = LearningProgress(fields: tmp);
+  learningProgress['fields'].forEach((field) {
+    List<LearningCourse> tmp1 = [];
+    LearningField learningField = LearningField(
+      name: field['name'],
+      progress: field['progress'],
+      courses: tmp1,
+    );
+    field['courses'].forEach((course) {
+      LearningCourse learningCourse = LearningCourse(
+        name: course['name'],
+        done: course['done'],
+        point: course['point'] ?? 0,
+      );
+      learningField.courses.add(learningCourse);
+    });
+    progress.fields.add(learningField);
+  });
+  final fieldIndex =
+      progress.fields.indexWhere((element) => element.name == field);
+  final courseIndex = progress.fields[fieldIndex].courses
+      .indexWhere((element) => element.name == course);
+  progress.fields[fieldIndex].courses[courseIndex].setDone(true);
+  progress.fields[fieldIndex].updateProgress();
+  progress.fields[fieldIndex].courses[courseIndex].point = 10;
+  await FirebaseFirestore.instance.collection('users').doc(ID).update({
+    'learningProgress': progress.toJson(),
+  });
+  return progress.fields[fieldIndex].progress;
+}
+
+// fetch LearningProgress from firestore: in the collection users, in the document with ID equal to input ID, get object LearningProgress to update point of a LearningCourse
+Future<int> fetchLearningProgressToSetPoint(
+    String ID, String field, String course, int point) async {
+  print(point);
+  final description =
+      await FirebaseFirestore.instance.collection('users').doc(ID).get();
+  final descriptionData = description.data();
+  if (descriptionData!['learningProgress'] == null) return -1;
+  final learningProgress = descriptionData!['learningProgress'];
+  List<LearningField> tmp = [];
+  LearningProgress progress = LearningProgress(fields: tmp);
+  learningProgress['fields'].forEach((field) {
+    List<LearningCourse> tmp1 = [];
+    LearningField learningField = LearningField(
+      name: field['name'],
+      progress: field['progress'],
+      courses: tmp1,
+    );
+    field['courses'].forEach((course) {
+      LearningCourse learningCourse = LearningCourse(
+        name: course['name'],
+        done: course['done'],
+        point: course['point'] ?? 0,
+      );
+      learningField.courses.add(learningCourse);
+    });
+    progress.fields.add(learningField);
+  });
+  final fieldIndex =
+      progress.fields.indexWhere((element) => element.name == field);
+  final courseIndex = progress.fields[fieldIndex].courses
+      .indexWhere((element) => element.name == course);
+  print(fieldIndex);
+  print(courseIndex);
+  progress.fields[fieldIndex].courses[courseIndex].point =
+      max(point, progress.fields[fieldIndex].courses[courseIndex].point);
+  await FirebaseFirestore.instance.collection('users').doc(ID).update({
+    'learningProgress': progress.toJson(),
+  });
+  return progress.fields[fieldIndex].courses[courseIndex].point;
+}
+
+// fetch LearningProgress from firestore: in the collection users, in the document with ID equal to input ID, to get point of a LearningCourse
+Future<int> fetchLearningProgressToGetPoint(
+    String ID, String field, String course) async {
+  final description =
+      await FirebaseFirestore.instance.collection('users').doc(ID).get();
+  final descriptionData = description.data();
+  if (descriptionData!['learningProgress'] == null) return -1;
+  final learningProgress = descriptionData!['learningProgress'];
+  List<LearningField> tmp = [];
+  LearningProgress progress = LearningProgress(fields: tmp);
+  learningProgress['fields'].forEach((field) {
+    List<LearningCourse> tmp1 = [];
+    LearningField learningField = LearningField(
+      name: field['name'],
+      progress: field['progress'],
+      courses: tmp1,
+    );
+    field['courses'].forEach((course) {
+      LearningCourse learningCourse = LearningCourse(
+        name: course['name'],
+        done: course['done'],
+        point: course['point'] ?? 0,
+      );
+      learningField.courses.add(learningCourse);
+    });
+    progress.fields.add(learningField);
+  });
+  final fieldIndex =
+      progress.fields.indexWhere((element) => element.name == field);
+  final courseIndex = progress.fields[fieldIndex].courses
+      .indexWhere((element) => element.name == course);
+  print(fieldIndex);
+  print(courseIndex);
+  return progress.fields[fieldIndex].courses[courseIndex].point;
 }

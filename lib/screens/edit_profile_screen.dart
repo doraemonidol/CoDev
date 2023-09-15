@@ -108,19 +108,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     DropdownMenuItem(
                       child: Text(
-                        'Bachelor',
+                        'Bachelors',
                         style: FigmaTextStyles.mButton
                             .copyWith(color: FigmaColors.sUNRISELightCharcoal),
                       ),
-                      value: 'Bachelor',
+                      value: 'Bachelors',
                     ),
                     DropdownMenuItem(
                       child: Text(
-                        'Master',
+                        'Masters',
                         style: FigmaTextStyles.mButton
                             .copyWith(color: FigmaColors.sUNRISELightCharcoal),
                       ),
-                      value: 'Master',
+                      value: 'Masters',
                     ),
                     DropdownMenuItem(
                       child: Text(

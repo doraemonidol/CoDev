@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:chiclet/chiclet.dart';
 import 'package:codev/helpers/style.dart';
+import 'package:codev/providers/progress.dart';
 import 'package:codev/providers/quiz_info.dart';
 import 'package:codev/screens/endquiz_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:provider/provider.dart';
+import '../providers/auth.dart';
 import '../providers/tasks.dart';
 import "package:http/http.dart" as http;
 import '../providers/quiz.dart';
@@ -196,16 +198,16 @@ class _QScreen extends State<QScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final task = Task(
-      field: "Frontend",
-      stage: "Internet",
-      course: "How the Internet works?",
-      startTime: DateTime(2023, 9, 2),
-      endTime: DateTime(2023, 9, 8),
-      state: 1,
-    );
+    // final task = Task(
+    //   field: "Frontend",
+    //   stage: "Internet",
+    //   course: "How the Internet works?",
+    //   startTime: DateTime(2023, 9, 2),
+    //   endTime: DateTime(2023, 9, 8),
+    //   state: 1,
+    // );
 
-    //final task = ModalRoute.of(context)!.settings.arguments as Task;
+    final task = ModalRoute.of(context)!.settings.arguments as Task;
 
     return ChangeNotifierProvider<QuizInfo>(
       create: (context) => QuizInfo(),
@@ -271,8 +273,27 @@ class _QuizScreen extends State<QuizScreen>
     });
   }
 
-  void onExit() {
-    Navigator.pop(context);
+  int totalCorrect = 0;
+
+  void onExit() async {
+    print(widget.task.field);
+    print(widget.task.course);
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    await fetchLearningProgressToSetPoint(
+      userId,
+      widget.task.field,
+      widget.task.course,
+      totalCorrect,
+    ).then((value) async {
+      if (value < 10) {
+        await setTaskState(
+          userId,
+          widget.task,
+          TaskState.inProgress.index,
+        );
+      }
+      Navigator.pop(context);
+    });
   }
 
   @override
@@ -297,8 +318,9 @@ class _QuizScreen extends State<QuizScreen>
           onPressed: onExit,
         ),
         titleSpacing: 0,
-        title: Consumer<QuizInfo>(
-          builder: (context, system, child) => StepProgressIndicator(
+        title: Consumer<QuizInfo>(builder: (context, system, child) {
+          totalCorrect = system.totalCorrect;
+          return StepProgressIndicator(
             totalSteps: 10,
             currentStep: system.totalCorrect,
             size: 16,
@@ -322,8 +344,8 @@ class _QuizScreen extends State<QuizScreen>
                 Color(0xFFE5E5E5),
               ],
             ),
-          ),
-        ),
+          );
+        }),
         actions: [
           Container(
             margin: EdgeInsets.symmetric(horizontal: deviceSize.width * 0.02),

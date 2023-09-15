@@ -18,15 +18,15 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late Animation<Offset> offset;
 
-  int updateAndGetProgressStatus(Task task) {
-    Provider.of<LearningProgress>(context, listen: false)
-        .toggleCourseDone(task.field, task.course);
-    Provider.of<LearningField>(context, listen: false).updateProgress();
-    Provider.of<TaskList>(context, listen: false).setState(
-        Provider.of<Auth>(context, listen: false).userId,
-        task,
-        TaskState.completed.index);
-    return Provider.of<LearningField>(context, listen: false).progress;
+  Future<int> updateAndGetProgressStatus(Task task) async {
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    await setTaskState(
+      userId,
+      task,
+      TaskState.completed.index,
+    );
+    return await fetchLearningProgressToToggleCourseDone(
+        userId, task.field, task.course);
   }
 
   @override
@@ -147,19 +147,33 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
                         child: SizedBox(
                           height: deviceSize.width * 0.26,
                           width: deviceSize.width * 0.26,
-                          child: CircleProgressBar(
-                              foregroundColor: Color(0xFFFFFFB017),
-                              backgroundColor: FigmaColors.sUNRISELightCoral,
-                              strokeWidth: 20,
-                              value: 0.66,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "${updateAndGetProgressStatus(args)}",
-                                  style: FigmaTextStyles.h4.copyWith(
-                                      color: FigmaColors.sUNRISEWhite),
-                                ),
-                              )),
+                          child: FutureBuilder<int>(
+                            future: updateAndGetProgressStatus(args),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return CircleProgressBar(
+                                  foregroundColor: Color(0xFFFFFFB017),
+                                  backgroundColor:
+                                      FigmaColors.sUNRISELightCoral,
+                                  strokeWidth: 20,
+                                  value: snapshot.data! / 100,
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "${snapshot.data}%",
+                                      style: FigmaTextStyles.h4.copyWith(
+                                          color: FigmaColors.sUNRISEWhite),
+                                    ),
+                                  ),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Text("${snapshot.error}");
+                              }
+
+                              // By default, show a loading spinner.
+                              return const CircularProgressIndicator();
+                            },
+                          ),
                         ),
                       ),
                       SizedBox(

@@ -315,8 +315,6 @@ Future<List<TaskList>?> getScheduledTasks(BuildContext context, String ID,
     };
   }).toList();
   try {
-    Map<String, IconData> iconMap;
-
     // create a list of task in order
     List<Task> tasks_unscheduled = [];
     learn.forEach((field) {
@@ -638,5 +636,35 @@ Future<List<TaskList>?> addFieldToSchedule(BuildContext context, String ID,
     return await getScheduledTasks(context, ID, fields, iconMap, colorMap);
   } catch (e) {
     print(e);
+  }
+}
+
+// fetch list of tasklist from firestore, set state of a task and update in firestore
+Future<void> setTaskState(String ID, Task task, int state) async {
+  final taskList = await fetchScheduled(ID);
+  if (taskList == null) {
+    return;
+  } else {
+    final index1 = taskList.indexWhere((element) {
+      return element.date.day == task.startTime.day &&
+          element.date.month == task.startTime.month &&
+          element.date.year == task.startTime.year;
+    });
+    print(index1);
+    final index = taskList[index1].tasks.indexWhere((element) {
+      return element.field == task.field &&
+          element.stage == task.stage &&
+          element.course == task.course &&
+          element.startTime == task.startTime &&
+          element.endTime == task.endTime;
+    });
+    print(index);
+
+    if (index == -1) {
+      throw Exception('No task found');
+    } else {
+      taskList[index1].tasks[index].state = state;
+      await updateSchedule(ID, taskList);
+    }
   }
 }
