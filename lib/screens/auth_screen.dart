@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../helpers/style.dart';
 import '../providers/auth.dart';
 import '../screens/signup_screen.dart';
+import '../providers/music.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -23,6 +24,7 @@ class AuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    startMusicList();
     final deviceSize = MediaQuery.of(context).size;
     double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
     // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
