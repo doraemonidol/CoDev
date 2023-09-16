@@ -238,6 +238,14 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
             ),
             SizedBox(height: 16),
             // output description
+            Text(
+              task!.description,
+              maxLines: 20,
+              overflow: TextOverflow.ellipsis,
+              style: FigmaTextStyles.mT.copyWith(
+                color: FigmaColors.sUNRISETextGrey,
+              ),
+            ),
           ],
         ),
       );

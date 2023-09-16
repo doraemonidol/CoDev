@@ -24,7 +24,7 @@ class NewLessonScreen extends StatefulWidget {
 class _NewLessonScreenState extends State<NewLessonScreen> {
   // const NewLessonScreen({super.key});
   final urlOb =
-      'https://www.hindustantimes.com/ht-img/img/2023/07/15/550x309/jennie_1689410686831_1689410687014.jpg';
+      'https://static.vecteezy.com/system/resources/thumbnails/001/882/531/small/dark-blue-technology-background-free-vector.jpg';
   final controller = ScrollController();
   Size? deviceSize;
   double? safeHeight;
@@ -312,7 +312,7 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
             ),
           );
         }
-        list = fieldSnapshot.data!.docs[0]['fields'];
+        list = fieldSnapshot.data!.docs[1]['fields'];
         print('query: $query');
         return Scaffold(
           backgroundColor: FigmaColors.sUNRISELightCoral,

@@ -22,7 +22,7 @@ class User with ChangeNotifier {
     this.name = 'Unknown',
     this.location = 'Unknown',
     this.imageUrl =
-        'https://upload.wikimedia.org/wikipedia/vi/b/b1/1989Deluxe.jpeg',
+        'https://firebasestorage.googleapis.com/v0/b/codev-cs.appspot.com/o/images%2FRZRiM3quwTfeDa24vmsuejRJMpK2?alt=media&token=ee459a0e-5244-47f4-8f05-decc115fe1bd',
     this.educationLevel = 'Unknown',
     this.point = 0,
   }) {}

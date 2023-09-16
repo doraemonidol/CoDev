@@ -315,9 +315,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             fit: BoxFit.cover,
             width: 100,
             height: 100,
-            child: InkWell(
-              onTap: widget.onClicked,
-            ),
           ),
         ),
       ),
@@ -332,10 +329,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           paddingAll: 2.0,
           color: const Color(0xFF2FD1C5),
           borderRadius: 5.0,
-          child: const Icon(
-            Icons.add_photo_alternate_outlined,
-            size: 20,
-            color: Colors.white,
+          child: InkWell(
+            onTap: widget.onClicked,
+            child: const Icon(
+              Icons.add_photo_alternate_outlined,
+              size: 20,
+              color: Colors.white,
+            ),
           ),
         ),
       );

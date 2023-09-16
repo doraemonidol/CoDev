@@ -55,11 +55,32 @@ class AuthScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SizedBox(
-                                  width: deviceSize.width * 0.35,
-                                  height: deviceSize.width * 0.35,
-                                  child: const Image(
-                                      image:
-                                          AssetImage('assets/images/logo.png')),
+                                  width: deviceSize.width * 0.3,
+                                  height: deviceSize.width * 0.3,
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16.0),
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.3),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    padding:
+                                        EdgeInsets.all(deviceSize.width * 0.05),
+                                    child: const Image(
+                                        image: AssetImage(
+                                            'assets/images/logo.png')),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 16,
                                 ),
                                 Text(
                                   "CoDev",
