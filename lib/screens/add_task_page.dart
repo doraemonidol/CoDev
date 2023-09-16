@@ -31,150 +31,175 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isFinished = false;
     return Scaffold(
         appBar: AppBar(),
-        body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MyInputField(
-                  title: "Title",
-                  hint: "Enter your title",
-                  controller: _titleController,
-                ),
-                MyInputField(
-                    title: "Description",
-                    hint: "Enter your description",
-                    controller: _descriptionController),
-                MyInputField(
-                    title: "Date",
-                    hint: DateFormat.yMd().format(_selectedDate),
-                    widget: IconButton(
-                      icon: Icon(Icons.calendar_today_outlined),
-                      color: Colors.grey,
-                      onPressed: () => _getDateFromUser(),
-                    )),
-                Row(
+        body: !isFinished
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: MyInputField(
-                        title: "Start Date",
-                        hint: _startTime,
-                        widget: IconButton(
-                          icon: Icon(
-                            Icons.access_time_rounded,
-                            color: Colors.grey,
-                          ),
-                          onPressed: () => _getTimeFromUser(),
-                        ),
-                      ),
+                    Text(
+                      "This function is currently unavailable!\nPlease come back later!",
+                      style: FigmaTextStyles.b,
+                      textAlign: TextAlign.center,
                     ),
                     SizedBox(
-                      width: 12.0,
+                      height: 16.0,
                     ),
-                    Expanded(
-                      child: MyInputField(
-                        title: "End Date",
-                        hint: _endTime,
-                        widget: IconButton(
-                          icon: Icon(
-                            Icons.access_time_rounded,
-                            color: Colors.grey,
-                          ),
-                          onPressed: () => _getTimeFromUser(isStartTime: false),
-                        ),
-                      ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text("Back"),
                     )
                   ],
                 ),
-                MyInputField(
-                    title: "Remind",
-                    hint: "$_selectedRemind minutes early",
-                    widget: DropdownButton(
-                      icon: Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.grey,
+              )
+            : Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      MyInputField(
+                        title: "Title",
+                        hint: "Enter your title",
+                        controller: _titleController,
                       ),
-                      style: TextStyle(),
-                      underline: Container(
-                        height: 0,
-                      ),
-                      iconSize: 32,
-                      elevation: 4,
-                      onChanged: (String? newValue) => setState(
-                          () => _selectedRemind = int.parse(newValue!)),
-                      items:
-                          remindList.map<DropdownMenuItem<String>>((int value) {
-                        return DropdownMenuItem<String>(
-                          value: value.toString(),
-                          child: Text(
-                            value.toString(),
-                            style: FigmaTextStyles.b.copyWith(
-                              color: FigmaColors.sUNRISETextGrey,
+                      MyInputField(
+                          title: "Description",
+                          hint: "Enter your description",
+                          controller: _descriptionController),
+                      MyInputField(
+                          title: "Date",
+                          hint: DateFormat.yMd().format(_selectedDate),
+                          widget: IconButton(
+                            icon: Icon(Icons.calendar_today_outlined),
+                            color: Colors.grey,
+                            onPressed: () => _getDateFromUser(),
+                          )),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MyInputField(
+                              title: "Start Date",
+                              hint: _startTime,
+                              widget: IconButton(
+                                icon: Icon(
+                                  Icons.access_time_rounded,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () => _getTimeFromUser(),
+                              ),
                             ),
                           ),
-                        );
-                      }).toList(),
-                    )),
-                MyInputField(
-                    title: "Repeat",
-                    hint: _selectedRepeat,
-                    widget: DropdownButton(
-                      icon: Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.grey,
+                          SizedBox(
+                            width: 12.0,
+                          ),
+                          Expanded(
+                            child: MyInputField(
+                              title: "End Date",
+                              hint: _endTime,
+                              widget: IconButton(
+                                icon: Icon(
+                                  Icons.access_time_rounded,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () =>
+                                    _getTimeFromUser(isStartTime: false),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                      style: TextStyle(),
-                      underline: Container(
-                        height: 0,
-                      ),
-                      iconSize: 32,
-                      elevation: 4,
-                      onChanged: (String? newValue) =>
-                          setState(() => _selectedRepeat = newValue!),
-                      items: repeatList
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: FigmaTextStyles.b.copyWith(
-                              color: FigmaColors.sUNRISETextGrey,
+                      MyInputField(
+                          title: "Remind",
+                          hint: "$_selectedRemind minutes early",
+                          widget: DropdownButton(
+                            icon: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.grey,
+                            ),
+                            style: TextStyle(),
+                            underline: Container(
+                              height: 0,
+                            ),
+                            iconSize: 32,
+                            elevation: 4,
+                            onChanged: (String? newValue) => setState(
+                                () => _selectedRemind = int.parse(newValue!)),
+                            items: remindList
+                                .map<DropdownMenuItem<String>>((int value) {
+                              return DropdownMenuItem<String>(
+                                value: value.toString(),
+                                child: Text(
+                                  value.toString(),
+                                  style: FigmaTextStyles.b.copyWith(
+                                    color: FigmaColors.sUNRISETextGrey,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          )),
+                      MyInputField(
+                          title: "Repeat",
+                          hint: _selectedRepeat,
+                          widget: DropdownButton(
+                            icon: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.grey,
+                            ),
+                            style: TextStyle(),
+                            underline: Container(
+                              height: 0,
+                            ),
+                            iconSize: 32,
+                            elevation: 4,
+                            onChanged: (String? newValue) =>
+                                setState(() => _selectedRepeat = newValue!),
+                            items: repeatList
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: FigmaTextStyles.b.copyWith(
+                                    color: FigmaColors.sUNRISETextGrey,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          )),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _colorPallete(),
+                          SizedBox(
+                            width: 16.0,
+                          ),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Colors.blue)),
+                              onPressed: () => _validate(),
+                              child: Text(
+                                "Save",
+                                style: FigmaTextStyles.sButton.copyWith(
+                                  color: FigmaColors.sUNRISEWhite,
+                                ),
+                              ),
                             ),
                           ),
-                        );
-                      }).toList(),
-                    )),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _colorPallete(),
-                    SizedBox(
-                      width: 16.0,
-                    ),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.blue)),
-                        onPressed: () => _validate(),
-                        child: Text(
-                          "Save",
-                          style: FigmaTextStyles.sButton.copyWith(
-                            color: FigmaColors.sUNRISEWhite,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        ));
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ));
   }
 
   _validate() {
