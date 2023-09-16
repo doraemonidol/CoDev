@@ -284,48 +284,92 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
               ),
             ],
           ),
-          buildTimer(),
+          TimeLeft(
+            task!,
+            deviceSize,
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget buildTimer() => SizedBox(
-        width: deviceSize!.width * 0.175,
-        height: deviceSize!.width * 0.175,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CircularProgressIndicator(
-              value: task!.endTime.difference(DateTime.now()).inSeconds / 1000,
-              strokeWidth: 6,
-              valueColor: const AlwaysStoppedAnimation(Color(0xFFFFB017)),
-              backgroundColor: const Color(0xFFE4EDFF),
-            ),
-            Center(child: buildTime()),
-          ],
-        ),
+class TimeLeft extends StatefulWidget {
+  Task task;
+  Size? deviceSize;
+  TimeLeft(this.task, this.deviceSize);
+
+  @override
+  State<TimeLeft> createState() => _TimeLeftState(
+        task: task,
+        deviceSize: deviceSize,
       );
+}
 
-  Widget buildTime() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(Icons.timer, color: Color(0xFF2FD1C5), size: 20),
-        FittedBox(
-          child: Text(
-              // output time left
-              task!.endTime.difference(DateTime.now()).inSeconds < 0
-                  ? '0 s'
-                  : (task!.endTime.difference(DateTime.now()).inHours != 0
-                      ? '${task!.endTime.difference(DateTime.now()).inHours}h ${task!.endTime.difference(DateTime.now()).inMinutes.remainder(60)}m'
-                      : (task!.endTime.difference(DateTime.now()).inMinutes != 0
-                          ? '${task!.endTime.difference(DateTime.now()).inMinutes}m ${task!.endTime.difference(DateTime.now()).inSeconds.remainder(60)}s'
-                          : '${task!.endTime.difference(DateTime.now()).inSeconds} s')),
-              style: FigmaTextStyles.mT
-                  .copyWith(color: FigmaColors.sUNRISETextGrey)),
-        ),
-      ],
+class _TimeLeftState extends State<TimeLeft> {
+  Task? task;
+  Size? deviceSize;
+
+  _TimeLeftState({this.task, this.deviceSize});
+
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: deviceSize!.width * 0.175,
+      height: deviceSize!.width * 0.175,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CircularProgressIndicator(
+            value: task!.endTime.difference(DateTime.now()).inSeconds /
+                task!.endTime.difference(task!.startTime).inSeconds,
+            strokeWidth: 6,
+            valueColor: const AlwaysStoppedAnimation(Color(0xFFFFB017)),
+            backgroundColor: const Color(0xFFE4EDFF),
+          ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.timer, color: Color(0xFF2FD1C5), size: 20),
+                FittedBox(
+                  child: Text(
+                      // output time left
+                      task!.endTime.difference(DateTime.now()).inSeconds < 0
+                          ? '0 s'
+                          : (task!.endTime.difference(DateTime.now()).inHours !=
+                                  0
+                              ? '${task!.endTime.difference(DateTime.now()).inHours}h ${task!.endTime.difference(DateTime.now()).inMinutes.remainder(60)}m'
+                              : (task!.endTime
+                                          .difference(DateTime.now())
+                                          .inMinutes !=
+                                      0
+                                  ? '${task!.endTime.difference(DateTime.now()).inMinutes}m ${task!.endTime.difference(DateTime.now()).inSeconds.remainder(60)}s'
+                                  : '${task!.endTime.difference(DateTime.now()).inSeconds} s')),
+                      style: FigmaTextStyles.mT
+                          .copyWith(color: FigmaColors.sUNRISETextGrey)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -68,6 +68,7 @@ dependencies:
   just_audio: ^0.9.35
   assets_audio_player: ^3.1.1
   audioplayers: ^5.1.0
+  scrollable_positioned_list: ^0.3.8
 
 dev_dependencies:
   flutter_test:
