@@ -817,10 +817,10 @@ class _VolumeButtonState extends State<VolumeButton> {
           isVolumeOff = !isVolumeOff;
         });
       },
-      iconSize: 60,
+      iconSize: 35,
       icon: isVolumeOff
-          ? Icon(Icons.volume_off, color: Colors.white)
-          : Icon(Icons.volume_down, color: Colors.white),
+          ? Icon(Icons.volume_off, color: FigmaColors.sUNRISELightCharcoal)
+          : Icon(Icons.volume_down, color: FigmaColors.sUNRISELightCharcoal),
     );
   }
 }
