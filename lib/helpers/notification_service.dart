@@ -106,24 +106,28 @@ Future<void> cancelPendingNotificationRequestsWithTaskPayload() async {
 // cancel pending notifications request with payload equal to task
 Future<bool> cancelPendingNotificationRequestsWithTag(Task task) async {
   print('cancelPendingNotificationRequestsWithTag');
-  print(task.toString());
-  final List<PendingNotificationRequest> pendingNotificationRequests =
-      await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-  for (final PendingNotificationRequest pendingNotificationRequest
-      in pendingNotificationRequests) {
-    Task currentTask = taskFromString(pendingNotificationRequest.payload!);
+  //checkPendingNotificationRequests();
+  print(task.description);
+  await flutterLocalNotificationsPlugin
+      .pendingNotificationRequests()
+      .then((pendingNotificationRequests) async {
+    for (final PendingNotificationRequest pendingNotificationRequest
+        in pendingNotificationRequests) {
+      Task currentTask = taskFromString(pendingNotificationRequest.payload!);
+      print(currentTask.startTime);
 
-    if (currentTask.field == task.field &&
-        currentTask.course == task.course &&
-        currentTask.stage == task.stage &&
-        currentTask.startTime == task.startTime &&
-        currentTask.endTime == task.endTime) {
-      print('delete 1 ne');
-      await flutterLocalNotificationsPlugin
-          .cancel(pendingNotificationRequest.id);
-      return true;
+      if (currentTask.field == task.field &&
+          currentTask.course == task.course &&
+          currentTask.stage == task.stage &&
+          currentTask.startTime == task.startTime &&
+          currentTask.endTime == task.endTime) {
+        print('delete 1 ne');
+        await flutterLocalNotificationsPlugin
+            .cancel(pendingNotificationRequest.id);
+        return true;
+      }
     }
-  }
+  });
   return false;
 }
 
