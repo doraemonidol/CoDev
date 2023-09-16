@@ -90,6 +90,8 @@ class _TabsScreenState extends State<TabsScreen> {
       ),
       centerTitle: true,
       backgroundColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
       leading: pageStack.length > 1
           ? IconButton(
               icon: Icon(Icons.arrow_back),

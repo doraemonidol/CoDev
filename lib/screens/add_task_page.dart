@@ -184,8 +184,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
       DateTime endTime = DateFormat("hh:mm a").parse(_endTime);
       Task newTask = Task(
           field: _titleController.text,
-          course: _descriptionController.text,
+          description: _descriptionController.text,
           stage: "",
+          course: "",
           startTime: DateTime(_selectedDate.year, _selectedDate.month,
               _selectedDate.day, startTime.hour, startTime.minute),
           endTime: DateTime(_selectedDate.year, _selectedDate.month,

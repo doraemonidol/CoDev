@@ -17,6 +17,7 @@ class Task {
   final String field;
   final String stage;
   final String course;
+  final String description;
   DateTime startTime;
   DateTime endTime;
   final Color color;
@@ -27,6 +28,7 @@ class Task {
     required this.field,
     required this.stage,
     required this.course,
+    required this.description,
     required this.startTime,
     required this.endTime,
     this.color = Colors.blue,
@@ -39,6 +41,7 @@ class Task {
       field: field,
       stage: stage,
       course: course,
+      description: description,
       startTime: startTime,
       endTime: endTime,
       color: color,
@@ -50,7 +53,7 @@ class Task {
   // to string
   @override
   String toString() {
-    return '{"field": "$field", "stage": "$stage", "course": "$course", "startTime": "${startTime.toString()}", "endTime": "${endTime.toString()}", "color": ${color.value}, "icon": ${icon.codePoint}, "state": $state}';
+    return '{"field": "$field", "stage": "$stage", "course": "$course", "description": "$description" , "startTime": "${startTime.toString()}", "endTime": "${endTime.toString()}", "color": ${color.value}, "icon": ${icon.codePoint}, "state": $state}';
   }
 
   // from json
@@ -59,6 +62,7 @@ class Task {
       field: json['field'],
       stage: json['stage'],
       course: json['course'],
+      description: json['description'],
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
       color: Color(json['color']),
@@ -136,6 +140,7 @@ class TaskList with ChangeNotifier {
           field: task['field'],
           stage: task['stage'],
           course: task['course'],
+          description: task['description'],
           startTime: DateTime.parse(task['startTime']),
           endTime: DateTime.parse(task['endTime']),
           color: Color(task['color']),
@@ -161,6 +166,7 @@ class TaskList with ChangeNotifier {
           field: task.field,
           stage: task.stage,
           course: task.course,
+          description: task.description,
           startTime: task.startTime,
           endTime: task.endTime,
           color: task.color,
@@ -181,6 +187,7 @@ class TaskList with ChangeNotifier {
                   'field': task.field,
                   'stage': task.stage,
                   'course': task.course,
+                  'description': task.description,
                   'startTime': task.startTime.toString(),
                   'endTime': task.endTime.toString(),
                   'color': task.color.value,
@@ -217,6 +224,7 @@ Future<void> addTaskList(String id, TaskList taskList) async {
               'field': task.field,
               'stage': task.stage,
               'course': task.course,
+              'description': task.description,
               'startTime': task.startTime.toString(),
               'endTime': task.endTime.toString(),
               'color': task.color.value,
@@ -242,6 +250,7 @@ Future<void> addTaskList(String id, TaskList taskList) async {
               'field': task.field,
               'stage': task.stage,
               'course': task.course,
+              'description': task.description,
               'startTime': task.startTime.toString(),
               'endTime': task.endTime.toString(),
               'color': task.color.value,
@@ -279,6 +288,7 @@ Future<TaskList> fetchTaskList(String id) async {
         field: task['field'],
         stage: task['stage'],
         course: task['course'],
+        description: task['description'],
         startTime: DateTime.parse(task['startTime']),
         endTime: DateTime.parse(task['endTime']),
         color: Color(task['color']),
@@ -322,6 +332,7 @@ Future<void> updateSchedule(String ID, List<TaskList> schedule) async {
             'field': task.field,
             'stage': task.stage,
             'course': task.course,
+            'description': task.description,
             'startTime': task.startTime.toString(),
             'endTime': task.endTime.toString(),
             'color': task.color.value,
@@ -361,6 +372,7 @@ Future<List<TaskList>?> getScheduledTasks(BuildContext context, String ID,
             field: field.name,
             stage: stage.name,
             course: course.name,
+            description: course.description,
             startTime: DateTime.now(),
             endTime: DateTime.now(),
             state: TaskState.todo.index,
@@ -528,6 +540,7 @@ Future<List<TaskList>?> fetchScheduled(String ID) async {
           field: task['field'],
           stage: task['stage'],
           course: task['course'],
+          description: task['description'],
           startTime: DateTime.parse(task['startTime']),
           endTime: DateTime.parse(task['endTime']),
           color: Color(task['color']),
@@ -604,6 +617,7 @@ Future<void> pushTask(
     field: field,
     stage: stage,
     course: course,
+    description: '',
     startTime: start_time,
     endTime: end_time,
     state: TaskState.todo.index,

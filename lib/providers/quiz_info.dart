@@ -20,6 +20,7 @@ class QuizInfo extends ChangeNotifier {
     field: '',
     stage: '',
     course: '',
+    description: '',
     startTime: DateTime.now(),
     endTime: DateTime.now(),
     color: Colors.blue,
