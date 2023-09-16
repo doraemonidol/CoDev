@@ -112,11 +112,13 @@ Future<void> addNotificationListToFirestore(
 
 // fetch the notification list from firestore: in the collection users, in the document with ID userId, an array object named "notifications"
 Future<List<NotificationDetail>> fetchNotificationList(String userId) async {
+  print('fetchNotificationList');
   final description = await FirebaseFirestore.instance
       .collection('users')
       .doc(userId)
       .collection('notifications')
       .get();
+  print('fetchNotificationList2');
   final descriptionData = description.docs;
   final notificationList = descriptionData.map<NotificationDetail>((noti) {
     return NotificationDetail(
@@ -143,16 +145,81 @@ Future<List<NotificationDetail>> fetchNotificationList(String userId) async {
   notificationList.sort((a, b) => a.task.startTime.compareTo(b.task.startTime));
   int begin = 0, end = -1;
   for (int i = 0; i < notificationList.length; i++) {
+    print('fetching notification list: ${notificationList[i].task.course} ' +
+        DateFormat('yyyy-MM-dd – kk:mm')
+            .format(notificationList[i].task.startTime));
     if (notificationList[i]
         .task
         .startTime
         .subtract(Duration(minutes: 15))
         .isBefore(DateTime.now())) {
       end = i;
+    } else {
+      break;
     }
+  }
+  print('fetchNotificationList3');
+  if (end == -1) {
+    return [];
   }
 
   return notificationList.sublist(begin, end + 1).reversed.toList();
+}
+
+Future<List<NotificationDetail>> fetchNotificationListUpcoming(
+    String userId) async {
+  print('fetchNotificationList');
+  final description = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .collection('notifications')
+      .get();
+  print('fetchNotificationList2');
+  final descriptionData = description.docs;
+  final notificationList = descriptionData.map<NotificationDetail>((noti) {
+    return NotificationDetail(
+      task: Task(
+        field: noti['field'],
+        stage: noti['stage'],
+        course: noti['course'],
+        description: noti['description'],
+        startTime: noti['startTime'].toDate(),
+        endTime: noti['endTime'].toDate(),
+        color: Color(noti['color']),
+        icon: IconData(
+          noti['icon'],
+          fontFamily: 'CupertinoIcons',
+          fontPackage: 'cupertino_icons',
+        ),
+        state: noti['state'],
+      ),
+      status: NotificationState.values[noti['status']],
+    );
+  }).toList();
+
+  //sort the notification list by time
+  notificationList.sort((a, b) => a.task.startTime.compareTo(b.task.startTime));
+  int begin = -1, end = notificationList.length - 1;
+  for (int i = 0; i < notificationList.length; i++) {
+    print('fetching notification list: ${notificationList[i].task.course} ' +
+        DateFormat('yyyy-MM-dd – kk:mm')
+            .format(notificationList[i].task.startTime));
+    if (notificationList[i]
+        .task
+        .startTime
+        .subtract(Duration(minutes: 15))
+        .isBefore(DateTime.now())) {
+      begin = i;
+    } else {
+      break;
+    }
+  }
+  print('fetchNotificationList3');
+  if (begin == end) {
+    return [];
+  }
+
+  return notificationList.sublist(begin + 1, end + 1).reversed.toList();
 }
 
 class NotificationScreen extends StatefulWidget {
