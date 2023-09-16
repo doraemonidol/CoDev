@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:codev/providers/sign_in_info.dart';
 import 'package:codev/providers/user.dart';
@@ -39,51 +41,22 @@ class _SignUpScreen extends State<SignUpScreen> {
     passwordReader.dispose();
   }
 
-  void returnResponse(status, context) {
-    String title = "";
-    String message = "";
-    late ContentType type;
-
-    switch (status) {
-      case Status.SUCESS:
-        title = "Welcome to CoDev!";
-        message = "We've been waiting for you!";
-        type = ContentType.success;
-        break;
-      case Status.EMAIL_EXISTS:
-        title = "You forgot, mate?";
-        message = "Look like you've already signed up! Try sigining in.";
-        type = ContentType.failure;
-        break;
-      case Status.INVALID_EMAIL:
-        title = "Alien detected!";
-        message = "Your email.. doesn't look like an email?";
-        type = ContentType.warning;
-        break;
-      default:
-        title = "Something happened!";
-        message = "but I don't know what it is. Try again!";
-        type = ContentType.help;
-        break;
-    }
-
-    final snackBar = SnackBar(
-      /// need to set following properties for best effect of awesome_snackbar_content
-      elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      content: AwesomeSnackbarContent(
-        title: title,
-        message: message,
-
-        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-        contentType: type,
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An error occurred!'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
       ),
     );
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(snackBar);
   }
 
   @override
@@ -187,7 +160,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) => (value! == passwordReader.text)
                       ? null
-                      : "It is not the same.",
+                      : "Password doesn't match",
                 ),
                 SizedBox(height: deviceSize.height * 0.05),
                 Center(
@@ -198,11 +171,41 @@ class _SignUpScreen extends State<SignUpScreen> {
                         create: (context) => User(),
                         child: ElevatedButton(
                             onPressed: () async {
-                              Provider.of<Auth>(context, listen: false).signup(
+                              Provider.of<Auth>(context, listen: false)
+                                  .signup(
                                 emailReader.text,
                                 passwordReader.text,
                                 context,
-                              );
+                              )
+                                  .onError((error, stackTrace) {
+                                print('error catched');
+                                print(error);
+                                //await player.resume();
+                                var errorMessage = 'Authentication failed';
+                                if (error.toString().contains('EMAIL_EXISTS')) {
+                                  errorMessage =
+                                      'This email address is already in use.';
+                                } else if (error
+                                    .toString()
+                                    .contains('INVALID_EMAIL')) {
+                                  errorMessage =
+                                      'This is not a valid email address';
+                                } else if (error
+                                    .toString()
+                                    .contains('WEAK_PASSWORD')) {
+                                  errorMessage = 'This password is too weak.';
+                                } else if (error
+                                    .toString()
+                                    .contains('EMAIL_NOT_FOUND')) {
+                                  errorMessage =
+                                      'Could not find a user with that email.';
+                                } else if (error
+                                    .toString()
+                                    .contains('INVALID_PASSWORD')) {
+                                  errorMessage = 'Invalid password.';
+                                }
+                                _showErrorDialog(errorMessage);
+                              });
 
                               Provider.of<SignUpProvider>(context,
                                       listen: false)

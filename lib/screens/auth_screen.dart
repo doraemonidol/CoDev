@@ -317,6 +317,24 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
     }
   }
 
+  void _showErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text('Retry'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   void returnResponse(status, context) {
     String title = "";
     String message = "";
@@ -335,23 +353,7 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
         break;
     }
 
-    final materialBanner = MaterialBanner(
-      /// need to set following properties for best effect of awesome_snackbar_content
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      forceActionsBelow: true,
-      content: AwesomeSnackbarContent(
-        title: title,
-        message: message,
-        contentType: type,
-        inMaterialBanner: true,
-      ),
-      actions: const [SizedBox.shrink()],
-    );
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentMaterialBanner()
-      ..showMaterialBanner(materialBanner);
+    _showErrorDialog(title, message);
   }
 
   @override
@@ -428,8 +430,6 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
                   Provider.of<Auth>(context, listen: false)
                       .login(emailReader.text, passwordReader.text, context)
                       .then((value) {
-                    returnResponse(Status.SUCESS, context);
-
                     Provider.of<SignInProvider>(context, listen: false)
                         .changeAuthScreen();
                   }).onError((error, stackTrace) {

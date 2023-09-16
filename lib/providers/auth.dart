@@ -125,7 +125,10 @@ class Auth with ChangeNotifier {
             });
           });
         });
-      }).onError((error, stackTrace) => throw error.toString());
+      }).onError((error, stackTrace) {
+        print('error: $error');
+        throw error.toString();
+      });
     } catch (error) {
       rethrow;
     }
