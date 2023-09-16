@@ -91,7 +91,8 @@ class Auth with ChangeNotifier {
         print('expiryDate: $_expiryDate');
         _autoLogout(context);
         if (urlSegment == 'signUp') {
-          Provider.of<CoDevUser.User>(context, listen: false).addUser(_userId);
+          Provider.of<CoDevUser.User>(context, listen: false)
+              .addUser(_userId, email);
         }
         notifyListeners();
         final prefs = await SharedPreferences.getInstance();

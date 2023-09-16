@@ -46,10 +46,10 @@ class User with ChangeNotifier {
       );
 
   // add this user data to firebase, in collection users, in document with ID equal to input ID
-  Future<void> addUser(String ID) async {
+  Future<void> addUser(String ID, String _email) async {
     await FirebaseFirestore.instance.collection('users').doc(ID).set({
       'phoneNumber': phone,
-      'email': email,
+      'email': _email,
       'name': name,
       'location': location,
       'imageUrl': imageUrl,

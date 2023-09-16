@@ -114,6 +114,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                     prefixIcon: Icon(Icons.mail_outline_rounded),
                     hintStyle: FigmaTextStyles.b,
                     labelStyle: FigmaTextStyles.b,
+                    floatingLabelStyle: FigmaTextStyles.b,
                   ),
                 ),
                 SizedBox(height: deviceSize.height * 0.02),
@@ -131,6 +132,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                     prefixIcon: Icon(Icons.lock_outline_rounded),
                     hintStyle: FigmaTextStyles.b,
                     labelStyle: FigmaTextStyles.b,
+                    floatingLabelStyle: FigmaTextStyles.b,
                     errorStyle: FigmaTextStyles.mP.copyWith(
                       color: FigmaColors.sUNRISEErrorRed,
                     ),
@@ -153,6 +155,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                     prefixIcon: Icon(Icons.lock_outline_rounded),
                     hintStyle: FigmaTextStyles.b,
                     labelStyle: FigmaTextStyles.b,
+                    floatingLabelStyle: FigmaTextStyles.b,
                     errorStyle: FigmaTextStyles.mP.copyWith(
                       color: FigmaColors.sUNRISEErrorRed,
                     ),
