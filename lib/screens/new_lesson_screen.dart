@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codev/main.dart';
 import 'package:codev/providers/field.dart';
 import 'package:codev/providers/tasks.dart';
+import 'package:codev/screens/notification_screen.dart';
 import 'package:codev/widgets/horizontal_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -8,12 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import '../helpers/notification_service.dart';
 import '../icon/my_icons.dart';
 import '../providers/auth.dart';
 
 class NewLessonScreen extends StatefulWidget {
   static const routeName = '/new-lesson-screen';
-  const NewLessonScreen({super.key});
 
   @override
   State<NewLessonScreen> createState() => _NewLessonScreenState();
@@ -136,16 +138,48 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
                                   _isLoading = true;
                                 });
                                 print(field['name']);
+                                final userId =
+                                    Provider.of<Auth>(context, listen: false)
+                                        .userId;
+                                List<NotificationDetail> notiList = [];
                                 await fetchField(field['name'])
                                     .then((value) async {
                                   await addFieldToSchedule(
                                     context,
-                                    Provider.of<Auth>(context, listen: false)
-                                        .userId,
+                                    userId,
                                     value,
                                     iconData!,
                                     color!,
-                                  ).then((value) {
+                                  ).then((value) async {
+                                    cancelPendingNotificationRequestsWithTaskPayload();
+                                    deleteNotificationFromFirestoreLaterThan(
+                                        userId,
+                                        DateTime.now()
+                                            .add(Duration(minutes: 15)));
+// for each task in value, add a notification
+                                    value!.forEach((tasks) {
+                                      tasks.tasks.forEach((task) {
+                                        notiList.add(NotificationDetail(
+                                          task: task,
+                                          status: NotificationState.unread,
+                                        ));
+                                        zonedScheduleNotification(
+                                          id: notificationId++,
+                                          title: 'It\'s time for your lesson!',
+                                          body:
+                                              'You have a lesson: ${task.course} on ${task.field} in 15 minutes!',
+                                          payload: task,
+                                          scheduledDate: task.startTime
+                                              .subtract(Duration(minutes: 15)),
+                                        );
+                                      });
+                                    });
+
+                                    await addNotificationListToFirestore(
+                                      userId,
+                                      notiList,
+                                    );
+
                                     setStateModalSheet(() {
                                       _isLoading = false;
                                     });
@@ -184,10 +218,8 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
         itemCount: list.length,
         itemBuilder: (context, index) {
           final item = list[index];
-          final name = item['name']
-              .split(' ')
-              .map((word) => word[0].toUpperCase() + word.substring(1))
-              .join(' ');
+          final name = item['name'];
+          ;
           //print(item['url']);
           return buildNum(
               name, item['url'] == null ? urlOb : item['url'], index);

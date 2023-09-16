@@ -46,6 +46,43 @@ class Task {
       state: state,
     );
   }
+
+  // to string
+  @override
+  String toString() {
+    return '{"field": "$field", "stage": "$stage", "course": "$course", "startTime": "${startTime.toString()}", "endTime": "${endTime.toString()}", "color": ${color.value}, "icon": ${icon.codePoint}, "state": $state}';
+  }
+
+  // from json
+  factory Task.fromJson(Map<String, dynamic> json) {
+    return Task(
+      field: json['field'],
+      stage: json['stage'],
+      course: json['course'],
+      startTime: DateTime.parse(json['startTime']),
+      endTime: DateTime.parse(json['endTime']),
+      color: Color(json['color']),
+      icon: IconData(
+        json['icon'],
+        fontFamily: 'CupertinoIcons',
+        fontPackage: 'cupertino_icons',
+      ),
+      state: json['state'],
+    );
+  }
+}
+
+// task from a json string
+Task taskFromString(String str) => Task.fromJson(json.decode(str));
+
+// check a string has format of a task
+bool isTask(String string) {
+  try {
+    taskFromString(string);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 class TaskList with ChangeNotifier {
@@ -356,7 +393,7 @@ Future<List<TaskList>?> getScheduledTasks(BuildContext context, String ID,
     DateTime current_date = DateTime(
       DateTime.now().year,
       DateTime.now().month,
-      DateTime.now().day,
+      DateTime.now().day + 1,
     );
     DateTime getDateCopy(DateTime x) {
       return DateTime(
@@ -577,8 +614,32 @@ Future<void> pushTask(
   await updateSchedule(ID, schedule);
 }
 
-Future<List<TaskList>?> addFieldToSchedule(BuildContext context, String ID,
-    Field field, IconData iconData, Color color) async {
+Future<List<TaskList>?> addFieldToSchedule(
+  BuildContext context,
+  String ID,
+  Field field,
+  IconData iconData,
+  Color color,
+) async {
+  // List<TaskList> schedule = [
+  //   TaskList(
+  //     date: DateTime.now().add(Duration(minutes: 16)),
+  //     tasks: [
+  //       Task(
+  //         field: field.name,
+  //         stage: field.stages[0].name,
+  //         course: field.stages[0].courses[0].name,
+  //         startTime: DateTime.now().add(Duration(minutes: 16)),
+  //         endTime:
+  //             DateTime.now().add(Duration(minutes: 16)).add(Duration(hours: 2)),
+  //         state: TaskState.todo.index,
+  //         color: color,
+  //         icon: iconData,
+  //       ),
+  //     ],
+  //   ),
+  // ];
+  // return schedule;
   Map<String, IconData> iconMap = {};
   Map<String, Color> colorMap = {};
 

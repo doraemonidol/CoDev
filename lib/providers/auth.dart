@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+import 'dart:math';
 import 'package:codev/providers/sign_in_info.dart';
 import 'package:codev/screens/main_screen.dart';
+import 'package:codev/screens/notification_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
+import '../helpers/notification_service.dart';
+import '../main.dart';
 import './user.dart' as CoDevUser;
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
@@ -84,6 +88,7 @@ class Auth with ChangeNotifier {
             ),
           ),
         );
+        print('expiryDate: $_expiryDate');
         _autoLogout(context);
         if (urlSegment == 'signUp') {
           Provider.of<CoDevUser.User>(context, listen: false).addUser(_userId);
@@ -92,12 +97,34 @@ class Auth with ChangeNotifier {
         final prefs = await SharedPreferences.getInstance();
         final userData = json.encode(
           {
+            'email': email,
+            'password': password,
             'token': _token,
             'userId': _userId,
             'expiryDate': _expiryDate!.toIso8601String(),
           },
         );
         prefs.setString('codev_auth', userData);
+        cancelPendingNotificationRequestsWithTaskPayload().then((value) {
+          checkPendingNotificationRequests();
+          fetchNotificationList(userId).then((value) {
+            value!.forEach((tasks) {
+              if (tasks.task.startTime
+                  .subtract(Duration(minutes: 15))
+                  .isAfter(DateTime.now())) {
+                zonedScheduleNotification(
+                  id: notificationId++,
+                  title: 'It\'s time for your lesson!',
+                  body:
+                      'You have a lesson: ${tasks.task.course} on ${tasks.task.field} in 15 minutes!',
+                  payload: tasks.task,
+                  scheduledDate:
+                      tasks.task.startTime.subtract(Duration(minutes: 15)),
+                );
+              }
+            });
+          });
+        });
       }).onError((error, stackTrace) => throw error.toString());
     } catch (error) {
       rethrow;
@@ -130,7 +157,15 @@ class Auth with ChangeNotifier {
       _authTimer!.cancel();
     }
     final timeToExpiry = _expiryDate!.difference(DateTime.now()).inSeconds;
-    _authTimer = Timer(Duration(seconds: timeToExpiry), () => logout());
+    _authTimer = Timer(Duration(seconds: timeToExpiry), () async {
+      final prefs = await SharedPreferences.getInstance();
+      final extractedUserData = json.decode(prefs.getString('codev_auth')!);
+      login(
+        extractedUserData['email'] as String,
+        extractedUserData['password'] as String,
+        context,
+      );
+    });
   }
 
   Future<bool> tryAutoLogin(BuildContext context) async {
@@ -143,6 +178,11 @@ class Auth with ChangeNotifier {
         DateTime.parse(extractedUserData['expiryDate'] as String);
 
     if (expiryDate.isBefore(DateTime.now())) {
+      login(
+        extractedUserData['email'] as String,
+        extractedUserData['password'] as String,
+        context,
+      );
       return false;
     }
     _token = extractedUserData['token'] as String;

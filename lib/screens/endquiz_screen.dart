@@ -1,6 +1,9 @@
+import 'package:codev/helpers/notification_service.dart';
 import 'package:codev/helpers/style.dart';
+import 'package:codev/main.dart';
 import 'package:codev/providers/progress.dart';
 import 'package:codev/providers/tasks.dart';
+import 'package:codev/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:circle_progress_bar/circle_progress_bar.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +23,12 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
 
   Future<int> updateAndGetProgressStatus(Task task) async {
     final userId = Provider.of<Auth>(context, listen: false).userId;
+    await cancelPendingNotificationRequestsWithTag(task).then((value) {
+      if (value) {
+        print("Notification deleted");
+        deleteNotificationFromFirestore(userId, task);
+      }
+    });
     await setTaskState(
       userId,
       task,

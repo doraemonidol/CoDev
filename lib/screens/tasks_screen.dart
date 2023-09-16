@@ -201,10 +201,10 @@ class _PageState extends State<Page> {
                           .copyWith(color: FigmaColors.sUNRISEDarkGrey),
                       children: <TextSpan>[
                         TextSpan(
-                            text: dates[index]
-                                        .difference(DateTime.now())
-                                        .inDays ==
-                                    0
+                            text: dates[index].day == DateTime.now().day &&
+                                    dates[index].month ==
+                                        DateTime.now().month &&
+                                    dates[index].year == DateTime.now().year
                                 ? 'Today, ${DateFormat('EEEE d').format(dates[index])}'
                                 : DateFormat('EEEE, MMMM d')
                                         .format(dates[index]) +

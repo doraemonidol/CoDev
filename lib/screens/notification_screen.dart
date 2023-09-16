@@ -64,6 +64,95 @@ class NotificationDetail {
   }
 }
 
+// delete notification from firestore with the given task
+Future<void> deleteNotificationFromFirestore(String userId, Task task) async {
+  await FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .collection('notifications')
+      .where('field', isEqualTo: task.field)
+      .where('stage', isEqualTo: task.stage)
+      .where('course', isEqualTo: task.course)
+      .where('startTime', isEqualTo: task.startTime)
+      .where('endTime', isEqualTo: task.endTime)
+      .get()
+      .then((value) {
+    value.docs.forEach((element) {
+      print(element.reference.id);
+      element.reference.delete();
+    });
+  });
+}
+
+// delete notification from firestore later than the given time
+Future<void> deleteNotificationFromFirestoreLaterThan(
+    String userId, DateTime time) async {
+  await FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .collection('notifications')
+      .where('endTime', isGreaterThan: time)
+      .get()
+      .then((value) {
+    value.docs.forEach((element) {
+      print(element.reference.id);
+      element.reference.delete();
+    });
+  });
+}
+
+// add list of notification to firestore
+Future<void> addNotificationListToFirestore(
+    String userId, List<NotificationDetail> notificationList) async {
+  for (int i = 0; i < notificationList.length; i++) {
+    await notificationList[i].saveNotification(userId);
+  }
+}
+
+// fetch the notification list from firestore: in the collection users, in the document with ID userId, an array object named "notifications"
+Future<List<NotificationDetail>> fetchNotificationList(String userId) async {
+  final description = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .collection('notifications')
+      .get();
+  final descriptionData = description.docs;
+  final notificationList = descriptionData.map<NotificationDetail>((noti) {
+    return NotificationDetail(
+      task: Task(
+        field: noti['field'],
+        stage: noti['stage'],
+        course: noti['course'],
+        startTime: noti['startTime'].toDate(),
+        endTime: noti['endTime'].toDate(),
+        color: Color(noti['color']),
+        icon: IconData(
+          noti['icon'],
+          fontFamily: 'CupertinoIcons',
+          fontPackage: 'cupertino_icons',
+        ),
+        state: noti['state'],
+      ),
+      status: NotificationState.values[noti['status']],
+    );
+  }).toList();
+
+  //sort the notification list by time
+  notificationList.sort((a, b) => a.task.startTime.compareTo(b.task.startTime));
+  int begin = 0, end = -1;
+  for (int i = 0; i < notificationList.length; i++) {
+    if (notificationList[i]
+        .task
+        .startTime
+        .subtract(Duration(minutes: 15))
+        .isBefore(DateTime.now())) {
+      end = i;
+    }
+  }
+
+  return notificationList.sublist(begin, end + 1).reversed.toList();
+}
+
 class NotificationScreen extends StatefulWidget {
   static const routeName = '/notification-screen';
   const NotificationScreen({super.key});
@@ -74,32 +163,6 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   final List<NotificationDetail> card = [];
-
-  // fetch the notification list from firestore: in the collection users, in the document with ID userId, an array object named "notifications"
-  Future<List<NotificationDetail>> fetchNotificationList(String userId) async {
-    final description = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('notifications')
-        .get();
-    final descriptionData = description.docs;
-    final notificationList = descriptionData.map<NotificationDetail>((noti) {
-      return NotificationDetail(
-        task: Task(
-          field: noti['field'],
-          stage: noti['stage'],
-          course: noti['course'],
-          startTime: noti['startTime'].toDate(),
-          endTime: noti['endTime'].toDate(),
-          color: Color(noti['color']),
-          icon: IconData(noti['icon'], fontFamily: 'MaterialIcons'),
-          state: noti['state'],
-        ),
-        status: NotificationState.values[noti['status']],
-      );
-    }).toList();
-    return notificationList;
-  }
 
   @override
   void initState() {
@@ -141,6 +204,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
     if (newCardState != null) {
       card[i].task.state = newCardState.state;
     }
+    final timePassed = card[i]
+        .task
+        .startTime
+        .subtract(Duration(minutes: 15))
+        .difference(DateTime.now());
     return Center(
       child: Expanded(
         child: Container(
@@ -201,7 +269,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 )),
                         SizedBox(width: 10),
                         Text(
-                          '${DateFormat('h:mm a').format(card[i].task.startTime)} - ${DateFormat('h:mm a').format(card[i].task.endTime)}',
+                          timePassed.inDays > 1
+                              ? '${timePassed.inDays} days ago'
+                              : timePassed.inDays == 1
+                                  ? '${timePassed.inDays} day ago'
+                                  : timePassed.inHours > 1
+                                      ? '${timePassed.inHours} hours ago'
+                                      : timePassed.inHours == 1
+                                          ? '${timePassed.inHours} hour ago'
+                                          : timePassed.inMinutes > 1
+                                              ? '${timePassed.inMinutes} minutes ago'
+                                              : timePassed.inMinutes == 1
+                                                  ? '${timePassed.inMinutes} minute ago'
+                                                  : timePassed.inSeconds > 1
+                                                      ? '${timePassed.inSeconds} seconds ago'
+                                                      : 'Just now',
                           style: FigmaTextStyles.mT.copyWith(
                               color: FigmaColors.systemGrey.withOpacity(
                             card[i].status == NotificationState.read ? 0.5 : 1,

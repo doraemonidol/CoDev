@@ -12,7 +12,9 @@ import 'package:provider/provider.dart';
 
 class DetailedTaskScreen extends StatefulWidget {
   static const routeName = '/detailed-task-screen';
-  const DetailedTaskScreen({super.key});
+  final String? payload;
+
+  const DetailedTaskScreen({Key? key, this.payload}) : super(key: key);
 
   @override
   State<DetailedTaskScreen> createState() => _DetailedTaskScreenState();
@@ -24,10 +26,23 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
   String? value;
   Size? deviceSize;
   double? safeHeight;
+  String? _payload;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _payload = widget.payload;
+  }
 
   @override
   Widget build(BuildContext context) {
-    this.task = ModalRoute.of(context)!.settings.arguments as Task;
+    if (_payload != null) {
+      task = taskFromString(_payload!);
+    } else {
+      print('payload is null');
+      task = ModalRoute.of(context)!.settings.arguments as Task;
+    }
     deviceSize = MediaQuery.of(context).size;
     safeHeight = deviceSize!.height - MediaQuery.of(context).padding.top;
 

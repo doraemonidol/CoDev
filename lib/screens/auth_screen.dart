@@ -58,7 +58,8 @@ class AuthScreen extends StatelessWidget {
                                   width: deviceSize.width * 0.35,
                                   height: deviceSize.width * 0.35,
                                   child: const Image(
-                                      image: AssetImage('assets/img/logo.png')),
+                                      image:
+                                          AssetImage('assets/images/logo.png')),
                                 ),
                                 Text(
                                   "CoDev",
