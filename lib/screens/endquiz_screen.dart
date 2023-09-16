@@ -90,14 +90,11 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
           ),
           SlideTransition(
             position: offset,
-            child: Positioned(
-              top: safeHeight * 0.097,
-              child: SizedBox(
-                width: deviceSize.width * 0.63,
-                height: deviceSize.width * 0.63,
-                child: const Image(
-                  image: AssetImage('assets/img/wow_cat.png'),
-                ),
+            child: SizedBox(
+              width: deviceSize.width * 0.63,
+              height: deviceSize.width * 0.63,
+              child: const Image(
+                image: AssetImage('assets/img/wow_cat.png'),
               ),
             ),
           ),
@@ -176,6 +173,7 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
                                   ),
                                 );
                               } else if (snapshot.hasError) {
+                                print(snapshot.error);
                                 return Text("${snapshot.error}");
                               }
 

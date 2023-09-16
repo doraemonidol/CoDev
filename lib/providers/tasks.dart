@@ -53,7 +53,7 @@ class Task {
   // to string
   @override
   String toString() {
-    return '{"field": "$field", "stage": "$stage", "course": "$course", "description": "$description" , "startTime": "${startTime.toString()}", "endTime": "${endTime.toString()}", "color": ${color.value}, "icon": ${icon.codePoint}, "state": $state}';
+    return '{"field": "$field", "stage": "$stage", "course": "$course", "description": "${description.substring(0, description.length - 2)}" , "startTime": "${startTime.toString()}", "endTime": "${endTime.toString()}", "color": ${color.value}, "icon": ${icon.codePoint}, "state": $state}';
   }
 
   // from json

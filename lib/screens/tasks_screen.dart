@@ -148,17 +148,22 @@ class Page extends StatefulWidget {
 class _PageState extends State<Page> {
   @override
   Widget build(BuildContext context) {
+    print('curState: ${widget.curState.index}');
     final List<Task> curStateTaskList = [];
     for (int i = 0; i < widget.list.length; i++) {
+      print('widget.list[i].tasks.length: ${widget.list[i].tasks.length}');
       for (int j = 0; j < widget.list[i].tasks.length; j++) {
+        print(
+            'widget.list[i].tasks[j].state: ${widget.list[i].tasks[j].state}');
         if (widget.list[i].tasks[j].state == widget.curState.index) {
           curStateTaskList.add(widget.list[i].tasks[j]);
         }
       }
     }
+    //print(curStateTaskList);
     // sort curStateTaskList by startTime
     curStateTaskList.sort((a, b) => a.startTime.compareTo(b.startTime));
-    print(curStateTaskList);
+    //print(curStateTaskList);
     // get list of dates (day, month, year) unique in curStateTaskList
     final List<DateTime> dates = [];
     for (int i = 0; i < curStateTaskList.length; i++) {
