@@ -124,6 +124,14 @@ flutter:
       fonts:
         - asset: assets/icons/Tick.ttf
 
+    - family: Music
+      fonts:
+        - asset: assets/icons/Music.ttf
+
+    - family: Mute
+      fonts:
+        - asset: assets/icons/Mute.ttf
+
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-Black.ttf

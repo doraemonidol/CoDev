@@ -7,6 +7,8 @@ import 'package:codev/screens/quiz_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:codev/icon/my_icons.dart';
+import 'package:codev/icon/music_icons.dart';
+import 'package:codev/icon/mute_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -113,18 +115,30 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
             ),
             SizedBox(height: 20),
 
-            IconButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamed(QuizScreen.routeName, arguments: task!)
-                    .then((value) {
-                  setState(() {});
-                });
-              },
-              style: IconButton.styleFrom(
-                  backgroundColor: const Color(0xFF2FD1C5)),
-              iconSize: 60,
-              icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  iconSize:60,
+                  icon: const Icon(Icons.shuffle, color: Colors.white),
+                ),
+                SizedBox(width: 10),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamed(QuizScreen.routeName, arguments: task!)
+                        .then((value) {
+                      setState(() {});
+                    });
+                  },
+                  style: IconButton.styleFrom(
+                      backgroundColor: const Color(0xFF2FD1C5)),
+                  iconSize: 60,
+                  icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
+                ),
+                SizedBox(width: 10),
+                VolumeButton(),
+              ],
             ),
             SizedBox(height: 10),
             Text(
@@ -370,6 +384,30 @@ class _TimeLeftState extends State<TimeLeft> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class VolumeButton extends StatefulWidget {
+  @override
+  _VolumeButtonState createState() => _VolumeButtonState();
+}
+
+class _VolumeButtonState extends State<VolumeButton> {
+  bool isVolumeOff = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        setState(() {
+          isVolumeOff = !isVolumeOff;
+        });
+      },
+      iconSize: 60,
+      icon: isVolumeOff
+          ? Icon(Icons.volume_off, color: Colors.white)
+          : Icon(Icons.volume_down, color: Colors.white),
     );
   }
 }
