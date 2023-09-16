@@ -9,7 +9,7 @@ class WaitingScreen extends StatelessWidget {
     double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
 
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xfffcfefc),
         body: Align(
             alignment: Alignment.center,
             child: Column(
@@ -18,8 +18,8 @@ class WaitingScreen extends StatelessWidget {
                 SizedBox(
                   width: deviceSize.width * 0.85,
                   height: safeHeight * 0.25,
-                  child:
-                      const Image(image: AssetImage('assets/img/easter-bunny.gif')),
+                  child: const Image(
+                      image: AssetImage('assets/img/easter-bunny.gif')),
                 ),
                 SizedBox(
                   width: deviceSize.width * 0.05,

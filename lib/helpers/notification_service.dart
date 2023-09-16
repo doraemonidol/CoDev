@@ -90,6 +90,7 @@ Future<void> configureLocalTimeZone() async {
 Future<void> cancelPendingNotificationRequestsWithTaskPayload() async {
   final List<PendingNotificationRequest> pendingNotificationRequests =
       await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+  print('cancelPendingNotificationRequestsWithTaskPayload');
   for (final PendingNotificationRequest pendingNotificationRequest
       in pendingNotificationRequests) {
     if (isTask(pendingNotificationRequest.payload ?? '')) {
@@ -150,7 +151,7 @@ Future<void> zonedScheduleNotification(
 Future<void> checkPendingNotificationRequests() async {
   final List<PendingNotificationRequest> pendingNotificationRequests =
       await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-  pendingNotificationRequests.forEach((PendingNotificationRequest p) {
+  pendingNotificationRequests.forEach((PendingNotificationRequest p) async {
     // ignore: avoid_print
     print(p.payload);
   });

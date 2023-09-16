@@ -119,7 +119,11 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
                       width: 250,
                       height: 62,
                       child: _isLoading
-                          ? Center(child: CircularProgressIndicator())
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                color: FigmaColors.sUNRISEWhite,
+                              ),
+                            )
                           : ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   padding: EdgeInsets.fromLTRB(2, 0, 0, 0),

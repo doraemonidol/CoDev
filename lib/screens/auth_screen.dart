@@ -8,10 +8,12 @@ import 'package:codev/screens/tasks_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../helpers/notification_service.dart';
 import '../helpers/style.dart';
 import '../providers/auth.dart';
 import '../screens/signup_screen.dart';
 import '../providers/music.dart';
+import 'notification_screen.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -24,7 +26,7 @@ class AuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    startMusicList();
+    //startMusicList();
     final deviceSize = MediaQuery.of(context).size;
     double safeHeight = deviceSize.height - MediaQuery.of(context).padding.top;
     // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
@@ -317,6 +319,24 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
     }
   }
 
+  void _showErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text('Retry'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   void returnResponse(status, context) {
     String title = "";
     String message = "";
@@ -335,23 +355,7 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
         break;
     }
 
-    final materialBanner = MaterialBanner(
-      /// need to set following properties for best effect of awesome_snackbar_content
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      forceActionsBelow: true,
-      content: AwesomeSnackbarContent(
-        title: title,
-        message: message,
-        contentType: type,
-        inMaterialBanner: true,
-      ),
-      actions: const [SizedBox.shrink()],
-    );
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentMaterialBanner()
-      ..showMaterialBanner(materialBanner);
+    _showErrorDialog(title, message);
   }
 
   @override
@@ -428,10 +432,32 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
                   Provider.of<Auth>(context, listen: false)
                       .login(emailReader.text, passwordReader.text, context)
                       .then((value) {
-                    returnResponse(Status.SUCESS, context);
-
                     Provider.of<SignInProvider>(context, listen: false)
                         .changeAuthScreen();
+                    final userId =
+                        Provider.of<Auth>(context, listen: false).userId;
+                    cancelPendingNotificationRequestsWithTaskPayload()
+                        .then((value) {
+                      checkPendingNotificationRequests();
+                      fetchNotificationListUpcoming(userId).then((value) {
+                        value!.forEach((tasks) {
+                          print(tasks.task.toString());
+                          if (tasks.task.startTime
+                              .subtract(Duration(minutes: 15))
+                              .isAfter(DateTime.now())) {
+                            zonedScheduleNotification(
+                              id: notificationId++,
+                              title: 'It\'s time for your lesson!',
+                              body:
+                                  'You have a lesson: ${tasks.task.course} on ${tasks.task.field} in 15 minutes!',
+                              payload: tasks.task,
+                              scheduledDate: tasks.task.startTime
+                                  .subtract(Duration(minutes: 15)),
+                            );
+                          }
+                        });
+                      });
+                    });
                   }).onError((error, stackTrace) {
                     returnResponse(Status.FAIL, context);
                   });

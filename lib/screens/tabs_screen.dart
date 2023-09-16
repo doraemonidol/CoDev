@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:codev/helpers/notification_service.dart';
 import 'package:codev/providers/auth.dart';
 import 'package:codev/providers/tasks.dart';
 import 'package:codev/screens/new_lesson_screen.dart';
@@ -36,7 +37,6 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     pageStack.push(0);
   }
 
