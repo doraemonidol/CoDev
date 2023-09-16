@@ -634,78 +634,83 @@ class _QuizContent extends State<QuizContent> {
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
           deviceSize.width * 0.05, 0, deviceSize.width * 0.05, 0),
-      child: Column(
+      child: Row(
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Choose the correct answers",
-              style: FigmaTextStyles.mP.copyWith(
-                color: FigmaColors.sUNRISETextGrey,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: safeHeight * 0.01,
-          ),
-          Consumer<QuizInfo>(
-            builder: (context, system, child) => Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                system.getCurrentQuestion().statement,
-                style: FigmaTextStyles.h4.copyWith(
-                  color: FigmaColors.sUNRISELightCharcoal,
+          Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Choose the correct answers",
+                  style: FigmaTextStyles.mP.copyWith(
+                    color: FigmaColors.sUNRISETextGrey,
+                  ),
                 ),
               ),
-            ),
-          ),
-          SizedBox(
-            height: safeHeight * 0.02,
-          ),
-          Consumer<QuizInfo>(
-            builder: (context, system, child) => Column(children: [
-              QuizOption(
-                deviceSize: deviceSize,
-                system: system,
-                index: 1,
-                borderColor: Color(0xFFFFDD563),
+              SizedBox(
+                height: safeHeight * 0.01,
+              ),
+              Consumer<QuizInfo>(
+                builder: (context, system, child) => Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    system.getCurrentQuestion().statement,
+                    style: FigmaTextStyles.h4.copyWith(
+                      color: FigmaColors.sUNRISELightCharcoal,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: safeHeight * 0.02,
+              ),
+              Consumer<QuizInfo>(
+                builder: (context, system, child) => Column(children: [
+                  QuizOption(
+                    deviceSize: deviceSize,
+                    system: system,
+                    index: 1,
+                    borderColor: Color(0xFFFFDD563),
+                  ),
+                  SizedBox(
+                    width: deviceSize.width * 0.05,
+                    height: deviceSize.width * 0.025,
+                  ),
+                  QuizOption(
+                    deviceSize: deviceSize,
+                    system: system,
+                    index: 2,
+                    borderColor: FigmaColors.sUNRISEWaves,
+                  ),
+                  SizedBox(
+                    width: deviceSize.width * 0.05,
+                    height: deviceSize.width * 0.025,
+                  ),
+                  QuizOption(
+                    deviceSize: deviceSize,
+                    system: system,
+                    index: 3,
+                    borderColor: Color(0xFFB3B4F7),
+                  ),
+                  SizedBox(
+                    width: deviceSize.width * 0.05,
+                    height: deviceSize.width * 0.025,
+                  ),
+                  QuizOption(
+                    deviceSize: deviceSize,
+                    system: system,
+                    index: 4,
+                    borderColor: Color(0xFF93B5FF),
+                  ),
+                ]),
               ),
               SizedBox(
                 width: deviceSize.width * 0.05,
                 height: deviceSize.width * 0.025,
               ),
-              QuizOption(
-                deviceSize: deviceSize,
-                system: system,
-                index: 2,
-                borderColor: FigmaColors.sUNRISEWaves,
-              ),
-              SizedBox(
-                width: deviceSize.width * 0.05,
-                height: deviceSize.width * 0.025,
-              ),
-              QuizOption(
-                deviceSize: deviceSize,
-                system: system,
-                index: 3,
-                borderColor: Color(0xFFB3B4F7),
-              ),
-              SizedBox(
-                width: deviceSize.width * 0.05,
-                height: deviceSize.width * 0.025,
-              ),
-              QuizOption(
-                deviceSize: deviceSize,
-                system: system,
-                index: 4,
-                borderColor: Color(0xFF93B5FF),
-              ),
-            ]),
+            ],
           ),
-          SizedBox(
-            width: deviceSize.width * 0.05,
-            height: deviceSize.width * 0.025,
-          ),
+          VolumeButton(),
         ],
       ),
     );
@@ -793,6 +798,29 @@ class QuizOption extends StatelessWidget {
           width: 2,
         ),
       )),
+    );
+  }
+}
+class VolumeButton extends StatefulWidget {
+  @override
+  _VolumeButtonState createState() => _VolumeButtonState();
+}
+
+class _VolumeButtonState extends State<VolumeButton> {
+  bool isVolumeOff = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        setState(() {
+          isVolumeOff = !isVolumeOff;
+        });
+      },
+      iconSize: 60,
+      icon: isVolumeOff
+          ? Icon(Icons.volume_off, color: Colors.white)
+          : Icon(Icons.volume_down, color: Colors.white),
     );
   }
 }

@@ -19,6 +19,7 @@ class FigmaColors {
   static const Color sUNRISEWaves = Color(0xffe48fff);
   static const Color systemGrey = Color(0xe59a9a9a);
   static const Color systemDark = Color(0xFF242736);
+  static const Color systemYellow = Color(0xFFFDD563);
 }
 
 class FigmaTextStyles {
