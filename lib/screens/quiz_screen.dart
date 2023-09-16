@@ -634,18 +634,21 @@ class _QuizContent extends State<QuizContent> {
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
           deviceSize.width * 0.05, 0, deviceSize.width * 0.05, 0),
-      child: Row(
-        children: [
-          Column(
+      child: Column(
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Choose the correct answers",
-                  style: FigmaTextStyles.mP.copyWith(
-                    color: FigmaColors.sUNRISETextGrey,
+              Row(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Choose the correct answers",
+                      style: FigmaTextStyles.mP.copyWith(
+                        color: FigmaColors.sUNRISETextGrey,
+                      ),
+                    ),
                   ),
-                ),
+                  VolumeButton(),
+                ],
               ),
               SizedBox(
                 height: safeHeight * 0.01,
@@ -710,9 +713,6 @@ class _QuizContent extends State<QuizContent> {
               ),
             ],
           ),
-          VolumeButton(),
-        ],
-      ),
     );
   }
 }
