@@ -15,6 +15,7 @@ import '../providers/quiz.dart';
 import '../screens/error_screen.dart';
 import '../screens/waiting_screen.dart';
 import '../helpers/prompt.dart';
+import '../providers/music.dart';
 
 class QScreen extends StatefulWidget {
   const QScreen({super.key});
@@ -26,6 +27,7 @@ class QScreen extends StatefulWidget {
 class _QScreen extends State<QScreen> {
   @override
   void dispose() {
+    stopMusicList();
     super.dispose();
   }
 
@@ -206,6 +208,9 @@ class _QScreen extends State<QScreen> {
     //   endTime: DateTime(2023, 9, 8),
     //   state: 1,
     // );
+
+    startMusicList();
+    muteMusicList();
 
     final task = ModalRoute.of(context)!.settings.arguments as Task;
 
@@ -389,7 +394,7 @@ class _QuizScreen extends State<QuizScreen>
                                       deviceSize.height * 0.07,
                                     ),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
+                                      borderRadius: BorderRadius.circular(16.0),
                                     ),
                                   ),
                                   child: Text(
@@ -492,10 +497,13 @@ class _QuizScreen extends State<QuizScreen>
                                         animationPlaying();
                                         if (system.complete) {
                                           Navigator.of(context)
-                                              .pushReplacementNamed(
+                                              .pushNamed(
                                             EndQuiz.routeName,
                                             arguments: widget.task,
-                                          );
+                                          )
+                                              .then((value) {
+                                            Navigator.of(context).pop();
+                                          });
                                         }
 
                                         Provider.of<QuizInfo>(context,
@@ -635,84 +643,84 @@ class _QuizContent extends State<QuizContent> {
       padding: EdgeInsets.fromLTRB(
           deviceSize.width * 0.05, 0, deviceSize.width * 0.05, 0),
       child: Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Choose the correct answers",
-                      style: FigmaTextStyles.mP.copyWith(
-                        color: FigmaColors.sUNRISETextGrey,
-                      ),
-                    ),
-                  ),
-                  VolumeButton(),
-                ],
-              ),
-              SizedBox(
-                height: safeHeight * 0.01,
-              ),
-              Consumer<QuizInfo>(
-                builder: (context, system, child) => Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    system.getCurrentQuestion().statement,
-                    style: FigmaTextStyles.h4.copyWith(
-                      color: FigmaColors.sUNRISELightCharcoal,
-                    ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Choose the correct answers",
+                  style: FigmaTextStyles.mP.copyWith(
+                    color: FigmaColors.sUNRISETextGrey,
                   ),
                 ),
               ),
-              SizedBox(
-                height: safeHeight * 0.02,
+              VolumeButton(),
+            ],
+          ),
+          SizedBox(
+            height: safeHeight * 0.01,
+          ),
+          Consumer<QuizInfo>(
+            builder: (context, system, child) => Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                system.getCurrentQuestion().statement,
+                style: FigmaTextStyles.h4.copyWith(
+                  color: FigmaColors.sUNRISELightCharcoal,
+                ),
               ),
-              Consumer<QuizInfo>(
-                builder: (context, system, child) => Column(children: [
-                  QuizOption(
-                    deviceSize: deviceSize,
-                    system: system,
-                    index: 1,
-                    borderColor: Color(0xFFFFDD563),
-                  ),
-                  SizedBox(
-                    width: deviceSize.width * 0.05,
-                    height: deviceSize.width * 0.025,
-                  ),
-                  QuizOption(
-                    deviceSize: deviceSize,
-                    system: system,
-                    index: 2,
-                    borderColor: FigmaColors.sUNRISEWaves,
-                  ),
-                  SizedBox(
-                    width: deviceSize.width * 0.05,
-                    height: deviceSize.width * 0.025,
-                  ),
-                  QuizOption(
-                    deviceSize: deviceSize,
-                    system: system,
-                    index: 3,
-                    borderColor: Color(0xFFB3B4F7),
-                  ),
-                  SizedBox(
-                    width: deviceSize.width * 0.05,
-                    height: deviceSize.width * 0.025,
-                  ),
-                  QuizOption(
-                    deviceSize: deviceSize,
-                    system: system,
-                    index: 4,
-                    borderColor: Color(0xFF93B5FF),
-                  ),
-                ]),
+            ),
+          ),
+          SizedBox(
+            height: safeHeight * 0.02,
+          ),
+          Consumer<QuizInfo>(
+            builder: (context, system, child) => Column(children: [
+              QuizOption(
+                deviceSize: deviceSize,
+                system: system,
+                index: 1,
+                borderColor: Color(0xFFFFDD563),
               ),
               SizedBox(
                 width: deviceSize.width * 0.05,
                 height: deviceSize.width * 0.025,
               ),
-            ],
+              QuizOption(
+                deviceSize: deviceSize,
+                system: system,
+                index: 2,
+                borderColor: FigmaColors.sUNRISEWaves,
+              ),
+              SizedBox(
+                width: deviceSize.width * 0.05,
+                height: deviceSize.width * 0.025,
+              ),
+              QuizOption(
+                deviceSize: deviceSize,
+                system: system,
+                index: 3,
+                borderColor: Color(0xFFB3B4F7),
+              ),
+              SizedBox(
+                width: deviceSize.width * 0.05,
+                height: deviceSize.width * 0.025,
+              ),
+              QuizOption(
+                deviceSize: deviceSize,
+                system: system,
+                index: 4,
+                borderColor: Color(0xFF93B5FF),
+              ),
+            ]),
           ),
+          SizedBox(
+            width: deviceSize.width * 0.05,
+            height: deviceSize.width * 0.025,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -801,20 +809,21 @@ class QuizOption extends StatelessWidget {
     );
   }
 }
+
 class VolumeButton extends StatefulWidget {
   @override
   _VolumeButtonState createState() => _VolumeButtonState();
 }
 
 class _VolumeButtonState extends State<VolumeButton> {
-  bool isVolumeOff = true;
-
+  bool isVolumeOff = false;
   @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
         setState(() {
           isVolumeOff = !isVolumeOff;
+          isVolumeOff ? muteMusicList() : unmuteMusicList();
         });
       },
       iconSize: 35,
@@ -822,5 +831,10 @@ class _VolumeButtonState extends State<VolumeButton> {
           ? Icon(Icons.volume_off, color: FigmaColors.sUNRISELightCharcoal)
           : Icon(Icons.volume_down, color: FigmaColors.sUNRISELightCharcoal),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

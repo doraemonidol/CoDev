@@ -82,7 +82,14 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
               ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: LinearProgressIndicator(
+                      value: 0,
+                      minHeight: 36,
+                      backgroundColor: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  );
                 } else if (snapshot.hasError) {
                   return const Center(child: Text('Error'));
                 } else {
@@ -97,8 +104,8 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
                         backgroundColor: Colors.white,
                         // change color of progress bar as val increase
                         valueColor: AlwaysStoppedAnimation<Color>(Color.lerp(
-                            Color.lerp(Colors.red, Colors.yellow, val / 100),
-                            Color.lerp(Colors.yellow, Colors.green, val / 100),
+                            Color.lerp(Colors.red, Colors.yellow, val / 10),
+                            Color.lerp(Colors.yellow, Colors.green, val / 10),
                             val / 10)!),
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -119,9 +126,10 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
                 Navigator.of(context)
                     .pushNamed(QuizScreen.routeName, arguments: task!)
                     .then((value) {
-                      setState(() {});
-                    });
-                },
+                  print('17082003');
+                  setState(() {});
+                });
+              },
               style: IconButton.styleFrom(
                   backgroundColor: const Color(0xFF2FD1C5)),
               iconSize: 60,
@@ -382,4 +390,3 @@ class _TimeLeftState extends State<TimeLeft> {
     );
   }
 }
-

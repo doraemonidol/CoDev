@@ -237,6 +237,7 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
                 labelText: 'Email',
                 hintStyle: FigmaTextStyles.b,
                 labelStyle: FigmaTextStyles.b,
+                floatingLabelStyle: FigmaTextStyles.b,
                 errorStyle: FigmaTextStyles.mP.copyWith(
                   color: FigmaColors.sUNRISEErrorRed,
                 ),
@@ -259,7 +260,7 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
                 });
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                backgroundColor: FigmaColors.sUNRISEBluePrimary,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0)),
                 minimumSize: Size(
@@ -399,6 +400,7 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
                 prefixIcon: const Icon(Icons.lock_outline_rounded),
                 hintStyle: FigmaTextStyles.b,
                 labelStyle: FigmaTextStyles.b,
+                floatingLabelStyle: FigmaTextStyles.b,
                 errorStyle: FigmaTextStyles.mP.copyWith(
                   color: FigmaColors.sUNRISEErrorRed,
                 ),
@@ -418,6 +420,7 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
                 prefixIcon: const Icon(Icons.lock_outline_rounded),
                 hintStyle: FigmaTextStyles.b,
                 labelStyle: FigmaTextStyles.b,
+                floatingLabelStyle: FigmaTextStyles.b,
                 errorStyle: FigmaTextStyles.mP.copyWith(
                   color: FigmaColors.sUNRISEErrorRed,
                 ),
@@ -463,7 +466,7 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  backgroundColor: FigmaColors.sUNRISEBluePrimary,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0)),
                   minimumSize: Size(

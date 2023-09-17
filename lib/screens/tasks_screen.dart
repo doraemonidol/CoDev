@@ -23,6 +23,42 @@ class TasksScreen extends StatefulWidget {
 
 class _TasksScreenState extends State<TasksScreen> {
   List<TaskList> list = [];
+  List<PopupMenuEntry> popUpMenuList = [];
+  List<String> fieldLearned = [];
+  String selectedFieldFilter = 'All';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    popUpMenuList.add(PopupMenuItem(
+      child: Text(
+        'All',
+        style: FigmaTextStyles.mB,
+      ),
+      value: 'All',
+    ));
+    bool _isLoading = true;
+    fetchScheduled(Provider.of<Auth>(context, listen: false).userId)
+        .then((taskLists) {
+      if (taskLists != null) {
+        taskLists.forEach((taskList) {
+          taskList.tasks.forEach((task) {
+            if (!fieldLearned.contains(task.field)) {
+              fieldLearned.add(task.field);
+              popUpMenuList.add(PopupMenuItem(
+                child: Text(
+                  task.field,
+                  style: FigmaTextStyles.mB,
+                ),
+                value: task.field,
+              ));
+            }
+          });
+        });
+      }
+    });
+  }
 
   void updateScreen() {
     setState(() {});
@@ -35,6 +71,7 @@ class _TasksScreenState extends State<TasksScreen> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        backgroundColor: FigmaColors.sUNRISESunray,
         body: Container(
           padding: EdgeInsets.all(24),
           child: Column(
@@ -72,19 +109,31 @@ class _TasksScreenState extends State<TasksScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Center(
-                        child: Icon(MyIcons.filter_variant,
-                            color: FigmaColors.sUNRISELightCharcoal)),
-                    iconSize: 20,
-                    onPressed: () {},
-                    style: IconButton.styleFrom(
-                        backgroundColor: FigmaColors.sUNRISEWhite,
-                        shape: ContinuousRectangleBorder(
-                          side: BorderSide(
-                              color: FigmaColors.lightblue, width: 1),
-                          borderRadius: BorderRadius.circular(12.0),
-                        )),
+                  // pop up menu button to choose filter option
+                  PopupMenuButton(
+                    color: FigmaColors.sUNRISEWhite,
+                    itemBuilder: (context) {
+                      return popUpMenuList;
+                    },
+                    onSelected: (value) {
+                      // filter the list
+                      print('value: $value');
+                      selectedFieldFilter = value;
+                      setState(() {});
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: FigmaColors.sUNRISEWhite,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: FigmaColors.sUNRISELightCoral,
+                          width: 2,
+                        ),
+                      ),
+                      child: Icon(MyIcons.filter_variant,
+                          color: FigmaColors.sUNRISELightCharcoal),
+                    ),
                   ),
                   Spacer(),
                   TextButton.icon(
@@ -113,6 +162,16 @@ class _TasksScreenState extends State<TasksScreen> {
                     list = snapshot.data == null
                         ? []
                         : snapshot.data as List<TaskList>;
+                    if (selectedFieldFilter != 'All')
+                      list = list
+                          .where((element) =>
+                              element.tasks
+                                  .where((element) =>
+                                      element.field == selectedFieldFilter)
+                                  .toList()
+                                  .length >
+                              0)
+                          .toList();
                     print(list);
                     return Expanded(
                       child: TabBarView(
@@ -148,17 +207,22 @@ class Page extends StatefulWidget {
 class _PageState extends State<Page> {
   @override
   Widget build(BuildContext context) {
+    print('curState: ${widget.curState.index}');
     final List<Task> curStateTaskList = [];
     for (int i = 0; i < widget.list.length; i++) {
+      print('widget.list[i].tasks.length: ${widget.list[i].tasks.length}');
       for (int j = 0; j < widget.list[i].tasks.length; j++) {
+        print(
+            'widget.list[i].tasks[j].state: ${widget.list[i].tasks[j].state}');
         if (widget.list[i].tasks[j].state == widget.curState.index) {
           curStateTaskList.add(widget.list[i].tasks[j]);
         }
       }
     }
+    //print(curStateTaskList);
     // sort curStateTaskList by startTime
     curStateTaskList.sort((a, b) => a.startTime.compareTo(b.startTime));
-    print(curStateTaskList);
+    //print(curStateTaskList);
     // get list of dates (day, month, year) unique in curStateTaskList
     final List<DateTime> dates = [];
     for (int i = 0; i < curStateTaskList.length; i++) {
@@ -388,8 +452,8 @@ class _PageState extends State<Page> {
                               leading: Icon(Icons.assignment_add),
                               title: Text('Move to In Progress tab',
                                   style: FigmaTextStyles.mB),
-                              iconColor: Theme.of(context).colorScheme.primary,
-                              textColor: Theme.of(context).colorScheme.primary,
+                              iconColor: FigmaColors.sUNRISEBluePrimary,
+                              textColor: FigmaColors.sUNRISEBluePrimary,
                               onTap: () {
                                 setTaskState(
                                   Provider.of<Auth>(context, listen: false)
@@ -408,8 +472,8 @@ class _PageState extends State<Page> {
                                 'Wait an hour',
                                 style: FigmaTextStyles.mB,
                               ),
-                              iconColor: Theme.of(context).colorScheme.primary,
-                              textColor: Theme.of(context).colorScheme.primary,
+                              iconColor: FigmaColors.sUNRISEBluePrimary,
+                              textColor: FigmaColors.sUNRISEBluePrimary,
                               onTap: () {
                                 Navigator.of(context).pop();
                               },
@@ -420,8 +484,8 @@ class _PageState extends State<Page> {
                                 'I will do this tomorrow',
                                 style: FigmaTextStyles.mB,
                               ),
-                              iconColor: Theme.of(context).colorScheme.primary,
-                              textColor: Theme.of(context).colorScheme.primary,
+                              iconColor: FigmaColors.sUNRISEBluePrimary,
+                              textColor: FigmaColors.sUNRISEBluePrimary,
                               onTap: () {
                                 Navigator.of(context).pop();
                               },

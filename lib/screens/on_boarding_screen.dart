@@ -140,7 +140,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                           style: FigmaTextStyles.mButton.copyWith(
                             color: _value == 0
                                 ? FigmaColors.lightblue
-                                : Theme.of(context).colorScheme.primary,
+                                : FigmaColors.sUNRISEBluePrimary,
                           ),
                         ),
                         onPressed: () async {

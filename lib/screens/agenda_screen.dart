@@ -473,7 +473,7 @@ class _AgendaTaskListState extends State<AgendaTaskList> {
   }
 
   Widget taskWidget(Task task) {
-    int defaultHeightPerHour = 75;
+    int defaultHeightPerHour = 80;
     final deviceSize = MediaQuery.of(context).size;
     return Row(
       children: [
@@ -500,7 +500,7 @@ class _AgendaTaskListState extends State<AgendaTaskList> {
               height: defaultHeightPerHour *
                   (task.endTime.difference(task.startTime).inMinutes / 60),
               margin: EdgeInsets.only(top: 5.0),
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 10),
+              padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
