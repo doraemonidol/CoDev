@@ -50,10 +50,23 @@ class Task {
     );
   }
 
+  // to json
+  Map<String, dynamic> toJson() => {
+        'field': field,
+        'stage': stage,
+        'course': course,
+        'description': description, //.substring(0, description.length - 2),
+        'startTime': startTime.toString(),
+        'endTime': endTime.toString(),
+        'color': color.value,
+        'icon': icon.codePoint,
+        'state': state,
+      };
+
   // to string
   @override
   String toString() {
-    return '{"field": "$field", "stage": "$stage", "course": "$course", "description": "${description.substring(0, description.length - 2)}" , "startTime": "${startTime.toString()}", "endTime": "${endTime.toString()}", "color": ${color.value}, "icon": ${icon.codePoint}, "state": $state}';
+    return '{"field": "$field", "stage": "$stage", "course": "$course", "description": "${description}", "startTime": "${startTime.toString()}", "endTime": "${endTime.toString()}", "color": ${color.value}, "icon": ${icon.codePoint}, "state": $state}';
   }
 
   // from json
@@ -269,7 +282,8 @@ Future<TaskList> fetchTaskList(String id) async {
   final description =
       await FirebaseFirestore.instance.collection('users').doc(id).get();
   final descriptionData = description.data();
-  final tasklists = descriptionData!['tasklists'];
+  final tasklists = descriptionData!['schedule'];
+  print(tasklists);
   final tasklist = tasklists.firstWhere((element) {
     return element['date'] ==
         DateTime(
@@ -281,7 +295,14 @@ Future<TaskList> fetchTaskList(String id) async {
     return null;
   });
   if (tasklist == null) {
-    throw Exception('No tasklist found');
+    return TaskList(
+      date: DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+      ),
+      tasks: [],
+    );
   } else {
     final tasks = tasklist['tasks'].map<Task>((task) {
       return Task(
@@ -702,7 +723,7 @@ Future<List<TaskList>?> addFieldToSchedule(
             .courses
             .add(Course(
               name: task.course,
-              description: '',
+              description: task.description,
               prerequisiteCourses: [],
             ));
       });
