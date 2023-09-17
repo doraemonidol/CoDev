@@ -14,8 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:codev/helpers/style.dart';
 import 'package:codev/screens/edit_profile_screen.dart';
-import 'package:codev/screens/reward_screen.dart';
-import 'package:codev/icon/reward_icons.dart';
 import 'package:codev/providers/user.dart' as CoDevCS;
 
 class ProfileScreen extends StatefulWidget {
@@ -224,30 +222,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
           width: 150,
           height: 48,
           child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
-                    backgroundColor: FigmaColors.sUNRISEBluePrimary,
-                    shape: ContinuousRectangleBorder(
-                      side: BorderSide.none,
-                      borderRadius: BorderRadius.circular(
-                        deviceSize!.width * 0.1,
-                      ),
-                    ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
+                backgroundColor: FigmaColors.sUNRISEBluePrimary,
+                shape: ContinuousRectangleBorder(
+                  side: BorderSide.none,
+                  borderRadius: BorderRadius.circular(
+                    deviceSize!.width * 0.1,
                   ),
-                  icon: Text('Edit',
-                      style: FigmaTextStyles.mButton
-                          .copyWith(color: FigmaColors.sUNRISEWhite)),
-                  onPressed: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => EditProfilePage(
-                        user: user,
-                      ),
-                    ));
-                    print('done editing');
-                    setState(() {});
-                  },
-                  label: const Icon(Icons.border_color,
-                      color: FigmaColors.sUNRISEWhite, size: 20)),
+                ),
+              ),
+              icon: Text('Edit',
+                  style: FigmaTextStyles.mButton
+                      .copyWith(color: FigmaColors.sUNRISEWhite)),
+              onPressed: () async {
+                await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EditProfilePage(
+                    user: user,
+                  ),
+                ));
+                print('done editing');
+                setState(() {});
+              },
+              label: const Icon(Icons.border_color,
+                  color: FigmaColors.sUNRISEWhite, size: 20)),
         ),
       );
 }
@@ -287,31 +285,14 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 style: FigmaTextStyles.mH3
                     .copyWith(color: const Color(0xFF2F394B)))),
         Center(
-          child: Row(
-            children: [
-              TextButton(
-                child: Text('Log Out',
-                    style: FigmaTextStyles.mP
-                        .copyWith(color: FigmaColors.sUNRISEBluePrimary)),
-                onPressed: () {
-                  print('Log Out');
-                  Provider.of<Auth>(context, listen: false).logout();
-                },
-              ),
-              const SizedBox(width: 15),
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RewardScreen(),
-                    ),
-                  );
-                },
-                iconSize: 20,
-                icon: Icon(Reward.award, color: FigmaColors.sUNRISELightCharcoal),
-              ),
-            ],
+          child: TextButton(
+            child: Text('Log Out',
+                style: FigmaTextStyles.mP
+                    .copyWith(color: FigmaColors.sUNRISEBluePrimary)),
+            onPressed: () {
+              print('Log Out');
+              Provider.of<Auth>(context, listen: false).logout();
+            },
           ),
         ),
       ],
