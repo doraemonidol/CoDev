@@ -76,7 +76,7 @@ class _TabsScreenState extends State<TabsScreen> {
                 pageStack.pop();
                 //Navigator.of(context).pushReplacementNamed('/');
               },
-              color: Theme.of(context).colorScheme.primary,
+              color: FigmaColors.sUNRISEBluePrimary,
             )
           : null,
     );
@@ -386,12 +386,12 @@ class _CustomBottomNavigatorBarState extends State<CustomBottomNavigatorBar> {
                                       iconColor:
                                           MaterialStateProperty.all<Color>(
                                         // FigmaColors.sUNRISEWaves,
-                                        Theme.of(context).colorScheme.primary,
+                                        FigmaColors.sUNRISEBluePrimary,
                                       ),
                                       foregroundColor:
                                           MaterialStateProperty.all<Color>(
                                         // FigmaColors.sUNRISEWaves,
-                                        Theme.of(context).colorScheme.primary,
+                                        FigmaColors.sUNRISEBluePrimary,
                                       ),
                                       shape: MaterialStateProperty.all<
                                               RoundedRectangleBorder>(
@@ -453,7 +453,7 @@ class _CustomBottomNavigatorBarState extends State<CustomBottomNavigatorBar> {
                                   ? displayWidth * .12
                                   : displayWidth * .076,
                               color: index == _selectedPageIndex
-                                  ? Theme.of(context).colorScheme.primary
+                                  ? FigmaColors.sUNRISEBluePrimary
                                   : Colors.black26,
                             ),
                           ],
@@ -476,9 +476,7 @@ class _CustomBottomNavigatorBarState extends State<CustomBottomNavigatorBar> {
                                           ? '${listOfStrings[index]}'
                                           : '',
                                       style: FigmaTextStyles.mP.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
+                                        color: FigmaColors.sUNRISEBluePrimary,
                                       ),
                                     ),
                                   ),

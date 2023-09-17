@@ -452,8 +452,8 @@ class _PageState extends State<Page> {
                               leading: Icon(Icons.assignment_add),
                               title: Text('Move to In Progress tab',
                                   style: FigmaTextStyles.mB),
-                              iconColor: Theme.of(context).colorScheme.primary,
-                              textColor: Theme.of(context).colorScheme.primary,
+                              iconColor: FigmaColors.sUNRISEBluePrimary,
+                              textColor: FigmaColors.sUNRISEBluePrimary,
                               onTap: () {
                                 setTaskState(
                                   Provider.of<Auth>(context, listen: false)
@@ -472,8 +472,8 @@ class _PageState extends State<Page> {
                                 'Wait an hour',
                                 style: FigmaTextStyles.mB,
                               ),
-                              iconColor: Theme.of(context).colorScheme.primary,
-                              textColor: Theme.of(context).colorScheme.primary,
+                              iconColor: FigmaColors.sUNRISEBluePrimary,
+                              textColor: FigmaColors.sUNRISEBluePrimary,
                               onTap: () {
                                 Navigator.of(context).pop();
                               },
@@ -484,8 +484,8 @@ class _PageState extends State<Page> {
                                 'I will do this tomorrow',
                                 style: FigmaTextStyles.mB,
                               ),
-                              iconColor: Theme.of(context).colorScheme.primary,
-                              textColor: Theme.of(context).colorScheme.primary,
+                              iconColor: FigmaColors.sUNRISEBluePrimary,
+                              textColor: FigmaColors.sUNRISEBluePrimary,
                               onTap: () {
                                 Navigator.of(context).pop();
                               },

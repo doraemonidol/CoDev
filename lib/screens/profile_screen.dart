@@ -269,7 +269,7 @@ class ProfileWidget extends StatefulWidget {
 class _ProfileWidgetState extends State<ProfileWidget> {
   @override
   Widget build(BuildContext context) {
-    // final color = Theme.of(context).colorScheme.primary;
+    // final color = FigmaColors.sUNRISEBluePrimary;
     return Column(
       children: [
         Center(

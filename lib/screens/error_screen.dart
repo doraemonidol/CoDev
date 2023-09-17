@@ -46,7 +46,7 @@ class ErrorScreen extends StatelessWidget {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    backgroundColor: FigmaColors.sUNRISEBluePrimary,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0)),
                     minimumSize: const Size(327, 50), //////// HERE
