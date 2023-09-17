@@ -20,10 +20,13 @@ import 'tasks_screen.dart';
 enum pages {
   agenda,
   tasks,
-  homeButton,
   notification,
   personal,
 }
+
+final pageStack = MyStack<int>();
+int _selectedPageIndex = 0;
+int _prevSelectedPageIndex = 0;
 
 class TabsScreen extends StatefulWidget {
   static const routeName = '/tabs-screen';
@@ -31,14 +34,114 @@ class TabsScreen extends StatefulWidget {
 }
 
 class _TabsScreenState extends State<TabsScreen> {
-  int _selectedPageIndex = 0;
-  int _prevSelectedPageIndex = 0;
-  final pageStack = MyStack<int>();
+  void _selectPage(int index) async {
+    setState(() {
+      if (index == _selectedPageIndex) {
+        if (index == 2) {
+          _selectedPageIndex = _prevSelectedPageIndex;
+        }
+      } else {
+        pageStack.push(index);
+        print(pageStack);
+        _prevSelectedPageIndex = _selectedPageIndex;
+        _selectedPageIndex = index;
+      }
+    });
+  }
 
   @override
   void initState() {
+    _selectedPageIndex = 0;
+    _prevSelectedPageIndex = 0;
+    while (!pageStack.isEmpty) pageStack.pop();
     pageStack.push(0);
   }
+
+  AppBar customizedAppBar(String title) {
+    return AppBar(
+      title: Text(
+        title,
+        style: FigmaTextStyles.mButton,
+      ),
+      centerTitle: true,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      leading: pageStack.length > 1
+          ? IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                pageStack.pop();
+                _selectPage(pageStack.peek);
+                pageStack.pop();
+                //Navigator.of(context).pushReplacementNamed('/');
+              },
+              color: Theme.of(context).colorScheme.primary,
+            )
+          : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double displayWidth = MediaQuery.of(context).size.width;
+    // Provider.of<User>(context, listen: false);
+    return DefaultTabController(
+      length: 5,
+      child: switch (pages.values[_selectedPageIndex > 1
+          ? _selectedPageIndex - 1
+          : _selectedPageIndex]) {
+        pages.agenda => Scaffold(
+            appBar: customizedAppBar('Agenda'),
+            body: AgendaScreen(),
+            extendBody: true,
+            bottomNavigationBar:
+                CustomBottomNavigatorBar(selectPage: _selectPage),
+          ),
+        pages.tasks => Scaffold(
+            appBar: customizedAppBar('Tasks'),
+            body: TasksScreen(),
+            extendBody: true,
+            bottomNavigationBar:
+                CustomBottomNavigatorBar(selectPage: _selectPage),
+          ),
+        pages.notification => Scaffold(
+            appBar: customizedAppBar('Notification'),
+            body: NotificationScreen(),
+            extendBody: true,
+            bottomNavigationBar:
+                CustomBottomNavigatorBar(selectPage: _selectPage),
+          ),
+        pages.personal => Scaffold(
+            appBar: customizedAppBar('Profile'),
+            body: ProfileScreen(),
+            extendBody: true,
+            bottomNavigationBar:
+                CustomBottomNavigatorBar(selectPage: _selectPage),
+          ),
+      },
+    );
+  }
+}
+
+class CustomBottomNavigatorBar extends StatefulWidget {
+  Function selectPage;
+
+  CustomBottomNavigatorBar({required this.selectPage});
+
+  @override
+  State<CustomBottomNavigatorBar> createState() =>
+      _CustomBottomNavigatorBarState(
+        selectPage: selectPage,
+      );
+}
+
+class _CustomBottomNavigatorBarState extends State<CustomBottomNavigatorBar> {
+  Function selectPage;
+
+  _CustomBottomNavigatorBarState({
+    required this.selectPage,
+  });
 
   void _selectPage(int index) async {
     setState(() {
@@ -82,32 +185,8 @@ class _TabsScreenState extends State<TabsScreen> {
     'Profile',
   ];
 
-  AppBar customizedAppBar(String title) {
-    return AppBar(
-      title: Text(
-        title,
-        style: FigmaTextStyles.mButton,
-      ),
-      centerTitle: true,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      leading: pageStack.length > 1
-          ? IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                pageStack.pop();
-                _selectPage(pageStack.peek);
-                pageStack.pop();
-                //Navigator.of(context).pushReplacementNamed('/');
-              },
-              color: Theme.of(context).colorScheme.primary,
-            )
-          : null,
-    );
-  }
-
-  Stack get bottomNavigationBar {
+  @override
+  Widget build(BuildContext context) {
     double displayWidth = MediaQuery.of(context).size.width;
     return Stack(
       alignment: Alignment.bottomCenter,
@@ -143,6 +222,205 @@ class _TabsScreenState extends State<TabsScreen> {
             itemBuilder: (context, index) => InkWell(
               onTap: () {
                 _selectPage(index);
+                if (index == 2) {
+                  showGeneralDialog(
+                    barrierLabel: "Label",
+                    barrierDismissible: true,
+                    barrierColor: Colors.black.withOpacity(0.5),
+                    transitionDuration: Duration(milliseconds: 500),
+                    context: context,
+                    pageBuilder: (context, anim1, anim2) {
+                      return Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        alignment: Alignment.bottomCenter,
+                        padding: EdgeInsets.only(
+                          bottom: displayWidth * 0.22,
+                        ),
+                        child: Container(
+                          width: displayWidth * 0.7,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color: FigmaColors.sUNRISESunray,
+                            border: Border.all(
+                              width: 1,
+                              color: FigmaColors.lightblue,
+                            ),
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          padding: EdgeInsets.all(15),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () async {
+                                      await fetchTaskList(
+                                        Provider.of<Auth>(context,
+                                                listen: false)
+                                            .userId,
+                                      ).then((taskList) {
+                                        final currentTask =
+                                            taskList.tasks.indexWhere(
+                                          (element) =>
+                                              element.startTime
+                                                  .isBefore(DateTime.now()) &&
+                                              element.endTime.isAfter(
+                                                DateTime.now(),
+                                              ),
+                                        );
+                                        if (currentTask != -1) {
+                                          Navigator.pushNamed(
+                                            context,
+                                            DetailedTaskScreen.routeName,
+                                            arguments:
+                                                taskList.tasks[currentTask],
+                                          );
+                                        } else {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              title: Text(
+                                                'No current task',
+                                                textAlign: TextAlign.center,
+                                                style:
+                                                    FigmaTextStyles.h4.copyWith(
+                                                  color: FigmaColors
+                                                      .sUNRISEErrorRed,
+                                                ),
+                                              ),
+                                              content: Text(
+                                                'You have no task to start right now',
+                                                textAlign: TextAlign.center,
+                                                style:
+                                                    FigmaTextStyles.p.copyWith(
+                                                  color: FigmaColors
+                                                      .sUNRISETextGrey,
+                                                ),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: Text(
+                                                    'Ok',
+                                                    style: FigmaTextStyles
+                                                        .mButton
+                                                        .copyWith(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .primary,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      });
+                                    },
+                                    icon: Icon(
+                                      Icons.play_circle_outlined,
+                                    ),
+                                    label: Text('Start current task'),
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        FigmaColors.sUNRISEWhite,
+                                      ),
+                                      textStyle:
+                                          MaterialStateProperty.all<TextStyle>(
+                                        FigmaTextStyles.mP,
+                                      ),
+                                      iconColor:
+                                          MaterialStateProperty.all<Color>(
+                                        // FigmaColors.sUNRISEWaves,
+                                        Theme.of(context).colorScheme.secondary,
+                                      ),
+                                      foregroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        // FigmaColors.sUNRISEWaves,
+                                        Theme.of(context).colorScheme.secondary,
+                                      ),
+                                      shape: MaterialStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12.0),
+                                              side: BorderSide(
+                                                  color:
+                                                      FigmaColors.lightblue))),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 12,
+                              ),
+                              Expanded(
+                                child: Container(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      Navigator.pushNamed(context,
+                                              NewLessonScreen.routeName)
+                                          .then((value) {
+                                        setState(() {});
+                                      });
+                                    },
+                                    icon:
+                                        Icon(Icons.add_circle_outline_rounded),
+                                    label: Text('Learn something new'),
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        FigmaColors.sUNRISEWhite,
+                                      ),
+                                      textStyle:
+                                          MaterialStateProperty.all<TextStyle>(
+                                        FigmaTextStyles.mP,
+                                      ),
+                                      iconColor:
+                                          MaterialStateProperty.all<Color>(
+                                        // FigmaColors.sUNRISEWaves,
+                                        Theme.of(context).colorScheme.primary,
+                                      ),
+                                      foregroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        // FigmaColors.sUNRISEWaves,
+                                        Theme.of(context).colorScheme.primary,
+                                      ),
+                                      shape: MaterialStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12.0),
+                                              side: BorderSide(
+                                                  color:
+                                                      FigmaColors.lightblue))),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    transitionBuilder: (context, anim1, anim2, child) {
+                      return SlideTransition(
+                        position: Tween(begin: Offset(0, 1), end: Offset(0, 0))
+                            .animate(anim1),
+                        child: child,
+                      );
+                    },
+                  ).then((value) {
+                    _selectPage(_selectedPageIndex);
+                  });
+                } else
+                  selectPage(index);
               },
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
@@ -214,215 +492,6 @@ class _TabsScreenState extends State<TabsScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double displayWidth = MediaQuery.of(context).size.width;
-    // Provider.of<User>(context, listen: false);
-    return DefaultTabController(
-      length: 5,
-      child: switch (pages.values[_selectedPageIndex]) {
-        pages.agenda => Scaffold(
-            appBar: customizedAppBar('Agenda'),
-            body: AgendaScreen(),
-            extendBody: true,
-            bottomNavigationBar: bottomNavigationBar,
-          ),
-        pages.tasks => Scaffold(
-            appBar: customizedAppBar('Tasks'),
-            body: TasksScreen(),
-            extendBody: true,
-            bottomNavigationBar: bottomNavigationBar,
-          ),
-        pages.homeButton => Scaffold(
-            body: Stack(
-              children: <Widget>[
-                PageView.builder(itemBuilder: (context, pos) {
-                  return Stack(
-                    children: <Widget>[
-                      Scaffold(
-                        appBar: customizedAppBar(
-                            listOfStrings[_prevSelectedPageIndex]),
-                        body: _prevSelectedPageIndex == 0
-                            ? AgendaScreen()
-                            : _prevSelectedPageIndex == 1
-                                ? TasksScreen()
-                                : _prevSelectedPageIndex == 3
-                                    ? NotificationScreen()
-                                    : ProfileScreen(),
-                        extendBody: true,
-                        bottomNavigationBar: bottomNavigationBar,
-                      ),
-                      BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                        child: Container(
-                          decoration: new BoxDecoration(
-                              color: Colors.white.withOpacity(0.7)),
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        alignment: Alignment.bottomCenter,
-                        padding: EdgeInsets.only(
-                          bottom: displayWidth * 0.22,
-                        ),
-                        child: Container(
-                            width: displayWidth * 0.7,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              color: FigmaColors.sUNRISESunray,
-                              border: Border.all(
-                                width: 1,
-                                color: FigmaColors.lightblue,
-                              ),
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            padding: EdgeInsets.all(15),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    width: double.infinity,
-                                    child: ElevatedButton.icon(
-                                      onPressed: () async {
-                                        await fetchTaskList(
-                                          Provider.of<Auth>(context,
-                                                  listen: false)
-                                              .userId,
-                                        ).then((taskList) {
-                                          final currentTask =
-                                              taskList.tasks.indexWhere(
-                                            (element) =>
-                                                element.startTime
-                                                    .isBefore(DateTime.now()) &&
-                                                element.endTime.isAfter(
-                                                  DateTime.now(),
-                                                ),
-                                          );
-                                          if (currentTask != -1) {
-                                            Navigator.pushNamed(
-                                              context,
-                                              DetailedTaskScreen.routeName,
-                                              arguments:
-                                                  taskList.tasks[currentTask],
-                                            );
-                                          }
-                                        });
-                                      },
-                                      icon: Icon(
-                                        Icons.play_circle_outlined,
-                                      ),
-                                      label: Text('Start current task'),
-                                      style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                          FigmaColors.sUNRISEWhite,
-                                        ),
-                                        textStyle: MaterialStateProperty.all<
-                                            TextStyle>(
-                                          FigmaTextStyles.mP,
-                                        ),
-                                        iconColor:
-                                            MaterialStateProperty.all<Color>(
-                                          // FigmaColors.sUNRISEWaves,
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                        ),
-                                        foregroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                          // FigmaColors.sUNRISEWaves,
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                        ),
-                                        shape: MaterialStateProperty.all<
-                                                RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12.0),
-                                                side: BorderSide(
-                                                    color: FigmaColors
-                                                        .lightblue))),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 12,
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    width: double.infinity,
-                                    child: ElevatedButton.icon(
-                                      onPressed: () {
-                                        Navigator.pushNamed(context,
-                                                NewLessonScreen.routeName)
-                                            .then((value) {
-                                          setState(() {});
-                                        });
-                                      },
-                                      icon: Icon(
-                                          Icons.add_circle_outline_rounded),
-                                      label: Text('Learn something new'),
-                                      style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                          FigmaColors.sUNRISEWhite,
-                                        ),
-                                        textStyle: MaterialStateProperty.all<
-                                            TextStyle>(
-                                          FigmaTextStyles.mP,
-                                        ),
-                                        iconColor:
-                                            MaterialStateProperty.all<Color>(
-                                          // FigmaColors.sUNRISEWaves,
-                                          Theme.of(context).colorScheme.primary,
-                                        ),
-                                        foregroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                          // FigmaColors.sUNRISEWaves,
-                                          Theme.of(context).colorScheme.primary,
-                                        ),
-                                        shape: MaterialStateProperty.all<
-                                                RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12.0),
-                                                side: BorderSide(
-                                                    color: FigmaColors
-                                                        .lightblue))),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )),
-                      ),
-                    ],
-                  );
-                }),
-              ],
-            ),
-            extendBody: true,
-            bottomNavigationBar: bottomNavigationBar,
-          ),
-        pages.notification => Scaffold(
-            appBar: customizedAppBar('Notification'),
-            body: NotificationScreen(),
-            extendBody: true,
-            bottomNavigationBar: bottomNavigationBar,
-          ),
-        pages.personal => Scaffold(
-            appBar: customizedAppBar('Profile'),
-            body: ProfileScreen(),
-            extendBody: true,
-            bottomNavigationBar: bottomNavigationBar,
-          ),
-      },
     );
   }
 }

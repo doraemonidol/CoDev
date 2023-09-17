@@ -23,6 +23,42 @@ class TasksScreen extends StatefulWidget {
 
 class _TasksScreenState extends State<TasksScreen> {
   List<TaskList> list = [];
+  List<PopupMenuEntry> popUpMenuList = [];
+  List<String> fieldLearned = [];
+  String selectedFieldFilter = 'All';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    popUpMenuList.add(PopupMenuItem(
+      child: Text(
+        'All',
+        style: FigmaTextStyles.mB,
+      ),
+      value: 'All',
+    ));
+    bool _isLoading = true;
+    fetchScheduled(Provider.of<Auth>(context, listen: false).userId)
+        .then((taskLists) {
+      if (taskLists != null) {
+        taskLists.forEach((taskList) {
+          taskList.tasks.forEach((task) {
+            if (!fieldLearned.contains(task.field)) {
+              fieldLearned.add(task.field);
+              popUpMenuList.add(PopupMenuItem(
+                child: Text(
+                  task.field,
+                  style: FigmaTextStyles.mB,
+                ),
+                value: task.field,
+              ));
+            }
+          });
+        });
+      }
+    });
+  }
 
   void updateScreen() {
     setState(() {});
@@ -72,19 +108,31 @@ class _TasksScreenState extends State<TasksScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Center(
-                        child: Icon(MyIcons.filter_variant,
-                            color: FigmaColors.sUNRISELightCharcoal)),
-                    iconSize: 20,
-                    onPressed: () {},
-                    style: IconButton.styleFrom(
-                        backgroundColor: FigmaColors.sUNRISEWhite,
-                        shape: ContinuousRectangleBorder(
-                          side: BorderSide(
-                              color: FigmaColors.lightblue, width: 1),
-                          borderRadius: BorderRadius.circular(12.0),
-                        )),
+                  // pop up menu button to choose filter option
+                  PopupMenuButton(
+                    color: FigmaColors.sUNRISEWhite,
+                    itemBuilder: (context) {
+                      return popUpMenuList;
+                    },
+                    onSelected: (value) {
+                      // filter the list
+                      print('value: $value');
+                      selectedFieldFilter = value;
+                      setState(() {});
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: FigmaColors.sUNRISEWhite,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: FigmaColors.sUNRISELightCoral,
+                          width: 2,
+                        ),
+                      ),
+                      child: Icon(MyIcons.filter_variant,
+                          color: FigmaColors.sUNRISELightCharcoal),
+                    ),
                   ),
                   Spacer(),
                   TextButton.icon(
@@ -113,6 +161,16 @@ class _TasksScreenState extends State<TasksScreen> {
                     list = snapshot.data == null
                         ? []
                         : snapshot.data as List<TaskList>;
+                    if (selectedFieldFilter != 'All')
+                      list = list
+                          .where((element) =>
+                              element.tasks
+                                  .where((element) =>
+                                      element.field == selectedFieldFilter)
+                                  .toList()
+                                  .length >
+                              0)
+                          .toList();
                     print(list);
                     return Expanded(
                       child: TabBarView(
