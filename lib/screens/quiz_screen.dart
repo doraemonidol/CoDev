@@ -491,11 +491,11 @@ class _QuizScreen extends State<QuizScreen>
                                         system.slideNextQuestion();
                                         animationPlaying();
                                         if (system.complete) {
-                                          Navigator.of(context)
-                                              .pushReplacementNamed(
+                                          Navigator.of(context).pushNamed(
                                             EndQuiz.routeName,
                                             arguments: widget.task,
                                           );
+                                          Navigator.of(context).pop();
                                         }
 
                                         Provider.of<QuizInfo>(context,

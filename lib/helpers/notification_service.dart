@@ -107,7 +107,7 @@ Future<void> cancelPendingNotificationRequestsWithTaskPayload() async {
 Future<bool> cancelPendingNotificationRequestsWithTag(Task task) async {
   print('cancelPendingNotificationRequestsWithTag');
   //checkPendingNotificationRequests();
-  print(task.description);
+  // print(task.description);
   await flutterLocalNotificationsPlugin
       .pendingNotificationRequests()
       .then((pendingNotificationRequests) async {
@@ -158,6 +158,8 @@ Future<void> checkPendingNotificationRequests() async {
   pendingNotificationRequests.forEach((PendingNotificationRequest p) async {
     // ignore: avoid_print
     print(p.payload);
+
+    //await flutterLocalNotificationsPlugin.cancel(p.id);
   });
   notificationId = pendingNotificationRequests.length;
   print('notificationId: $notificationId');
