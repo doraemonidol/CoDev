@@ -204,8 +204,6 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
   }
 
   Widget buildGridView() {
-    final user = FirebaseAuth.instance.currentUser;
-
     //get list of field from firestore
     print('building grid view');
 
