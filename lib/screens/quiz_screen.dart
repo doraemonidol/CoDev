@@ -816,7 +816,7 @@ class VolumeButton extends StatefulWidget {
 }
 
 class _VolumeButtonState extends State<VolumeButton> {
-  bool isVolumeOff = true;
+  bool isVolumeOff = false;
   @override
   Widget build(BuildContext context) {
     return IconButton(

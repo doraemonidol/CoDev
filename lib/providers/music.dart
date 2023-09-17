@@ -18,17 +18,21 @@ Future<List<String>> fetchMusicList() async {
 
 void startMusicList() async {
   musicList = await fetchMusicList();
+  print('music list fetched');
+  for (int i = 0; i < 5; i++) print(i);
+  print(await musicList);
+  for (int i = 6; i < 10; i++) print(i);
   shuffleMusicList(musicList);
-  assetsAudioPlayer.open(
+  await assetsAudioPlayer.open(
     Playlist(
-      audios: musicList
+      audios: await musicList
           .map((link) => Audio.network(
                 link,
               ))
           .toList(),
     ),
   );
-  assetsAudioPlayer.play();
+  await assetsAudioPlayer.play();
   print('music list started');
 }
 
@@ -36,18 +40,18 @@ void shuffleMusicList(List<String> musicList) {
   musicList.shuffle();
 }
 
-void stopMusicList() {
-  assetsAudioPlayer.stop();
+void stopMusicList() async {
+  await assetsAudioPlayer.stop();
 }
 
-void resumeMusicList() {
-  assetsAudioPlayer.play();
+void resumeMusicList() async {
+  await assetsAudioPlayer.play();
 }
 
-void muteMusicList() {
-  assetsAudioPlayer.setVolume(0);
+void muteMusicList() async {
+  await assetsAudioPlayer.setVolume(0);
 }
 
-void unmuteMusicList() {
-  assetsAudioPlayer.setVolume(1);
+void unmuteMusicList() async {
+  await assetsAudioPlayer.setVolume(1);
 }
