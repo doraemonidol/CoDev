@@ -64,7 +64,7 @@ class _TabsScreenState extends State<TabsScreen> {
         style: FigmaTextStyles.mButton,
       ),
       centerTitle: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: FigmaColors.sUNRISESunray,
       elevation: 0,
       scrolledUnderElevation: 0,
       leading: pageStack.length > 1
@@ -106,6 +106,7 @@ class _TabsScreenState extends State<TabsScreen> {
                 CustomBottomNavigatorBar(selectPage: _selectPage),
           ),
         pages.notification => Scaffold(
+            backgroundColor: FigmaColors.sUNRISESunray,
             appBar: customizedAppBar('Notification'),
             body: NotificationScreen(),
             extendBody: true,

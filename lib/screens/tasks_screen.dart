@@ -71,6 +71,7 @@ class _TasksScreenState extends State<TasksScreen> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        backgroundColor: FigmaColors.sUNRISESunray,
         body: Container(
           padding: EdgeInsets.all(24),
           child: Column(
