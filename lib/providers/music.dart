@@ -18,6 +18,7 @@ Future<List<String>> fetchMusicList() async {
 
 void startMusicList() async {
   musicList = await fetchMusicList();
+  shuffleMusicList(musicList);
   assetsAudioPlayer.open(
     Playlist(
       audios: musicList
@@ -28,6 +29,7 @@ void startMusicList() async {
     ),
   );
   assetsAudioPlayer.play();
+  print('music list started');
 }
 
 void shuffleMusicList(List<String> musicList) {
@@ -40,4 +42,12 @@ void stopMusicList() {
 
 void resumeMusicList() {
   assetsAudioPlayer.play();
+}
+
+void muteMusicList() {
+  assetsAudioPlayer.setVolume(0);
+}
+
+void unmuteMusicList() {
+  assetsAudioPlayer.setVolume(1);
 }

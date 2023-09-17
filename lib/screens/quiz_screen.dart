@@ -15,6 +15,7 @@ import '../providers/quiz.dart';
 import '../screens/error_screen.dart';
 import '../screens/waiting_screen.dart';
 import '../helpers/prompt.dart';
+import '../providers/music.dart';
 
 class QScreen extends StatefulWidget {
   const QScreen({super.key});
@@ -26,6 +27,7 @@ class QScreen extends StatefulWidget {
 class _QScreen extends State<QScreen> {
   @override
   void dispose() {
+    stopMusicList();
     super.dispose();
   }
 
@@ -206,6 +208,9 @@ class _QScreen extends State<QScreen> {
     //   endTime: DateTime(2023, 9, 8),
     //   state: 1,
     // );
+
+    startMusicList();
+    muteMusicList();
 
     final task = ModalRoute.of(context)!.settings.arguments as Task;
 
@@ -812,13 +817,13 @@ class VolumeButton extends StatefulWidget {
 
 class _VolumeButtonState extends State<VolumeButton> {
   bool isVolumeOff = true;
-
   @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
         setState(() {
           isVolumeOff = !isVolumeOff;
+          isVolumeOff ? muteMusicList() : unmuteMusicList();
         });
       },
       iconSize: 35,
@@ -826,5 +831,10 @@ class _VolumeButtonState extends State<VolumeButton> {
           ? Icon(Icons.volume_off, color: FigmaColors.sUNRISELightCharcoal)
           : Icon(Icons.volume_down, color: FigmaColors.sUNRISELightCharcoal),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }
