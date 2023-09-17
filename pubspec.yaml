@@ -132,10 +132,6 @@ flutter:
       fonts:
         - asset: assets/icons/Mute.ttf
 
-    - family: Reward
-      fonts:
-        - asset: assets/icons/Reward.ttf
-
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-Black.ttf

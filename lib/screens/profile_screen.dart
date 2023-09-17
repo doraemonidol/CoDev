@@ -16,6 +16,8 @@ import 'package:codev/helpers/style.dart';
 import 'package:codev/screens/edit_profile_screen.dart';
 import 'package:codev/providers/user.dart' as CoDevCS;
 
+import 'reward_screen.dart';
+
 class ProfileScreen extends StatefulWidget {
   static const routeName = '/profile-screen';
   const ProfileScreen({super.key});
@@ -81,6 +83,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             user = CoDevCS.User.fromJson(
                 snapshot.data!.data() as Map<String, dynamic>);
             return Scaffold(
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.endFloat,
+                floatingActionButton: buildEditButton(context, setState),
                 backgroundColor: FigmaColors.sUNRISESunray,
                 body: Column(
                     // physics: BouncingScrollPhysics(),
@@ -99,13 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               topRight: Radius.circular(24),
                             ),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              buildDetailedInformation(user),
-                              buildEditButton(context, setState),
-                            ],
-                          ),
+                          child: buildDetailedInformation(user),
                         ),
                       )
                     ]));
@@ -145,7 +144,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
             CupertinoIcons.book,
             "Education Level",
             user.educationLevel,
-            last: true,
+          ),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide.none,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 30,
+                  child: Center(
+                    child: Text(
+                      String.fromCharCode(
+                        CupertinoIcons.gift.codePoint,
+                      ),
+                      style: TextStyle(
+                        inherit: false,
+                        color: FigmaColors.sUNRISEBluePrimary,
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.w100,
+                        fontFamily: CupertinoIcons.gift.fontFamily,
+                        package: CupertinoIcons.gift.fontPackage,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Reward',
+                      style: FigmaTextStyles.h0
+                          .copyWith(color: FigmaColors.sUNRISETextGrey),
+                    ),
+                    const SizedBox(height: 4),
+                    InkWell(
+                      child: Text(
+                        'See here',
+                        style: FigmaTextStyles.mB.copyWith(
+                          color: FigmaColors.sUNRISEBluePrimary,
+                          decoration: TextDecoration.underline,
+                          decorationColor: FigmaColors.sUNRISEBluePrimary,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RewardScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ],
       ),
@@ -170,13 +230,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Icon(
-          //   icon,
-          //   color: FigmaColors.sUNRISEBluePrimary,
-          //   size: safeHeight! * 0.05,
-          //   weight: 0.1,
-          //   grade: 0.1,
-          // ),
           SizedBox(
             width: 30,
             child: Center(
@@ -213,41 +266,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  buildEditButton(BuildContext context, Function setState) => Center(
-        child: Container(
-          decoration: BoxDecoration(
-            color: FigmaColors.sUNRISEBluePrimary,
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          width: 150,
-          height: 48,
-          child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
-                backgroundColor: FigmaColors.sUNRISEBluePrimary,
-                shape: ContinuousRectangleBorder(
-                  side: BorderSide.none,
-                  borderRadius: BorderRadius.circular(
-                    deviceSize!.width * 0.1,
-                  ),
-                ),
-              ),
-              icon: Text('Edit',
-                  style: FigmaTextStyles.mButton
-                      .copyWith(color: FigmaColors.sUNRISEWhite)),
-              onPressed: () async {
-                await Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EditProfilePage(
-                    user: user,
-                  ),
-                ));
-                print('done editing');
-                setState(() {});
-              },
-              label: const Icon(Icons.border_color,
-                  color: FigmaColors.sUNRISEWhite, size: 20)),
-        ),
-      );
+  buildEditButton(BuildContext context, Function setState) {
+    double displayWidth = MediaQuery.of(context).size.width;
+    return Container(
+      margin: EdgeInsets.only(
+        bottom: displayWidth * 0.2,
+      ),
+      child: FloatingActionButton(
+        onPressed: () async {
+          await Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => EditProfilePage(
+              user: user,
+            ),
+          ));
+          print('done editing');
+          setState(() {});
+        },
+        child: const Icon(Icons.border_color, color: FigmaColors.sUNRISEWhite),
+        backgroundColor: FigmaColors.sUNRISEBluePrimary,
+      ),
+    );
+  }
+  // Center(
+  //   child: Container(
+  //     decoration: BoxDecoration(
+  //       color: FigmaColors.sUNRISEBluePrimary,
+  //       borderRadius: BorderRadius.circular(12.0),
+  //     ),
+  //     width: 150,
+  //     height: 48,
+  //     child: ElevatedButton.icon(
+  //         style: ElevatedButton.styleFrom(
+  //           padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
+  //           backgroundColor: FigmaColors.sUNRISEBluePrimary,
+  //           shape: ContinuousRectangleBorder(
+  //             side: BorderSide.none,
+  //             borderRadius: BorderRadius.circular(
+  //               deviceSize!.width * 0.1,
+  //             ),
+  //           ),
+  //         ),
+  //         icon: Text('Edit',
+  //             style: FigmaTextStyles.mButton
+  //                 .copyWith(color: FigmaColors.sUNRISEWhite)),
+  //         onPressed: () async {
+  //           await Navigator.of(context).push(MaterialPageRoute(
+  //             builder: (context) => EditProfilePage(
+  //               user: user,
+  //             ),
+  //           ));
+  //           print('done editing');
+  //           setState(() {});
+  //         },
+  //         label: const Icon(Icons.border_color,
+  //             color: FigmaColors.sUNRISEWhite, size: 20)),
+  //   ),
+  // );
 }
 
 class ProfileWidget extends StatefulWidget {
