@@ -76,7 +76,7 @@ Future<void> main() async {
   if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
     selectedNotificationPayload =
         notificationAppLaunchDetails!.notificationResponse?.payload;
-    initialRoute = DetailedTaskScreen.routeName;
+    initialRoute = TabsScreen.routeName;
   }
 
   const AndroidInitializationSettings initializationSettingsAndroid =
@@ -272,7 +272,7 @@ class _MyAppState extends State<MyApp> {
                 await Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (BuildContext context) => DetailedTaskScreen(
-                        payload: receivedNotification.payload,),
+                        payload: null,),
                   ),
                 );
               },
@@ -442,7 +442,7 @@ class _MyAppState extends State<MyApp> {
           // home: MyFirstScreen(
           //   showNotification: _checkPendingNotificationRequests,
           // ),
-          initialRoute: !auth.isAuth ? null : widget.initialRoute,
+          // initialRoute: !auth.isAuth ? null : widget.initialRoute,
           home: auth.isAuth // auth.isAuth
               ? (auth.isFirstTime ? MainScreen() : TabsScreen())
               : FutureBuilder(
