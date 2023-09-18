@@ -352,7 +352,7 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
                                 list.map((e) => e['name'] as String).toList(),
                               ),
                             );
-                            _showModalBottomSheet(context);
+                            _showModalBottomSheet(context, name: query);
                           },
                           child: Row(
                             children: [
@@ -375,7 +375,7 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
                               list.map((e) => e['name'] as String).toList(),
                             ),
                           );
-                          _showModalBottomSheet(context);
+                          _showModalBottomSheet(context, name: query);
                         },
                         icon: const Icon(Icons.search),
                       ),
