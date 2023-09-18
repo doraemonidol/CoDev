@@ -109,7 +109,7 @@ class _QScreen extends State<QScreen> {
     Map<String, dynamic> jsonObject = json.decode(content);
 
     return Quiz(
-      quizID: "randomQuizThatHasn'tBeenIdentified",
+      quizID: "123456789",
       createDate: DateTime.now(),
       quests: attachQuestion(jsonObject['quiz']),
     );
