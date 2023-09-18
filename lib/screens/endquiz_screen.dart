@@ -25,7 +25,7 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
 
   Future<int> updateAndGetProgressStatus(Task task) async {
     final userId = Provider.of<Auth>(context, listen: false).userId;
-    await cancelPendingNotificationRequestsWithTag(task).then((value) {
+    await cancelPendingNotificationRequestsWithTag(task).then((value) async {
       if (value) {
         print("Notification deleted");
         deleteNotificationFromFirestore(userId, task);
@@ -36,14 +36,6 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
       task,
       TaskState.completed.index,
     );
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .snapshots()
-        .listen((event) {
-      final user = User.fromJson(event.data()!);
-      user.updateUser(userId);
-    });
     return await fetchLearningProgressToToggleCourseDone(
         userId, task.field, task.course);
   }
@@ -51,6 +43,18 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        final user = User.fromJson(value.data()!);
+        user.point++;
+        user.updateUser(userId);
+      }
+    });
 
     controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));

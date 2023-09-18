@@ -175,7 +175,7 @@ class _RewardScreenState extends State<RewardScreen> {
                         left: deviceSize.width * 1.7,
                         //top: deviceSize.height * 0.0,
                         child: Image.asset(
-                          'assets/images/${(isCompleted == 3 && stage == 3) ? 'butterfly' : 'black_butterfly'}.png',
+                          'assets/images/${(isCompleted == 3 && stage == 3) || (stage > 3) ? 'butterfly' : 'black_butterfly'}.png',
                           width: deviceSize.width * 0.55,
                           fit: BoxFit.cover,
                         ),

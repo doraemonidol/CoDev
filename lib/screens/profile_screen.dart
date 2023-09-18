@@ -79,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             .snapshots(),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.hasData) {
-            print(snapshot.data!.data());
+            //print(snapshot.data!.data());
             user = CoDevCS.User.fromJson(
                 snapshot.data!.data() as Map<String, dynamic>);
             return Scaffold(
