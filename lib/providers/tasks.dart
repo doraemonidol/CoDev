@@ -465,6 +465,9 @@ Future<List<TaskList>?> getScheduledTasks(BuildContext context, String ID,
             int.parse(line.split(' ')[2].split(':')[0]),
             int.parse(line.split(' ')[2].split(':')[1]),
           );
+          /*final start_time =
+              DateTime.now().add(Duration(minutes: 17 + 2 * task_count));
+          final end_time = start_time.add(Duration(hours: 2));*/
           // find the task in tasks_unscheduled with index equal to index
           final task = tasks_unscheduled[index].getCopy();
           // set start time and end time of task to start_time and end_time
@@ -585,8 +588,6 @@ Future<List<TaskList>?> fetchScheduled(String ID) async {
     }).toList();
     print("fetchScheduled done");
   }
-  debugPrint("??????---????");
-  debugPrint(tasklists.toString());
   return tasklists;
 }
 
@@ -745,31 +746,33 @@ Future<List<TaskList>?> addFieldToSchedule(
 
 // fetch list of tasklist from firestore, set state of a task and update in firestore
 Future<void> setTaskState(String ID, Task task, int state) async {
-  fetchScheduled(ID).then((taskList) async {
-    if (taskList == null) {
-      return;
-    } else {
-      final index1 = taskList.indexWhere((element) {
-        return element.date.day == task.startTime.day &&
-            element.date.month == task.startTime.month &&
-            element.date.year == task.startTime.year;
-      });
-      print(index1);
-      final index = taskList[index1].tasks.indexWhere((element) {
-        return element.field == task.field &&
-            element.stage == task.stage &&
-            element.course == task.course &&
-            element.startTime == task.startTime &&
-            element.endTime == task.endTime;
-      });
-      print(index);
+  final taskList = await fetchScheduled(ID);
 
-      if (index == -1) {
-        throw Exception('No task found');
-      } else {
-        taskList[index1].tasks[index].state = state;
-        await updateSchedule(ID, taskList);
-      }
+  if (taskList == null) {
+    return;
+  } 
+  else {
+    final index1 = taskList.indexWhere((element) {
+      return element.date.day == task.startTime.day &&
+          element.date.month == task.startTime.month &&
+          element.date.year == task.startTime.year;
+    });
+    debugPrint(index1.toString());
+    final index = taskList[index1].tasks.indexWhere((element) {
+      return element.field == task.field &&
+          element.stage == task.stage &&
+          element.course == task.course &&
+          element.startTime == task.startTime &&
+          element.endTime == task.endTime;
+    });
+
+    debugPrint(index.toString());
+
+    if (index == -1) {
+      throw Exception('No task found');
+    } else {
+      taskList[index1].tasks[index].state = state;
+      await updateSchedule(ID, taskList);
     }
-  });
+  }
 }

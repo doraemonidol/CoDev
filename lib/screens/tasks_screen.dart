@@ -155,7 +155,6 @@ class _TasksScreenState extends State<TasksScreen> {
                 future: fetchScheduled(Provider.of<Auth>(context, listen: false).userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    debugPrint("JZTR ????????");
                     return Center(child: CircularProgressIndicator());
                   } 
                   else {

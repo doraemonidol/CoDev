@@ -159,7 +159,7 @@ Future<void> checkPendingNotificationRequests() async {
     // ignore: avoid_print
     print(p.payload);
 
-    await flutterLocalNotificationsPlugin.cancel(p.id);
+    //await flutterLocalNotificationsPlugin.cancel(p.id);
   });
   notificationId = pendingNotificationRequests.length;  
   print('notificationId: $notificationId');
