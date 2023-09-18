@@ -309,7 +309,8 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
             ),
           );
         }
-        if (fieldSnapshot.connectionState == ConnectionState.waiting) {
+        if (fieldSnapshot.connectionState != ConnectionState.done &&
+            fieldSnapshot.connectionState != ConnectionState.active) {
           return Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
