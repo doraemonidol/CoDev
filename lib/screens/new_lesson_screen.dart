@@ -29,6 +29,7 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
   Size? deviceSize;
   double? safeHeight;
   List list = [];
+  List unavailableList = [];
   String query = '';
   bool _isLoading = false;
   IconData? iconData;
@@ -247,6 +248,21 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
     //if (!imageReady[index]) checkImageValidity(url2, index);
     return InkWell(
       onTap: () {
+        if (unavailableList.contains(list[index])) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: FigmaColors.sUNRISEErrorRed,
+              content: Text(
+                'This field is not available yet',
+                style: FigmaTextStyles.p.copyWith(
+                  color: FigmaColors.sUNRISEWhite,
+                ),
+              ),
+              duration: Duration(seconds: 1),
+            ),
+          );
+          return;
+        }
         _showModalBottomSheet(context, index: index);
       },
       child: Container(
@@ -318,6 +334,10 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
           );
         }
         list = fieldSnapshot.data!.docs[1]['fields'];
+        // create list of field with no course
+        unavailableList =
+            list.where((element) => element['stages'].length == 0).toList();
+        print('unavailable list: $unavailableList');
         print('query: $query');
         return Scaffold(
           backgroundColor: FigmaColors.sUNRISELightCoral,
