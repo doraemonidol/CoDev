@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:codev/screens/error_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ class AgendaScreen extends StatefulWidget {
 
 class _AgendaScreenState extends State<AgendaScreen> {
   DateTime _selectedDate = DateTime.now();
-  List<TaskList> taskLists = [];
+  List<TaskList>? taskLists = [];
   final DatePickerController _controller = DatePickerController();
 
   void executeAfterBuild() {
@@ -41,14 +42,20 @@ class _AgendaScreenState extends State<AgendaScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder(
-        future:
-            fetchScheduled(Provider.of<Auth>(context, listen: false).userId),
+        future: fetchScheduled(Provider.of<Auth>(context, listen: false).userId),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.hasError) {
+              return const ErrorScreen();
+          }
+          else if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else {
+            if (snapshot.hasData) {
+              if (snapshot.data == null) {return const ErrorScreen();}
+            }
             print('adsfasdf');
-            taskLists = snapshot.data as List<TaskList>;
+            taskLists = snapshot.data;
+            if (taskLists == null) taskLists = [];
             print('done assigne');
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +70,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                   ),
                 ),
                 AgendaTaskList(
-                    taskLists.firstWhere(
+                    taskLists!.firstWhere(
                         (taskList) =>
                             taskList.date.year == _selectedDate.year &&
                             taskList.date.month == _selectedDate.month &&

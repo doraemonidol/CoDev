@@ -548,16 +548,19 @@ Future<List<TaskList>?> getScheduledTasks(BuildContext context, String ID,
 
 // fetch scheduled tasks from firestore: in the collection users, in the document with ID equal to input ID, find object schedule, return it
 Future<List<TaskList>?> fetchScheduled(String ID) async {
+  late final tasklists;
   print("fetchScheduled called");
   final description =
       await FirebaseFirestore.instance.collection('users').doc(ID).get();
   final descriptionData = description.data();
   final schedule = descriptionData!['schedule'];
+  //debugPrint("OK HET ROI NE!");
+  //debugPrint(schedule.toString());
   if (schedule == null) {
     return [];
     throw Exception('No schedule found');
   } else {
-    final tasklists = schedule.map<TaskList>((tasklist) {
+    tasklists = schedule.map<TaskList>((tasklist) {
       final tasks = tasklist['tasks'].map<Task>((task) {
         return Task(
           field: task['field'],
@@ -581,8 +584,10 @@ Future<List<TaskList>?> fetchScheduled(String ID) async {
       );
     }).toList();
     print("fetchScheduled done");
-    return tasklists;
   }
+  debugPrint("??????---????");
+  debugPrint(tasklists.toString());
+  return tasklists;
 }
 
 // input a schedule and a task name, push it to the next date of the schedule, that is in the tasklist with date equal to the next date, add the task to the end of the tasklist with start time equal to the end time of the last task in the tasklist, and end time equal to the start time plus 2 hours
@@ -684,7 +689,8 @@ Future<List<TaskList>?> addFieldToSchedule(
   colorMap[field.name] = color;
   try {
     print("addFieldToSchedule called");
-    final schedule = await fetchScheduled(ID);
+    List<TaskList>? schedule = await fetchScheduled(ID);
+    if (schedule == null) schedule = [];
     // create a list of field, iterate throught each task in schedule, if the field of the task is not in the list, add it to the list, then add that course to the field
     List<Field> fields = [];
     fields.add(field);
@@ -739,30 +745,31 @@ Future<List<TaskList>?> addFieldToSchedule(
 
 // fetch list of tasklist from firestore, set state of a task and update in firestore
 Future<void> setTaskState(String ID, Task task, int state) async {
-  final taskList = await fetchScheduled(ID);
-  if (taskList == null) {
-    return;
-  } else {
-    final index1 = taskList.indexWhere((element) {
-      return element.date.day == task.startTime.day &&
-          element.date.month == task.startTime.month &&
-          element.date.year == task.startTime.year;
-    });
-    print(index1);
-    final index = taskList[index1].tasks.indexWhere((element) {
-      return element.field == task.field &&
-          element.stage == task.stage &&
-          element.course == task.course &&
-          element.startTime == task.startTime &&
-          element.endTime == task.endTime;
-    });
-    print(index);
-
-    if (index == -1) {
-      throw Exception('No task found');
+  fetchScheduled(ID).then((taskList) async {
+    if (taskList == null) {
+      return;
     } else {
-      taskList[index1].tasks[index].state = state;
-      await updateSchedule(ID, taskList);
+      final index1 = taskList.indexWhere((element) {
+        return element.date.day == task.startTime.day &&
+            element.date.month == task.startTime.month &&
+            element.date.year == task.startTime.year;
+      });
+      print(index1);
+      final index = taskList[index1].tasks.indexWhere((element) {
+        return element.field == task.field &&
+            element.stage == task.stage &&
+            element.course == task.course &&
+            element.startTime == task.startTime &&
+            element.endTime == task.endTime;
+      });
+      print(index);
+
+      if (index == -1) {
+        throw Exception('No task found');
+      } else {
+        taskList[index1].tasks[index].state = state;
+        await updateSchedule(ID, taskList);
+      }
     }
-  }
+  });
 }

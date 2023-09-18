@@ -333,7 +333,7 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
             ),
           );
         }
-        list = fieldSnapshot.data!.docs[1]['fields'];
+        list = fieldSnapshot.data!.docs[0]['fields'];
         // create list of field with no course
         unavailableList =
             list.where((element) => element['stages'].length == 0).toList();

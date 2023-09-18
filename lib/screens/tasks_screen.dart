@@ -41,22 +41,21 @@ class _TasksScreenState extends State<TasksScreen> {
     bool _isLoading = true;
     fetchScheduled(Provider.of<Auth>(context, listen: false).userId)
         .then((taskLists) {
-      if (taskLists != null) {
-        taskLists.forEach((taskList) {
-          taskList.tasks.forEach((task) {
-            if (!fieldLearned.contains(task.field)) {
-              fieldLearned.add(task.field);
-              popUpMenuList.add(PopupMenuItem(
-                child: Text(
-                  task.field,
-                  style: FigmaTextStyles.mB,
-                ),
-                value: task.field,
-              ));
-            }
-          });
+      if (taskLists == null) taskLists = [];
+      taskLists.forEach((taskList) {
+        taskList.tasks.forEach((task) {
+          if (!fieldLearned.contains(task.field)) {
+            fieldLearned.add(task.field);
+            popUpMenuList.add(PopupMenuItem(
+              child: Text(
+                task.field,
+                style: FigmaTextStyles.mB,
+              ),
+              value: task.field,
+            ));
+          }
         });
-      }
+      });
     });
   }
 
@@ -153,15 +152,24 @@ class _TasksScreenState extends State<TasksScreen> {
                 ],
               ),
               FutureBuilder(
-                future: fetchScheduled(
-                    Provider.of<Auth>(context, listen: true).userId),
+                future: fetchScheduled(Provider.of<Auth>(context, listen: false).userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
+                    debugPrint("JZTR ????????");
                     return Center(child: CircularProgressIndicator());
-                  } else {
+                  } 
+                  else {
+                    if (snapshot.hasError) debugPrint("CO LOI ROI KIA ????????");
+                    if (snapshot.hasData) {
+                      if (snapshot.data == null) debugPrint("TAI SO NO BANG NULL ????????");
+                    }
+                    debugPrint("TROI OI CUU TOI 1");
+                    debugPrint(snapshot.data.toString());
                     list = snapshot.data == null
                         ? []
                         : snapshot.data as List<TaskList>;
+                    debugPrint("TROI OI CUU TOI 2");
+                    debugPrint(list.toString());
                     if (selectedFieldFilter != 'All')
                       list = list
                           .where((element) =>

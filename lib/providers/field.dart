@@ -51,14 +51,12 @@ Future<Field> fetchField(String name) async {
   final stageList = stages.map<Stage>((stage) {
     final courses = stage['courses'];
     final courseList = courses.map<Course>((course) {
-      print('+ ' +
-          course['description'].toString().substring(
-              0, max(course['description'].toString().length - 2, 0)));
+      
       return Course(
         name: course['name'],
         description: course['description']
-            .toString()
-            .substring(0, max(course['description'].toString().length - 2, 0)),
+            .toString(),
+          //  .substring(0, max(course['description'].toString().length - 2, 0)),
         prerequisiteCourses: [],
       );
     }).toList();

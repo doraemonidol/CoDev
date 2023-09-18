@@ -31,6 +31,7 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
         deleteNotificationFromFirestore(userId, task);
       }
     });
+    
     await setTaskState(
       userId,
       task,

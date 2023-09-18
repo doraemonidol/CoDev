@@ -41,6 +41,7 @@ class _DetailedTaskScreenState extends State<DetailedTaskScreen> {
   Widget build(BuildContext context) {
     if (_payload != null) {
       task = taskFromString(_payload!);
+      _payload = null;
     } else {
       print('payload is null');
       task = ModalRoute.of(context)!.settings.arguments as Task;

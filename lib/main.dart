@@ -272,7 +272,7 @@ class _MyAppState extends State<MyApp> {
                 await Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (BuildContext context) => DetailedTaskScreen(
-                        payload: receivedNotification.payload),
+                        payload: receivedNotification.payload,),
                   ),
                 );
               },
@@ -462,7 +462,7 @@ class _MyAppState extends State<MyApp> {
             MainScreen.routeName: (ctx) => MainScreen(),
             TabsScreen.routeName: (ctx) => TabsScreen(),
             DetailedTaskScreen.routeName: (ctx) => DetailedTaskScreen(
-                  payload: widget.selectedNotificationPayload,
+                  payload: null,
                 ),
             QuizScreen.routeName: (ctx) => QScreen(),
             EndQuiz.routeName: (ctx) => EndQuiz(),
