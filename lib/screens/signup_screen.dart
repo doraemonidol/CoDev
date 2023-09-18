@@ -31,6 +31,7 @@ class _SignUpScreen extends State<SignUpScreen> {
 
   @override
   void initState() {
+    emailReader.text = email!;
     super.initState();
   }
 
@@ -41,19 +42,27 @@ class _SignUpScreen extends State<SignUpScreen> {
     passwordReader.dispose();
   }
 
-  void _showErrorDialog(String message) {
-    showDialog(
+  Future<bool> _showErrorDialog(String message) async {
+    return await showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('An error occurred!'),
-        content: Text(message),
+        title: Text('An error occurred!', style: FigmaTextStyles.h3),
+        content: Text(message, style: FigmaTextStyles.p),
         actions: [
           TextButton(
-            child: Text('Okay'),
+            child: Text('Retry', style: FigmaTextStyles.mButton),
             onPressed: () {
-              Navigator.of(ctx).pop();
+              Navigator.of(ctx).pop(false);
             },
-          )
+          ),
+          if (message ==
+              'This email address is already in use. Signin instead?')
+            TextButton(
+              child: Text('Signin', style: FigmaTextStyles.mButton),
+              onPressed: () {
+                Navigator.of(ctx).pop(true);
+              },
+            ),
         ],
       ),
     );
@@ -62,7 +71,6 @@ class _SignUpScreen extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-    emailReader.text = email!;
 
     return Scaffold(
       appBar: AppBar(),
@@ -174,20 +182,22 @@ class _SignUpScreen extends State<SignUpScreen> {
                         create: (context) => User(),
                         child: ElevatedButton(
                             onPressed: () async {
-                              Provider.of<Auth>(context, listen: false)
+                              bool noError = true;
+                              await Provider.of<Auth>(context, listen: false)
                                   .signup(
                                 emailReader.text,
                                 passwordReader.text,
                                 context,
                               )
                                   .onError((error, stackTrace) {
+                                noError = false;
                                 print('error catched');
                                 print(error);
                                 //await player.resume();
                                 var errorMessage = 'Authentication failed';
                                 if (error.toString().contains('EMAIL_EXISTS')) {
                                   errorMessage =
-                                      'This email address is already in use.';
+                                      'This email address is already in use. Signin instead?';
                                 } else if (error
                                     .toString()
                                     .contains('INVALID_EMAIL')) {
@@ -207,12 +217,22 @@ class _SignUpScreen extends State<SignUpScreen> {
                                     .contains('INVALID_PASSWORD')) {
                                   errorMessage = 'Invalid password.';
                                 }
-                                _showErrorDialog(errorMessage);
+                                _showErrorDialog(errorMessage).then((value) {
+                                  if (value == true) {
+                                    print('signin');
+                                    Provider.of<SignUpProvider>(context,
+                                            listen: false)
+                                        .init();
+                                  }
+                                });
+                                return;
                               });
-
-                              Provider.of<SignUpProvider>(context,
-                                      listen: false)
-                                  .init();
+                              if (noError) {
+                                print('no error');
+                                Provider.of<SignUpProvider>(context,
+                                        listen: false)
+                                    .init();
+                              }
                             },
                             child: Text(
                               "Create Account",

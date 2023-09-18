@@ -149,6 +149,27 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
     Provider.of<SignInProvider>(context, listen: false).changeAuthScreen();
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An error occurred!', style: FigmaTextStyles.h3),
+        content: Text(message, style: FigmaTextStyles.p),
+        actions: [
+          TextButton(
+            child: Text(
+              'Retry',
+              style: FigmaTextStyles.mButton,
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
@@ -255,8 +276,16 @@ class _AuthScreenOption1 extends State<AuthScreenOption1> {
                   if (error == 'HttpException: EMAIL_NOT_FOUND')
                     Provider.of<SignUpProvider>(context, listen: false)
                         .changeSigningUp();
-                  else
-                    onContinueClicked();
+                  else {
+                    var errorMessage = 'Authentication failed';
+                    if (error.toString().contains('INVALID_EMAIL')) {
+                      errorMessage = 'This is not a valid email address';
+                    } else if (error.toString().contains('INVALID_PASSWORD')) {
+                      onContinueClicked();
+                      return;
+                    }
+                    _showErrorDialog(errorMessage);
+                  }
                 });
               },
               style: ElevatedButton.styleFrom(
@@ -320,43 +349,28 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
     }
   }
 
-  void _showErrorDialog(String title, String message) {
-    showDialog(
+  Future<bool> _showErrorDialog(String message) async {
+    return await showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
+        title: Text('An error occurred!', style: FigmaTextStyles.h3),
+        content: Text(message, style: FigmaTextStyles.p),
         actions: [
           TextButton(
-            child: Text('Retry'),
+            child: Text('Retry', style: FigmaTextStyles.mButton),
             onPressed: () {
-              Navigator.of(ctx).pop();
+              Navigator.of(ctx).pop(false);
+            },
+          ),
+          TextButton(
+            child: Text('Sign up', style: FigmaTextStyles.mButton),
+            onPressed: () {
+              Navigator.of(ctx).pop(true);
             },
           )
         ],
       ),
     );
-  }
-
-  void returnResponse(status, context) {
-    String title = "";
-    String message = "";
-    late ContentType type;
-
-    switch (status) {
-      case Status.SUCESS:
-        title = "Welcome to CoDev!";
-        message = "We've been waiting for you!";
-        type = ContentType.success;
-        break;
-      default:
-        title = "We can't detect you.";
-        message = "Peep Po Peep Peep! Nicki.. is that you? ";
-        type = ContentType.failure;
-        break;
-    }
-
-    _showErrorDialog(title, message);
   }
 
   @override
@@ -431,6 +445,8 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
               child: ElevatedButton(
                 onPressed: () {
                   Provider.of<SignInProvider>(context, listen: false)
+                      .receiveEmail(emailReader.text);
+                  Provider.of<SignInProvider>(context, listen: false)
                       .receivePassword(passwordReader.text);
                   Provider.of<Auth>(context, listen: false)
                       .login(emailReader.text, passwordReader.text, context)
@@ -462,7 +478,26 @@ class _AuthScreenOption2 extends State<AuthScreenOption2>
                       });
                     });
                   }).onError((error, stackTrace) {
-                    returnResponse(Status.FAIL, context);
+                    var errorMessage = 'Authentication failed';
+                    if (error.toString().contains('EMAIL_EXISTS')) {
+                      errorMessage = 'This email address is already in use.';
+                    } else if (error.toString().contains('INVALID_EMAIL')) {
+                      errorMessage = 'This is not a valid email address';
+                    } else if (error.toString().contains('WEAK_PASSWORD')) {
+                      errorMessage = 'This password is too weak.';
+                    } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
+                      errorMessage = 'Could not find a user with that email.';
+                    } else if (error.toString().contains('INVALID_PASSWORD')) {
+                      errorMessage = 'Invalid password.';
+                    }
+                    _showErrorDialog(errorMessage).then((value) {
+                      if (value) {
+                        Provider.of<SignInProvider>(context, listen: false)
+                            .changeAuthScreen();
+                        Provider.of<SignUpProvider>(context, listen: false)
+                            .changeSigningUp();
+                      }
+                    });
                   });
                 },
                 style: ElevatedButton.styleFrom(
