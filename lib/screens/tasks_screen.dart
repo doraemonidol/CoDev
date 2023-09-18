@@ -245,6 +245,7 @@ class _PageState extends State<Page> {
     }
 
     return Scaffold(
+      backgroundColor: FigmaColors.sUNRISESunray,
       body: SingleChildScrollView(
         child: ListView.builder(
           physics: NeverScrollableScrollPhysics(),
