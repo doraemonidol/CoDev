@@ -197,7 +197,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => RewardScreen(),
+                            builder: (context) => RewardScreen(
+                              point: user.point,
+                            ),
                           ),
                         );
                       },
@@ -360,9 +362,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     .copyWith(color: const Color(0xFF2F394B)))),
         Center(
           child: TextButton(
-            child: Text('Log Out',
-                style: FigmaTextStyles.mP
-                    .copyWith(color: FigmaColors.sUNRISEBluePrimary)),
+            child: Text(
+              'Log Out',
+              style: FigmaTextStyles.mP.copyWith(
+                color: FigmaColors.sUNRISEErrorRed,
+              ),
+            ),
             onPressed: () {
               print('Log Out');
               Provider.of<Auth>(context, listen: false).logout();

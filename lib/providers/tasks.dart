@@ -87,6 +87,8 @@ class Task {
       state: json['state'],
     );
   }
+
+  // to json
 }
 
 // task from a json string

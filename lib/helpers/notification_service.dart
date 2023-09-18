@@ -142,7 +142,7 @@ Future<void> zonedScheduleNotification(
       title,
       body,
       tz.TZDateTime.from(scheduledDate, tz.local),
-      payload: payload.toString(),
+      payload: jsonEncode(payload.toJson()),
       const NotificationDetails(
           android: AndroidNotificationDetails(
               'your channel id', 'your channel name',

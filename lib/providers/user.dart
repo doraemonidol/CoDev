@@ -34,6 +34,7 @@ class User with ChangeNotifier {
         'phoneNumber': phone,
         'location': location,
         'educationLevel': educationLevel,
+        'point': point,
       };
 
   static User fromJson(Map<String, dynamic> json) => User(
@@ -43,6 +44,7 @@ class User with ChangeNotifier {
         phone: json['phoneNumber'],
         location: json['location'],
         educationLevel: json['educationLevel'].toString(),
+        point: json['point'],
       );
 
   // add this user data to firebase, in collection users, in document with ID equal to input ID

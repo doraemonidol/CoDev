@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:codev/helpers/notification_service.dart';
 import 'package:codev/helpers/style.dart';
 import 'package:codev/main.dart';
@@ -9,6 +10,7 @@ import 'package:circle_progress_bar/circle_progress_bar.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
+import '../providers/user.dart';
 
 class EndQuiz extends StatefulWidget {
   static const routeName = '/end-quiz';
@@ -34,6 +36,14 @@ class _EndQuiz extends State<EndQuiz> with SingleTickerProviderStateMixin {
       task,
       TaskState.completed.index,
     );
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .snapshots()
+        .listen((event) {
+      final user = User.fromJson(event.data()!);
+      user.updateUser(userId);
+    });
     return await fetchLearningProgressToToggleCourseDone(
         userId, task.field, task.course);
   }

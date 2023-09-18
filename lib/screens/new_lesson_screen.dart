@@ -161,6 +161,7 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
                                         DateTime.now()
                                             .add(Duration(minutes: 15)));
 // for each task in value, add a notification
+                                    // int notiIndex = 1;
                                     value!.forEach((tasks) {
                                       tasks.tasks.forEach((task) {
                                         notiList.add(NotificationDetail(
@@ -175,6 +176,7 @@ class _NewLessonScreenState extends State<NewLessonScreen> {
                                           payload: task,
                                           scheduledDate: task.startTime
                                               .subtract(Duration(minutes: 15)),
+                                          // DateTime.now().add(Duration(seconds: 20 * notiIndex++)),
                                         );
                                       });
                                     });
